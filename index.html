@@ -11,14 +11,14 @@
     <link rel="icon" href="https://avatars.githubusercontent.com/u/63386366?v=4">
     <script src="https://cdn.staticfile.org/instant.page/5.1.0/instantpage.min.js" type="module"></script>
     <script src="https://cdn.staticfile.org/font-awesome/6.2.0/js/all.min.js"></script>
-    
-        <link rel="stylesheet" href="/css/fonts.min.css">
-        <link rel="stylesheet" href="/css/particlex.css">
-    
     <script src="https://cdn.staticfile.org/vue/3.2.33/vue.global.prod.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+
+    <link rel="stylesheet" href="/css/particlex.css">
+    <link rel="stylesheet" href="/css/card.css">
 <meta name="generator" content="Hexo 6.3.0"></head>
 <body>
+
 <div id="loading"
      style="height:100vh;width:100vw;position:fixed;display:flex;z-index:200;justify-content:space-between;background:#fff;transition:opacity 0.3s ease-out">
     <div style="position:fixed;height:100vh;width:100vw;display:flex;justify-content:center;align-items:center">
@@ -31,6 +31,7 @@
         </div>
     </div>
 </div>
+
 <div id="layout">
     <i data-fa-symbol="calendar-solid" class="fa-solid fa-calendar fa-fw"></i>
     <i data-fa-symbol="bookmark-solid" class="fa-solid fa-bookmark fa-fw"></i>
@@ -100,7 +101,9 @@
             <span class="info">
             <div class="wrap">
                 <h1>TroTro</h1>
-                <h1 id="typed3"></h1>
+                <div style="text-align:center;font-size:2rem;">
+                    <strong id="typed3"></strong>
+                </div>
             </div>
             </span>
         </div>
@@ -114,8 +117,8 @@
             
 
 <div class="post">
-    <a href="/2022/10/04/全体目光向我看齐/">
-        <h2 class="post-title">全体目光向我看齐</h2>
+    <a href="/2022/10/06/TEST/">
+        <h2 class="post-title">TEST</h2>
     </a>
     <div class="category-and-date">
         
@@ -123,21 +126,34 @@
             <span class="icon">
                 <svg class="fa-icon"><use xlink:href="#calendar-solid"></use></svg>
             </span>
-            2022/10/4
+            2022/10/6
         </span>
     </div>
     <div class="excerpt">
         <div class="content" v-pre>
             
-            <p>我在沈阳大街等你</p>
+            <blockquote>
+<p>我是测试我是测试我是测试<hr><br>真的是测试哦</p>
+</blockquote>
             
         </div>
     </div>
     <div class="post-tags">
         
+        <span class="icon">
+            <svg class="fa-icon"><use xlink:href="#tags-solid"></use></svg>
+        </span>
+        
+        
+        <span class="tag">
+            
+            <a href="/tags/TEST/" style="color: #00bcd4">
+                TEST
+            </a>
+        </span>
         
     </div>
-    <a href="/2022/10/04/全体目光向我看齐/" class="go-post">阅读全文</a>
+    <a href="/2022/10/06/TEST/" class="go-post">阅读全文</a>
 </div>
 
              
@@ -158,39 +174,45 @@
 </div>
         </div>
     </div>
-    
-        <div id="home-card">
-            <div id="card-div">
+
+    <div id="home-card">
+        <div style="position: relative; top: 0px">
     <div class="card-style" style="width: 300px">
         <div class="avatar">
-            <img src="https://avatars.githubusercontent.com/u/63386366?v=4 " alt="avatar">
+            <img src="https://avatars.githubusercontent.com/u/63386366?v=4" alt="avatar">
         </div>
         <div class="name">
-            TroTro
-        </div>
-        <div class="descriptions">
-            
-            <div class="description">
-                hi
-            </div>
-            
-        </div>
-        <div class="icon-links">
-            
-            <span class="icon-link">
-                <a href="">
-                    <i class="fa-solid fa-TroTro fa-fw"></i>
-                </a>
-            </span>
-            
-        </div>
-        <div class="friend-links">
-            
+            <h1>TroTro</h1>
         </div>
     </div>
 </div>
-        </div>
-    
+
+<div style="position: relative; top: 80px;">
+    <div class="card-style" style="width: 300px">
+        <h1>相恋</h1>
+        <div id="loveTime"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    setInterval(() => {
+        var date1= '2022/06/25 00:00:00';
+        var date2 = new Date();
+        var date3 = date2.getTime() - new Date(date1).getTime();
+        var days=Math.floor(date3/(24*3600*1000))
+        var leave1=date3%(24*3600*1000)
+        var hours=Math.floor(leave1/(3600*1000))
+        var leave2=leave1%(3600*1000)
+        var minutes=Math.floor(leave2/(60*1000))
+        var leave3=leave2%(60*1000)
+        var seconds=Math.round(leave3/1000)
+
+        document.getElementById("loveTime").innerHTML =
+            "<h3>" + days + "天" + hours + "时" + minutes + "分" + seconds + "秒" + "</h3>"
+    }, 1000)
+</script>
+
+    </div>
 </div>
 
                 
@@ -214,6 +236,10 @@
         <img id="img_content" alt="img_show">
     </div>
 </div>
+<canvas
+        id="background"
+        style="position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:-1"
+></canvas>
 </body>
 <script src="https://cdn.staticfile.org/highlight.js/11.5.1/highlight.min.js"></script>
 <script src="/js/particlex.js"></script>
@@ -228,13 +254,14 @@
 <script src="/js/firework.js"></script>
 
 
+<script src="/js/background.js"></script>
 
 
 <script data-pjax type="text/javascript">
     try {
         var typed3 = new Typed("#typed3", {
-            strings: ["到达世界最高城","理塘！"],//字符串
-            startDelay: 0,//开始的延迟
+            strings: ["众里寻他千百度","蓦然回首", "那人却在", "灯火阑珊处"],
+            startDelay: 10,//开始的延迟
             typeSpeed: 200,//打字速度
             backSpeed: 100,//回退速度
             loop: true,//是否循环
@@ -245,5 +272,8 @@
     } catch (err) {
     }
 </script>
+
+
+
 
 </html>

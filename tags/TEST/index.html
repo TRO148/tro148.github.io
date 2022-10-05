@@ -4,21 +4,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0">
-    <title>全体目光向我看齐 | TroTro</title>
+    <title>Tags: TEST | TroTro</title>
     <meta name="author" content="TroTro">
     <meta name="description" content="">
     <meta name="keywords" content="">
     <link rel="icon" href="https://avatars.githubusercontent.com/u/63386366?v=4">
     <script src="https://cdn.staticfile.org/instant.page/5.1.0/instantpage.min.js" type="module"></script>
     <script src="https://cdn.staticfile.org/font-awesome/6.2.0/js/all.min.js"></script>
-    
-        <link rel="stylesheet" href="/css/fonts.min.css">
-        <link rel="stylesheet" href="/css/particlex.css">
-    
     <script src="https://cdn.staticfile.org/vue/3.2.33/vue.global.prod.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+
+    <link rel="stylesheet" href="/css/particlex.css">
+    <link rel="stylesheet" href="/css/card.css">
 <meta name="generator" content="Hexo 6.3.0"></head>
 <body>
+
 <div id="loading"
      style="height:100vh;width:100vw;position:fixed;display:flex;z-index:200;justify-content:space-between;background:#fff;transition:opacity 0.3s ease-out">
     <div style="position:fixed;height:100vh;width:100vw;display:flex;justify-content:center;align-items:center">
@@ -31,6 +31,7 @@
         </div>
     </div>
 </div>
+
 <div id="layout">
     <i data-fa-symbol="calendar-solid" class="fa-solid fa-calendar fa-fw"></i>
     <i data-fa-symbol="bookmark-solid" class="fa-solid fa-bookmark fa-fw"></i>
@@ -89,30 +90,53 @@
 </nav>
             </div>
             <div id="main">
-                
-<div class="article">
-    <div>
-        <h1>全体目光向我看齐 </h1>
-    </div>
-    <div class="info">
-        <span class="date">
-            <span class="icon">
-                <svg class="fa-icon"><use xlink:href="#calendar-solid"></use></svg>
-            </span>
-            2022/10/4
+                 
+<div class="categories-tags">
+    
+    <div class="all-s">
+        
+        
+        <span>
+            <a href="/tags/TEST/" style="background: linear-gradient(120deg, #9abbf7 0%, #ffbbf4 100%)">
+                <span class="icon">
+                    <svg class="fa-icon"><use xlink:href="#tags-solid"></use></svg>
+                </span>
+                TEST
+            </a>
         </span>
         
+    </div>
+    <div id="archives">
+        
+        <div class="timeline">
+            <div class="timeline-tail"></div>
+            <div class="timeline-content">
+                <div class="item-time">2022/10/6</div>
+                <a href="/2022/10/06/TEST/">
+                    <h3>TEST</h3>
+                </a>
+                <div class="info">
+                    
+                    
+                    <span class="tags">
+                        <span class="icon">
+                            <svg class="fa-icon"><use xlink:href="#tags-solid"></use></svg>
+                        </span>
+                        
+                        <span class="tag">
+                            
+                            <a href="/tags/TEST/" style="color: #ffa2c4">
+                                TEST
+                            </a>
+                        </span>
+                        
+                    </span>
+                    
+                </div>
+            </div>
+        </div>
         
     </div>
-    <div class="content" v-pre>
-        <p>我在沈阳大街等你</p>
-<span id="more"></span>
-
-<p><code>到达世界最好城，42号混凝土踢出盛夏，而漏牛子把打火机咬死了</code><br>你好<br>你好</p>
-
-    </div>
-    
-    
 </div>
                 
 <footer id="footer">
@@ -135,6 +159,10 @@
         <img id="img_content" alt="img_show">
     </div>
 </div>
+<canvas
+        id="background"
+        style="position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:-1"
+></canvas>
 </body>
 <script src="https://cdn.staticfile.org/highlight.js/11.5.1/highlight.min.js"></script>
 <script src="/js/particlex.js"></script>
@@ -149,13 +177,14 @@
 <script src="/js/firework.js"></script>
 
 
+<script src="/js/background.js"></script>
 
 
 <script data-pjax type="text/javascript">
     try {
         var typed3 = new Typed("#typed3", {
-            strings: ["到达世界最高城","理塘！"],//字符串
-            startDelay: 0,//开始的延迟
+            strings: ["众里寻他千百度","蓦然回首", "那人却在", "灯火阑珊处"],
+            startDelay: 10,//开始的延迟
             typeSpeed: 200,//打字速度
             backSpeed: 100,//回退速度
             loop: true,//是否循环
@@ -166,5 +195,8 @@
     } catch (err) {
     }
 </script>
+
+
+
 
 </html>
