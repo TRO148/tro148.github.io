@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,7 +9,7 @@
     <meta name="author" content="TroTro">
     <meta name="description" content="">
     <meta name="keywords" content="">
-    <link rel="icon" href="https://avatars.githubusercontent.com/u/63386366?v=4">
+    <link rel="icon" href="https://raw.githubusercontent.com/TRO148/TroTroBlog/master/image/touxiang.jpg">
     <script src="https://cdn.staticfile.org/instant.page/5.1.0/instantpage.min.js" type="module"></script>
     <script src="https://cdn.staticfile.org/font-awesome/6.2.0/js/all.min.js"></script>
     <script src="https://cdn.staticfile.org/vue/3.2.33/vue.global.prod.min.js"></script>
@@ -16,6 +17,12 @@
 
     <link rel="stylesheet" href="/css/particlex.css">
     <link rel="stylesheet" href="/css/card.css">
+    <link rel="stylesheet" href="/css/menu.css">
+    <link rel="stylesheet" href="/css/home-post.css">
+    <link rel="stylesheet" href="/css/home-head.css">
+    <link rel="stylesheet" href="/css/archives.css">
+    <link rel="stylesheet" href="/css/article.css">
+    <link rel="stylesheet" href="/css/footer.css">
 <meta name="generator" content="Hexo 6.3.0"></head>
 <body>
 
@@ -56,6 +63,11 @@
             <span>&ensp;archives</span>
         </a>
         
+        <a href="/tags">
+            <i class="fa-solid fa-tags fa-fw"></i>
+            <span>&ensp;tags</span>
+        </a>
+        
     </div>
     <div :class="'phone-menu ' + menu_show" id="phone-menu">
         <div class="curtain" @click="menu_show = !menu_show" v-show="menu_show"></div>
@@ -81,6 +93,15 @@
                         <i class="fa-solid fa-box-archive fa-fw"></i>
                     </div>
                     <div style="min-width: 100px; max-width: 150%; width: 20%">archives</div>
+                </div>
+            </a>
+            
+            <a href="/tags">
+                <div class="item">
+                    <div style="min-width: 20px; max-width: 50px; width: 10%">
+                        <i class="fa-solid fa-tags fa-fw"></i>
+                    </div>
+                    <div style="min-width: 100px; max-width: 150%; width: 20%">tags</div>
                 </div>
             </a>
             
@@ -111,7 +132,7 @@
             
             <span class="tag">
                 
-                <a href="/tags/TEST/" style="color: #03a9f4">
+                <a href="/tags/TEST/" style="color: #ff7d73">
                     TEST
                 </a>
             </span>
@@ -127,19 +148,30 @@
 <h1 id="T"><a href="#T" class="headerlink" title="T"></a>T</h1><h2 id="T-1"><a href="#T-1" class="headerlink" title="T"></a>T</h2><p><code>TEST</code><br>你好</p>
 
     </div>
-    
-    
 </div>
+
                 
 <footer id="footer">
     <div class="footer-wrap">
         <div>
-            © 20xx - 2022 TroTro
+            © 2022 - 2022 TroTro
             <span class="footer-icon">
                 <i class="fa-solid fa-font-awesome fa-fw"></i>
             </span>
             @TroTro
         </div>
+        <div></div>
+        <div>Based on the <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo Engine</a> & <a
+                    target="_blank" rel="noopener" href="https://github.com/argvchs/hexo-theme-particlex">ParticleX Theme</a></div>
+        
+            <div>
+                备案号：
+                
+                    <a target="_blank" rel="noopener" href="https://beian.miit.gov.cn/#/Integrated/index">
+                        鲁ICP备2022032158号-1
+                    </a>
+                
+            </div>
         
     </div>
 </footer>
@@ -151,10 +183,7 @@
         <img id="img_content" alt="img_show">
     </div>
 </div>
-<canvas
-        id="background"
-        style="position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:-1"
-></canvas>
+<div id="home-background" style="background-image: url(https://raw.githubusercontent.com/TRO148/TroTroBlog/master/image/bg.png); "></div>
 </body>
 <script src="https://cdn.staticfile.org/highlight.js/11.5.1/highlight.min.js"></script>
 <script src="/js/particlex.js"></script>
@@ -169,13 +198,40 @@
 <script src="/js/firework.js"></script>
 
 
-<script src="/js/background.js"></script>
-
-
 <script data-pjax type="text/javascript">
     try {
         var typed3 = new Typed("#typed3", {
-            strings: ["众里寻他千百度","蓦然回首", "那人却在", "灯火阑珊处"],
+            strings: [
+                "盛夏日落迟",
+                "灯火未夜匆匆明",
+                "历夏十七遭",
+                "终于与君逢",
+                "葵花芃芃",
+                "书中何词叙",
+                "可爱",
+                "言语如苏打般",
+                "涌现雷鸣隆隆",
+                "终须言语使相知",
+                "晚虹灿灿",
+                "心有衷情盼君聆",
+                "热浪缕缕",
+                "飞来为君掌心掬",
+                "对晚夏中的你",
+                "我愿纵情呐喊",
+                "可怜山樱芽",
+                "我心悦之",
+                "可爱山樱牙",
+                "我心悦之",
+                "可爱山樱语",
+                "我心悦之",
+                "可爱山樱焰",
+                "亦心悦之",
+                "可爱山樱靥",
+                "我心悦之",
+                "山樱啊微笑",
+                "我心悦之",
+                "我喜欢你"
+            ],
             startDelay: 10,//开始的延迟
             typeSpeed: 200,//打字速度
             backSpeed: 100,//回退速度

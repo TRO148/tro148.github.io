@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,7 +9,7 @@
     <meta name="author" content="TroTro">
     <meta name="description" content="">
     <meta name="keywords" content="">
-    <link rel="icon" href="https://avatars.githubusercontent.com/u/63386366?v=4">
+    <link rel="icon" href="https://raw.githubusercontent.com/TRO148/TroTroBlog/master/image/touxiang.jpg">
     <script src="https://cdn.staticfile.org/instant.page/5.1.0/instantpage.min.js" type="module"></script>
     <script src="https://cdn.staticfile.org/font-awesome/6.2.0/js/all.min.js"></script>
     <script src="https://cdn.staticfile.org/vue/3.2.33/vue.global.prod.min.js"></script>
@@ -16,6 +17,12 @@
 
     <link rel="stylesheet" href="/css/particlex.css">
     <link rel="stylesheet" href="/css/card.css">
+    <link rel="stylesheet" href="/css/menu.css">
+    <link rel="stylesheet" href="/css/home-post.css">
+    <link rel="stylesheet" href="/css/home-head.css">
+    <link rel="stylesheet" href="/css/archives.css">
+    <link rel="stylesheet" href="/css/article.css">
+    <link rel="stylesheet" href="/css/footer.css">
 <meta name="generator" content="Hexo 6.3.0"></head>
 <body>
 
@@ -56,6 +63,11 @@
             <span>&ensp;archives</span>
         </a>
         
+        <a href="/tags">
+            <i class="fa-solid fa-tags fa-fw"></i>
+            <span>&ensp;tags</span>
+        </a>
+        
     </div>
     <div :class="'phone-menu ' + menu_show" id="phone-menu">
         <div class="curtain" @click="menu_show = !menu_show" v-show="menu_show"></div>
@@ -84,6 +96,15 @@
                 </div>
             </a>
             
+            <a href="/tags">
+                <div class="item">
+                    <div style="min-width: 20px; max-width: 50px; width: 10%">
+                        <i class="fa-solid fa-tags fa-fw"></i>
+                    </div>
+                    <div style="min-width: 100px; max-width: 150%; width: 20%">tags</div>
+                </div>
+            </a>
+            
         </div>
         </transition>
     </div>
@@ -91,9 +112,7 @@
             </div>
             <div id="main">
                 <div id="home-head">
-    <div id="home-background" style="background-image: url(https://imgapi.xl0408.top/index.php)"></div>
-    
-        <div id="home-info" class="home-info" @click="home_click">
+        <div id="home-info" class="home-info">
             <span class="loop"></span>
             <span class="loop"></span>
             <span class="loop"></span>
@@ -107,14 +126,153 @@
             </div>
             </span>
         </div>
-    
 </div>
 
-
-<div id="home-posts-wrap" class="">
+<div id="home-posts-wrap">
     <div id="home-posts">
         <div id="posts">
             
+
+<div class="post">
+    <a href="/2022/10/08/学习python的基础语法/">
+        <h2 class="post-title">学习Python的基础语法</h2>
+    </a>
+    <div class="category-and-date">
+        
+        <span class="date">
+            <span class="icon">
+                <svg class="fa-icon"><use xlink:href="#calendar-solid"></use></svg>
+            </span>
+            2022/10/8
+        </span>
+    </div>
+    <div class="excerpt">
+        <div class="content" v-pre>
+            
+            <blockquote>
+<p>因之前学习过部分语言，所以就光说些不同的大方面啦</p>
+</blockquote>
+            
+        </div>
+    </div>
+    <div class="post-tags">
+        
+        <span class="icon">
+            <svg class="fa-icon"><use xlink:href="#tags-solid"></use></svg>
+        </span>
+        
+        
+        <span class="tag">
+            
+            <a href="/tags/python-语言/" style="color: #00a596">
+                python 语言
+            </a>
+        </span>
+        
+    </div>
+    <a href="/2022/10/08/学习python的基础语法/" class="go-post">阅读全文</a>
+</div>
+
+<div class="post">
+    <a href="/2022/10/07/快速稀疏矩阵转置/">
+        <h2 class="post-title">快速稀疏矩阵转置</h2>
+    </a>
+    <div class="category-and-date">
+        
+        <span class="date">
+            <span class="icon">
+                <svg class="fa-icon"><use xlink:href="#calendar-solid"></use></svg>
+            </span>
+            2022/10/7
+        </span>
+    </div>
+    <div class="excerpt">
+        <div class="content" v-pre>
+            
+            <blockquote>
+<p>快速稀疏矩阵大致通过一张数据表，<br>统计每行非零元首个位置，<br>根据原数据放置到新表中</p>
+</blockquote>
+            
+        </div>
+    </div>
+    <div class="post-tags">
+        
+        <span class="icon">
+            <svg class="fa-icon"><use xlink:href="#tags-solid"></use></svg>
+        </span>
+        
+        
+        <span class="tag">
+            
+            <a href="/tags/数据结构/" style="color: #03a9f4">
+                数据结构
+            </a>
+        </span>
+        
+        <span class="tag">
+            
+            <a href="/tags/算法/" style="color: #ff7d73">
+                算法
+            </a>
+        </span>
+        
+    </div>
+    <a href="/2022/10/07/快速稀疏矩阵转置/" class="go-post">阅读全文</a>
+</div>
+
+<div class="post">
+    <a href="/2022/10/06/研究二叉树与相关操作/">
+        <h2 class="post-title">研究二叉树树与相关操作</h2>
+    </a>
+    <div class="category-and-date">
+        
+        <span class="date">
+            <span class="icon">
+                <svg class="fa-icon"><use xlink:href="#calendar-solid"></use></svg>
+            </span>
+            2022/10/6
+        </span>
+    </div>
+    <div class="excerpt">
+        <div class="content" v-pre>
+            
+            <blockquote>
+<p>尝试解读与写出二叉树的相关操作</p>
+</blockquote>
+            
+        </div>
+    </div>
+    <div class="post-tags">
+        
+        <span class="icon">
+            <svg class="fa-icon"><use xlink:href="#tags-solid"></use></svg>
+        </span>
+        
+        
+        <span class="tag">
+            
+            <a href="/tags/数据结构/" style="color: #00a596">
+                数据结构
+            </a>
+        </span>
+        
+        <span class="tag">
+            
+            <a href="/tags/树/" style="color: #00bcd4">
+                树
+            </a>
+        </span>
+        
+        <span class="tag">
+            
+            <a href="/tags/二叉树/" style="color: #ff7d73">
+                二叉树
+            </a>
+        </span>
+        
+    </div>
+    <a href="/2022/10/06/研究二叉树与相关操作/" class="go-post">阅读全文</a>
+</div>
 
 <div class="post">
     <a href="/2022/10/06/TEST/">
@@ -179,38 +337,86 @@
         <div style="position: relative; top: 0px">
     <div class="card-style" style="width: 300px">
         <div class="avatar">
-            <img src="https://avatars.githubusercontent.com/u/63386366?v=4" alt="avatar">
+            <img src="https://raw.githubusercontent.com/TRO148/TroTroBlog/master/image/touxiang.jpg" alt="avatar">
         </div>
         <div class="name">
             <h1>TroTro</h1>
+            <span style="display: inline-block">
+                当前学习于
+                <h3 style="display: inline-block; color: #9dd1ff">Python</h3>
+            </span>
         </div>
     </div>
 </div>
 
 <div style="position: relative; top: 80px;">
-    <div class="card-style" style="width: 300px">
-        <h1>相恋</h1>
+    <div class="card-style" style="width: 300px;
+        background-image: -moz-linear-gradient(180deg, rgb(251, 121, 169), rgb(247, 105, 159));
+        background-image: -webkit-linear-gradient(180deg, rgb(251, 121, 169), rgb(247, 105, 159));
+        background-image: linear-gradient(180deg, rgb(251, 121, 169), rgb(247, 105, 159));">
+        <div style="position: relative; left: 45px; display: block; height: 80px;">
+            <div class="lover">
+                <img src="https://raw.githubusercontent.com/TRO148/TroTroBlog/master/image/loverLeft.jpg" alt="avatar">
+            </div>
+            <div class="lover-love">
+                <img src="https://raw.githubusercontent.com/TRO148/TroTroBlog/master/image/love.png" alt="avatar">
+            </div>
+            <div class="lover">
+                <img src="https://raw.githubusercontent.com/TRO148/TroTroBlog/master/image/loverRight.jpg" alt="avatar">
+            </div>
+        </div>
         <div id="loveTime"></div>
     </div>
 </div>
 
 <script type="text/javascript">
     setInterval(() => {
-        var date1= '2022/06/25 00:00:00';
+        var date1 = '2022/06/25 00:00:00';
         var date2 = new Date();
         var date3 = date2.getTime() - new Date(date1).getTime();
-        var days=Math.floor(date3/(24*3600*1000))
-        var leave1=date3%(24*3600*1000)
-        var hours=Math.floor(leave1/(3600*1000))
-        var leave2=leave1%(3600*1000)
-        var minutes=Math.floor(leave2/(60*1000))
-        var leave3=leave2%(60*1000)
-        var seconds=Math.round(leave3/1000)
+        var days = Math.floor(date3 / (24 * 3600 * 1000))
+        var leave1 = date3 % (24 * 3600 * 1000)
+        var hours = Math.floor(leave1 / (3600 * 1000))
+        var leave2 = leave1 % (3600 * 1000)
+        var minutes = Math.floor(leave2 / (60 * 1000))
+        var leave3 = leave2 % (60 * 1000)
+        var seconds = Math.round(leave3 / 1000)
 
         document.getElementById("loveTime").innerHTML =
-            "<h3>" + days + "天" + hours + "时" + minutes + "分" + seconds + "秒" + "</h3>"
+            "<h3 style=\"color: white\" " + ">" + days + "天" + hours + "时" + minutes + "分" + seconds + "秒" + "</h3>"
     }, 1000)
 </script>
+
+<div style="position: relative; top: 160px">
+    <div class="card-style" style="width: 300px; padding-top: 10px; background: rgba(240,202,252,0.73);">
+        <div style="background: rgba(255,255,255,0.8); width: 280px; margin: auto; border-radius: 10px; padding-left: 10px; padding-right: 10px">
+            <h1>知乎热搜</h1>
+            <div id="zhiHuHot"></div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    fetch("https://tenapi.cn/zhihuresou/").then(data => {
+        return data.json()
+    }).then(res => {
+        for (let i = 0; i < res.list.length; i++) {
+            let div = document.getElementById("zhiHuHot")
+            let elem = document.createElement("div")
+            let text = res.list[i].name
+
+            elem.innerHTML =
+                "<a style='font-size: large; color: rgba(0,0,0,0.45)' " +
+                "title=" + res.list[i].query +
+                " href=" + res.list[i].url + ">"
+                + text +
+                "</a>"
+            div.appendChild(elem)
+            div.appendChild(document.createElement("br"))
+        }
+    })
+</script>
+
 
     </div>
 </div>
@@ -219,12 +425,24 @@
 <footer id="footer">
     <div class="footer-wrap">
         <div>
-            © 20xx - 2022 TroTro
+            © 2022 - 2022 TroTro
             <span class="footer-icon">
                 <i class="fa-solid fa-font-awesome fa-fw"></i>
             </span>
             @TroTro
         </div>
+        <div></div>
+        <div>Based on the <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo Engine</a> & <a
+                    target="_blank" rel="noopener" href="https://github.com/argvchs/hexo-theme-particlex">ParticleX Theme</a></div>
+        
+            <div>
+                备案号：
+                
+                    <a target="_blank" rel="noopener" href="https://beian.miit.gov.cn/#/Integrated/index">
+                        鲁ICP备2022032158号-1
+                    </a>
+                
+            </div>
         
     </div>
 </footer>
@@ -236,10 +454,7 @@
         <img id="img_content" alt="img_show">
     </div>
 </div>
-<canvas
-        id="background"
-        style="position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:-1"
-></canvas>
+<div id="home-background" style="background-image: url(https://raw.githubusercontent.com/TRO148/TroTroBlog/master/image/bg.png); "></div>
 </body>
 <script src="https://cdn.staticfile.org/highlight.js/11.5.1/highlight.min.js"></script>
 <script src="/js/particlex.js"></script>
@@ -254,13 +469,40 @@
 <script src="/js/firework.js"></script>
 
 
-<script src="/js/background.js"></script>
-
-
 <script data-pjax type="text/javascript">
     try {
         var typed3 = new Typed("#typed3", {
-            strings: ["众里寻他千百度","蓦然回首", "那人却在", "灯火阑珊处"],
+            strings: [
+                "盛夏日落迟",
+                "灯火未夜匆匆明",
+                "历夏十七遭",
+                "终于与君逢",
+                "葵花芃芃",
+                "书中何词叙",
+                "可爱",
+                "言语如苏打般",
+                "涌现雷鸣隆隆",
+                "终须言语使相知",
+                "晚虹灿灿",
+                "心有衷情盼君聆",
+                "热浪缕缕",
+                "飞来为君掌心掬",
+                "对晚夏中的你",
+                "我愿纵情呐喊",
+                "可怜山樱芽",
+                "我心悦之",
+                "可爱山樱牙",
+                "我心悦之",
+                "可爱山樱语",
+                "我心悦之",
+                "可爱山樱焰",
+                "亦心悦之",
+                "可爱山樱靥",
+                "我心悦之",
+                "山樱啊微笑",
+                "我心悦之",
+                "我喜欢你"
+            ],
             startDelay: 10,//开始的延迟
             typeSpeed: 200,//打字速度
             backSpeed: 100,//回退速度

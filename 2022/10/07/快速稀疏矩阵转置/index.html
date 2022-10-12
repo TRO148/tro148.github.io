@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0">
-    <title>Archives | TroTro</title>
+    <title>快速稀疏矩阵转置 | TroTro</title>
     <meta name="author" content="TroTro">
     <meta name="description" content="">
     <meta name="keywords" content="">
@@ -112,142 +112,102 @@
             </div>
             <div id="main">
                 
-<div id="archives">
-    
-    <div class="timeline">
-        <div class="timeline-tail"></div>
-        <div class="timeline-content">
-            <div class="item-time">2022/10/8</div>
-            <a href="/2022/10/08/学习python的基础语法/">
-                <h3>学习python的基础语法</h3>
-            </a>
-            <div class="info">
-                
-                
-                <span class="tags">
-                    <span class="icon">
-                        <svg class="fa-icon"><use xlink:href="#tags-solid"></use></svg>
-                    </span>
-                    
-                    <span class="tag">
-                        
-                        <a href="/tags/python-语言/" style="color: #ff7d73">
-                            python 语言
-                        </a>
-                    </span>
-                    
-                </span>
-                
-            </div>
-        </div>
+<div class="article">
+    <div>
+        <h1>快速稀疏矩阵转置 </h1>
     </div>
-    
-    <div class="timeline">
-        <div class="timeline-tail"></div>
-        <div class="timeline-content">
-            <div class="item-time">2022/10/7</div>
-            <a href="/2022/10/07/快速稀疏矩阵转置/">
-                <h3>快速稀疏矩阵转置</h3>
-            </a>
-            <div class="info">
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <svg class="fa-icon"><use xlink:href="#calendar-solid"></use></svg>
+            </span>
+            2022/10/7
+        </span>
+        
+        
+        <span class="tags">
+            <span class="icon">
+                <svg class="fa-icon"><use xlink:href="#tags-solid"></use></svg>
+            </span>
+            
+            <span class="tag">
                 
+                <a href="/tags/数据结构/" style="color: #00bcd4">
+                    数据结构
+                </a>
+            </span>
+            
+            <span class="tag">
                 
-                <span class="tags">
-                    <span class="icon">
-                        <svg class="fa-icon"><use xlink:href="#tags-solid"></use></svg>
-                    </span>
-                    
-                    <span class="tag">
-                        
-                        <a href="/tags/数据结构/" style="color: #ff7d73">
-                            数据结构
-                        </a>
-                    </span>
-                    
-                    <span class="tag">
-                        
-                        <a href="/tags/算法/" style="color: #ffa2c4">
-                            算法
-                        </a>
-                    </span>
-                    
-                </span>
-                
-            </div>
-        </div>
+                <a href="/tags/算法/" style="color: #ffa2c4">
+                    算法
+                </a>
+            </span>
+            
+        </span>
+        
     </div>
+    <div class="content" v-pre>
+        <blockquote>
+<p>快速稀疏矩阵大致通过一张数据表，<br>统计每行非零元首个位置，<br>根据原数据放置到新表中</p>
+</blockquote>
+<span id="more"></span>
+<p>首先，定义矩阵表数据结构为：</p>
+<pre><code class="C">#define M 100
+//表中节点
+struct node&#123;
+int i,j,v;//行列值
+&#125;;
+//表结构
+struct tripletable
+&#123;
+struct node S[M];
+int m,n,t;//行数列数值数
+&#125;;
+</code></pre>
+<p>快速稀疏矩阵转置方法为：</p>
+<pre><code class="C">    //首先创建新表格，记录相应数值
+    struct tripletable *t2=(struct tripletable *)malloc(sizeof(struct tripletable));
+    t2-&gt;m = t1-&gt;n;
+    t2-&gt;n = t1-&gt;m;
+    t2-&gt;t = t1-&gt;t;
+    //num用来记录每行多少个非零元，post用来记录首个非零元应存放的位置
+    int num[M];
+    int pos[t1-&gt;t];
+    if ( t1-&gt;t ) &#123;
     
-    <div class="timeline">
-        <div class="timeline-tail"></div>
-        <div class="timeline-content">
-            <div class="item-time">2022/10/6</div>
-            <a href="/2022/10/06/研究二叉树与相关操作/">
-                <h3>研究二叉树树与相关操作</h3>
-            </a>
-            <div class="info">
-                
-                
-                <span class="tags">
-                    <span class="icon">
-                        <svg class="fa-icon"><use xlink:href="#tags-solid"></use></svg>
-                    </span>
-                    
-                    <span class="tag">
-                        
-                        <a href="/tags/数据结构/" style="color: #ffa2c4">
-                            数据结构
-                        </a>
-                    </span>
-                    
-                    <span class="tag">
-                        
-                        <a href="/tags/树/" style="color: #00a596">
-                            树
-                        </a>
-                    </span>
-                    
-                    <span class="tag">
-                        
-                        <a href="/tags/二叉树/" style="color: #ff7d73">
-                            二叉树
-                        </a>
-                    </span>
-                    
-                </span>
-                
-            </div>
-        </div>
+        //每行多少个非零元
+        for ( int col = 0; col &lt; t1-&gt;n; col++ ) &#123;
+            num[col] = 0;
+        &#125;
+        for ( int i = 0; i &lt; t1-&gt;t; i++ ) &#123;
+            num[t1-&gt;S[i].j] ++;
+        &#125;
+        
+        //每行从哪里开始多少个非零元
+        pos[0] = 0;
+        for ( int col = 1; col &lt; t1-&gt;n; col++ ) &#123;
+            pos[col] = pos[col - 1] + num[col - 1];
+        &#125;
+        
+        //根据原位置推出现位置
+        for ( int p = 0; p &lt; t1-&gt;t; p++ ) &#123;
+            int col = t1-&gt;S[p].j;
+            int q = pos[col];
+            
+            //进行转换
+            t2-&gt;S[q].i = t1-&gt;S[p].j;
+            t2-&gt;S[q].j = t1-&gt;S[p].i;
+            t2-&gt;S[q].v = t1-&gt;S[p].v;
+            pos[col]++;
+        &#125;
+    &#125;
+    return t2;
+</code></pre>
+
     </div>
-    
-    <div class="timeline">
-        <div class="timeline-tail"></div>
-        <div class="timeline-content">
-            <div class="item-time">2022/10/6</div>
-            <a href="/2022/10/06/TEST/">
-                <h3>TEST</h3>
-            </a>
-            <div class="info">
-                
-                
-                <span class="tags">
-                    <span class="icon">
-                        <svg class="fa-icon"><use xlink:href="#tags-solid"></use></svg>
-                    </span>
-                    
-                    <span class="tag">
-                        
-                        <a href="/tags/TEST/" style="color: #00bcd4">
-                            TEST
-                        </a>
-                    </span>
-                    
-                </span>
-                
-            </div>
-        </div>
-    </div>
-    
 </div>
+
                 
 <footer id="footer">
     <div class="footer-wrap">
