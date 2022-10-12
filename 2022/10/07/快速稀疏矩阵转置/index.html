@@ -26,6 +26,19 @@
 <meta name="generator" content="Hexo 6.3.0"></head>
 <body>
 
+<div id="loading"
+     style="height:100vh;width:100vw;position:fixed;display:flex;z-index:200;justify-content:space-between;background:#fff;transition:opacity 0.3s ease-out">
+    <div style="position:fixed;height:100vh;width:100vw;display:flex;justify-content:center;align-items:center">
+        <div id="loadcontent"
+             style="width:50vmin;height:50vmin;padding:50px;border-radius:50%;display:flex;justify-content:center;align-items:center;border:solid 10px #a3ddfb;text-align:center">
+            <div><h2>LOADING...</h2>
+                <p style="word-break:keep-all">加载过慢请开启缓存(浏览器默认开启)</p>
+                <div><img alt="loading" src="/loading.gif"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div id="layout">
     <i data-fa-symbol="calendar-solid" class="fa-solid fa-calendar fa-fw"></i>
     <i data-fa-symbol="bookmark-solid" class="fa-solid fa-bookmark fa-fw"></i>
@@ -119,14 +132,14 @@
             
             <span class="tag">
                 
-                <a href="/tags/数据结构/" style="color: #ffa2c4">
+                <a href="/tags/数据结构/" style="color: #03a9f4">
                     数据结构
                 </a>
             </span>
             
             <span class="tag">
                 
-                <a href="/tags/算法/" style="color: #ffa2c4">
+                <a href="/tags/算法/" style="color: #ff7d73">
                     算法
                 </a>
             </span>
@@ -228,7 +241,7 @@ int m,n,t;//行数列数值数
         <img id="img_content" alt="img_show">
     </div>
 </div>
-<div id="home-background" style="background-image: url(./image/bg.png); "></div>
+<div id="home-background" style="background-image: url(https://raw.githubusercontent.com/TRO148/TroTroBlog/master/image/bg.png); "></div>
 </body>
 <script src="https://cdn.staticfile.org/highlight.js/11.5.1/highlight.min.js"></script>
 <script src="/js/particlex.js"></script>
@@ -241,6 +254,9 @@ int m,n,t;//行数列数值数
 
 
 <script src="/js/firework.js"></script>
+
+
+<script src="/js/loadImage.js"></script>
 
 
 <script data-pjax type="text/javascript">
