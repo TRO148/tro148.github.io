@@ -146,7 +146,7 @@
             
             <span class="tag">
                 
-                <a href="/tags/二叉树/" style="color: #03a9f4">
+                <a href="/tags/二叉树/" style="color: #00a596">
                     二叉树
                 </a>
             </span>
@@ -159,44 +159,131 @@
 <p>尝试解读与写出二叉树的相关操作</p>
 </blockquote>
 <span id="more"></span>
-<h2 id="1-定义二叉树的基本结构"><a href="#1-定义二叉树的基本结构" class="headerlink" title="1.定义二叉树的基本结构"></a>1.定义二叉树的基本结构</h2><pre><code class="C">#define MAX_TREE_SIZE 100
-typedef struct 
-</code></pre>
-<h2 id="2-求二叉树相关属性"><a href="#2-求二叉树相关属性" class="headerlink" title="2.求二叉树相关属性"></a>2.求二叉树相关属性</h2><ul>
-<li>求二叉树深:</li>
-</ul>
-<pre><code class="C">int GetDepthOfBiTree ( BiTree T ) &#123;
-    //如果当前节点不存在，返回0
-    if ( !T ) &#123;
-        return 0;
+<h2 id="1-定义二叉树的基本结构"><a href="#1-定义二叉树的基本结构" class="headerlink" title="1.定义二叉树的基本结构"></a>1.定义二叉树的基本结构</h2><pre><code class="C">typedef struct BiTNode&#123;
+    ElemType data;
+    struct BiTNode* lchild;
+    struct BiTNode* rchild;
+&#125;BiTNode, *BiTree;
+
+Status CreateBiTree(BiTree &amp; T) &#123;
+    ElemType i;
+    cin &gt;&gt; i;
+    //判断为空子树
+    if ( i == 0 ) &#123;
+        //一定要记住，输入0后一定赋值为NULL，否则后面无法判断什么时候为空子树
+        T = NULL;
+        return ERROR;
     &#125; else &#123;
-        //左右取值比大小
-        int l = GetDepthOfBiTree(T-&gt;lchild);
-        int r = GetDepthOfBiTree(T-&gt;rchild);
-        if ( l &gt; r ) return 1 + l;
-        else return 1 + r; 
+        T = new BiTNode;
+        T-&gt;data = i;
+        //先写左，再写右
+        CreateBiTree(T-&gt;lchild);
+        CreateBiTree(T-&gt;rchild);
     &#125;
 &#125;
 </code></pre>
-<p>要有<strong>整体思维</strong>，即抽象看待问题，简单理解为当前节点深度+左右一支的最大深度。</p>
+<h2 id="2-二叉树性质"><a href="#2-二叉树性质" class="headerlink" title="2.二叉树性质"></a>2.二叉树性质</h2><p>1.任意一棵树，若结点数量为n,则边的数量为n − 1。<br>2.非空二叉树上的叶子节点数等于度为2的结点数加1，即n0 &#x3D; n2 + 1<br>3.非空二叉树上第k层上至多有2的k - 1次方个结点<br>4.具有n个结点的完全二叉树的高度为log2N + 1</p>
+<h2 id="3-遍历二叉树"><a href="#3-遍历二叉树" class="headerlink" title="3.遍历二叉树"></a>3.遍历二叉树</h2><blockquote>
+<p>要有<strong>整体思维</strong>，即抽象看待问题，三种遍历方式简单理解为[访问当前节点，遍历左节点，遍历右节点]的不同顺序组合</p>
+</blockquote>
 <ul>
-<li>求二叉树叶数</li>
+<li>先序遍历:</li>
 </ul>
-<pre><code class="C">int LeafCount ( BiTree T ) &#123;
-    //如果树不存在，返回0
-    if ( !T ) &#123;
-        return 0;
-        //判断是否为叶
-    &#125; else if ( !T-&gt;lchild &amp;&amp; !T-&gt;rchild ) &#123;
-        return 1;
-    &#125; else &#123;
-        //左右叶子数量相加
-        return LeafCount(T-&gt;lchild) + LeafCount(T-&gt;rchild);
+<pre><code class="C">void PreOrder(BiTree &amp;T) &#123;
+    if ( T == NULL ) return;
+    visit(T);//先访问
+    PreOrder(T-&gt;lchild);//遍历左
+    PreOrder(T-&gt;rchild);//遍历右
+&#125;
+</code></pre>
+<p>先序遍历不递归:</p>
+<pre><code class="C">void PreOrderNonRec(BiTree &amp;T) &#123;
+    stack&lt;BiTNode *&gt; S;
+    BiTNode * p = T;
+    //p!=NULL是没走完，!S.empty是走到某个路径的头
+    while ( p != NULL || !S.empty() ) &#123;
+        if ( p ) &#123;
+            S.push(p);
+            visit(p);
+            //先访问
+            p = T-&gt;lchild;
+            //走左边
+        &#125; else &#123;
+            //走到头，走右边
+            S.pop();
+            p = T-&gt;rchild;
+        &#125;
+    &#125;
+</code></pre>
+<p><img src="/pic/PreOrder.png" alt="img"></p>
+<ul>
+<li>中序遍历:</li>
+</ul>
+<pre><code class="C">void InOrder(BiTree &amp;T) &#123;
+    if ( T == NULL ) return;
+    InOrder(T-&gt;lchild);
+    visit(T);
+    InOrder(T-&gt;rchild);
+&#125;
+</code></pre>
+<p>中序遍历不递归:</p>
+<pre><code class="C">void InOrderNonRec(BiTree &amp;T) &#123;
+    stack&lt;BiTNode *&gt; S;
+    BiTNode * p = T;
+    while ( p != NULL || !S.empty() ) &#123;
+        if ( p ) &#123;
+            S.push(p);
+            p = T-&gt;lchild;
+        &#125; else &#123;
+            p = S.top();
+            S.pop();
+            visit(p);
+            p = T-&gt;rchild;
+        &#125;
     &#125;
 &#125;
 </code></pre>
-<p>同样，只需理解为左边叶子数量+右边叶子数量即可</p>
-<p>+ </p>
+<p><img src="/pic/InOrder.png" alt="img"></p>
+<ul>
+<li>后序遍历:</li>
+</ul>
+<pre><code class="C">void PostOrder(BiTree &amp;T) &#123;
+    if ( T == NULL ) return;
+    PostOrder(T-&gt;lchild);
+    PostOrder(T-&gt;rchild);
+    visit(T);
+&#125;
+</code></pre>
+<p>后续遍历不递归: </p>
+<pre><code class="C">void PostOrderNonRec(BiTree &amp;T) &#123;
+    stack&lt;BiTNode *&gt; S;
+    BiTNode *p = T;
+    BiTNode *r = NULL;
+    while ( p != NULL || !S.empty() ) &#123;
+        if ( p ) &#123;
+            //访问左边
+            S.push(p);
+            p = p-&gt;lchild;
+        &#125; else &#123;
+            p = S.top();
+            if ( p-&gt;rchild &amp;&amp; p-&gt;rchild != r) &#123;
+                //访问右边
+                p = p-&gt;rchild;
+                S.push(p);
+                p = p-&gt;lchild;
+            &#125; else &#123;
+                //访问节点
+                p = S.top();
+                S.pop();
+                visit(p);
+                r = p;
+                p = NULL;
+            &#125;
+        &#125;
+    &#125;
+&#125;
+</code></pre>
+<p><img src="/pic/PostOrder.png" alt="img"></p>
 
     </div>
 </div>
