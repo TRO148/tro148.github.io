@@ -21,8 +21,6 @@
 
     var imgs = document.querySelectorAll('img');
 
-    console.log(imgs.length)
-    console.log(1)
     for (var i = 0; i < imgs.length; i++) {
         console.log(1)
         var url = imgs[i].dataset.src;
