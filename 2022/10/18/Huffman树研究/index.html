@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0">
-    <title>Tags: TEST | TroTro</title>
+    <title>Huffman树研究 | TroTro</title>
     <meta name="author" content="TroTro">
     <meta name="description" content="">
     <meta name="keywords" content="">
@@ -112,111 +112,94 @@
             </div>
             <div id="main">
                 
-<div class="categories-tags">
-    
-    <div class="all-s">
-        
-        
-        <span>
-            <a href="/tags/python/" style="background: #00a596">
-                <span class="icon">
-                    <svg class="fa-icon"><use xlink:href="#tags-solid"></use></svg>
-                </span>
-                python
-            </a>
+<div class="article">
+    <div>
+        <h1>Huffman树研究 </h1>
+    </div>
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <svg class="fa-icon"><use xlink:href="#calendar-solid"></use></svg>
+            </span>
+            2022/10/18
         </span>
         
         
-        <span>
-            <a href="/tags/English/" style="background: #03a9f4">
-                <span class="icon">
-                    <svg class="fa-icon"><use xlink:href="#tags-solid"></use></svg>
-                </span>
-                English
-            </a>
-        </span>
-        
-        
-        <span>
-            <a href="/tags/TEST/" style="background: linear-gradient(120deg, #9abbf7 0%, #ffbbf4 100%)">
-                <span class="icon">
-                    <svg class="fa-icon"><use xlink:href="#tags-solid"></use></svg>
-                </span>
-                TEST
-            </a>
-        </span>
-        
-        
-        <span>
-            <a href="/tags/数据结构/" style="background: #ffa2c4">
-                <span class="icon">
-                    <svg class="fa-icon"><use xlink:href="#tags-solid"></use></svg>
-                </span>
-                数据结构
-            </a>
-        </span>
-        
-        
-        <span>
-            <a href="/tags/算法/" style="background: #00bcd4">
-                <span class="icon">
-                    <svg class="fa-icon"><use xlink:href="#tags-solid"></use></svg>
-                </span>
-                算法
-            </a>
-        </span>
-        
-        
-        <span>
-            <a href="/tags/树/" style="background: #00bcd4">
-                <span class="icon">
-                    <svg class="fa-icon"><use xlink:href="#tags-solid"></use></svg>
-                </span>
-                树
-            </a>
-        </span>
-        
-        
-        <span>
-            <a href="/tags/二叉树/" style="background: #00bcd4">
-                <span class="icon">
-                    <svg class="fa-icon"><use xlink:href="#tags-solid"></use></svg>
-                </span>
-                二叉树
-            </a>
+        <span class="tags">
+            <span class="icon">
+                <svg class="fa-icon"><use xlink:href="#tags-solid"></use></svg>
+            </span>
+            
+            <span class="tag">
+                
+                <a href="/tags/数据结构/" style="color: #ffa2c4">
+                    数据结构
+                </a>
+            </span>
+            
+            <span class="tag">
+                
+                <a href="/tags/树/" style="color: #ff7d73">
+                    树
+                </a>
+            </span>
+            
         </span>
         
     </div>
-    <div id="archives">
-        
-        <div class="timeline">
-            <div class="timeline-tail"></div>
-            <div class="timeline-content">
-                <div class="item-time">2022/10/6</div>
-                <a href="/2022/10/06/TEST/">
-                    <h3>TEST</h3>
-                </a>
-                <div class="info">
-                    
-                    
-                    <span class="tags">
-                        <span class="icon">
-                            <svg class="fa-icon"><use xlink:href="#tags-solid"></use></svg>
-                        </span>
-                        
-                        <span class="tag">
-                            
-                            <a href="/tags/TEST/" style="color: #ff7d73">
-                                TEST
-                            </a>
-                        </span>
-                        
-                    </span>
-                    
-                </div>
-            </div>
-        </div>
-        
+    <div class="content" v-pre>
+        <p>记录研究Huffman树的实现</p>
+<span id="more"></span>
+<p><em>大致思路为，Huffman树使用最优二叉树方式存储</em></p>
+<h2 id="1-创建节点"><a href="#1-创建节点" class="headerlink" title="1.创建节点"></a>1.创建节点</h2><pre><code class="C">typedef struct HuffmanTNode &#123;
+    ElemType data;
+    struct HuffmanTNode *left;
+    struct HuffmanTNode *right;
+    struct HuffmanTNode *parent;
+&#125; HuffmanTNode;
+</code></pre>
+<h2 id="2-创建树"><a href="#2-创建树" class="headerlink" title="2.创建树"></a>2.创建树</h2><pre><code class="C">class Compare &#123;
+public:
+    bool operator()(HuffmanTNode *a, HuffmanTNode *b) &#123;
+        return a-&gt;data &gt; b-&gt;data;
+    &#125;
+&#125;
+
+HuffmanTNode * CreateHuffmanTNode() &#123;
+    priority_queue&lt;HuffmanTNode *, vector&lt;HuffmanTNode *&gt;, Compare&gt; nodes;
+    //先给nodes中输入数据，输入0则停止
+    while ( true ) &#123;
+        ElemType a;
+        cin &gt;&gt; a;
+        if ( a == 0 ) break;
+        HuffmanTNode* T = new HuffmanTNode;
+        T-&gt;data = a;
+        T-&gt;left = nullptr;
+        T-&gt;right = nullptr;
+        T-&gt;parent = nullptr;
+        nodes.push(T);
+    &#125;
+
+    while ( nodes.size() &gt; 1 ) &#123;
+        HuffmanTNode* a = nodes.top();
+        nodes.pop();
+        HuffmanTNode* b = nodes.top();
+        nodes.pop();
+        HuffmanTNode* cur = new HuffmanTNode;
+        cur-&gt;data = a-&gt;data + b-&gt;data;
+        cur-&gt;left = a;
+        cur-&gt;right = b;
+        a-&gt;parent = cur;
+        b-&gt;parent = cur;
+
+        nodes.push(cur);
+    &#125;
+
+    return nodes.top();
+&#125;
+</code></pre>
+<p>创建一个优先队列，使其从小到大排序，输入数值后，通过不断合并前两项，建立Huffman树</p>
+
     </div>
 </div>
 
