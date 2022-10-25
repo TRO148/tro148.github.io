@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0">
-    <title>Tags | TroTro</title>
+    <title>论坛项目开发记录1 | TroTro</title>
     <meta name="author" content="TroTro">
     <meta name="description" content="">
     <meta name="keywords" content="">
@@ -112,63 +112,67 @@
             </div>
             <div id="main">
                 
-<div class="categories-tags">
-    
-    <div class="all-s">
-        
-        
-        <span>
-            <a href="/tags/python/" style="background: #00bcd4">
-                <span class="icon">
-                    <svg class="fa-icon"><use xlink:href="#tags-solid"></use></svg>
-                </span>
-                python
-            </a>
+<div class="article">
+    <div>
+        <h1>论坛项目开发记录1 </h1>
+    </div>
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <svg class="fa-icon"><use xlink:href="#calendar-solid"></use></svg>
+            </span>
+            2022/10/25
         </span>
         
         
-        <span>
-            <a href="/tags/数据结构/" style="background: #00bcd4">
-                <span class="icon">
-                    <svg class="fa-icon"><use xlink:href="#tags-solid"></use></svg>
-                </span>
-                数据结构
-            </a>
-        </span>
-        
-        
-        <span>
-            <a href="/tags/树/" style="background: #ff7d73">
-                <span class="icon">
-                    <svg class="fa-icon"><use xlink:href="#tags-solid"></use></svg>
-                </span>
-                树
-            </a>
-        </span>
-        
-        
-        <span>
-            <a href="/tags/算法/" style="background: #03a9f4">
-                <span class="icon">
-                    <svg class="fa-icon"><use xlink:href="#tags-solid"></use></svg>
-                </span>
-                算法
-            </a>
-        </span>
-        
-        
-        <span>
-            <a href="/tags/项目开发/" style="background: #00a596">
-                <span class="icon">
-                    <svg class="fa-icon"><use xlink:href="#tags-solid"></use></svg>
-                </span>
-                项目开发
-            </a>
+        <span class="tags">
+            <span class="icon">
+                <svg class="fa-icon"><use xlink:href="#tags-solid"></use></svg>
+            </span>
+            
+            <span class="tag">
+                
+                <a href="/tags/项目开发/" style="color: #ff7d73">
+                    项目开发
+                </a>
+            </span>
+            
         </span>
         
     </div>
-    <div id="archives">
-        
+    <div class="content" v-pre>
+        <p>准备工作：<br>搭建前后端，和完成自动部署至远程服务器</p>
+<span id="more"></span>
+<h2 id="1-前端部分"><a href="#1-前端部分" class="headerlink" title="1.前端部分"></a>1.前端部分</h2><p>使用umi框架快速搭建项目，由于之前经常使用React，所以本次选择<strong>AntDesign</strong>开发。<br>可以简单分析下umi的文件树中主要文件:</p>
+<ul>
+<li>.husky用来自动部署服务器</li>
+<li>.umirc.ts用来配置<strong>路由</strong></li>
+<li>src <ul>
+<li>services存放请求函数</li>
+<li>pages存放网页</li>
+<li>components存放公用组件</li>
+<li>app.ts存放Layout全局组件<blockquote>
+<p>所出现的错误<br><br>1.cygpath: command not found” when commiting to branch<br>将Git\usr\bin\cygpath.exe放到&lt;% HOME %&gt;\AppData\Local\GitHubDesktop\app-3.1.2\resources\app\git\usr\bin即可<br>分析Git使用resource的cygpath程序时，未找到而报错</p>
+<p>2.husky - commit-msg hook exited with code 1 (error)<br>第一次commit的时候，使用git commit “fix: ····”即可解决</p>
+</blockquote>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<p>在搭建前端项目后，就可以上服务器部署啦!<br><br>大致思路为：<em>前端先生成部署文件，自己手动部署，用nginx做代理服务器</em><br><br>下列是我所配置的.conf内容</p>
+<pre><code class="text">server &#123;
+        listen 10086;
+        server_name TroForum.com;
+        root /home/ubuntu/projects/TroForum/;
+
+        index index.html index.htm index.nginx-debian.html;
+        location / &#123;
+
+        &#125;
+</code></pre>
+<p>nginx服务器监听10086端口，使用根目录文件为TroForum<br><br>这样就完成项目的前端基础搭建与部署啦</p>
+
     </div>
 </div>
 
