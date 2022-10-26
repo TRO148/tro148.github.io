@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0">
-    <title>Archives | TroTro</title>
+    <title>图的邻接表实现与操作 | TroTro</title>
     <meta name="author" content="TroTro">
     <meta name="description" content="">
     <meta name="keywords" content="">
@@ -112,233 +112,107 @@
             </div>
             <div id="main">
                 
-<div id="archives">
-    
-    <div class="timeline">
-        <div class="timeline-tail"></div>
-        <div class="timeline-content">
-            <div class="item-time">2022/10/26</div>
-            <a href="/2022/10/26/图的邻接表实现与操作/">
-                <h3>图的邻接表实现与操作</h3>
-            </a>
-            <div class="info">
-                
-                
-                <span class="tags">
-                    <span class="icon">
-                        <svg class="fa-icon"><use xlink:href="#tags-solid"></use></svg>
-                    </span>
-                    
-                    <span class="tag">
-                        
-                        <a href="/tags/数据结构/" style="color: #00bcd4">
-                            数据结构
-                        </a>
-                    </span>
-                    
-                    <span class="tag">
-                        
-                        <a href="/tags/图/" style="color: #ffa2c4">
-                            图
-                        </a>
-                    </span>
-                    
-                </span>
-                
-            </div>
-        </div>
+<div class="article">
+    <div>
+        <h1>图的邻接表实现与操作 </h1>
     </div>
-    
-    <div class="timeline">
-        <div class="timeline-tail"></div>
-        <div class="timeline-content">
-            <div class="item-time">2022/10/25</div>
-            <a href="/2022/10/25/论坛项目开发记录1/">
-                <h3>论坛项目开发记录1</h3>
-            </a>
-            <div class="info">
+    <div class="info">
+        <span class="date">
+            <span class="icon">
+                <svg class="fa-icon"><use xlink:href="#calendar-solid"></use></svg>
+            </span>
+            2022/10/26
+        </span>
+        
+        
+        <span class="tags">
+            <span class="icon">
+                <svg class="fa-icon"><use xlink:href="#tags-solid"></use></svg>
+            </span>
+            
+            <span class="tag">
                 
+                <a href="/tags/数据结构/" style="color: #00bcd4">
+                    数据结构
+                </a>
+            </span>
+            
+            <span class="tag">
                 
-                <span class="tags">
-                    <span class="icon">
-                        <svg class="fa-icon"><use xlink:href="#tags-solid"></use></svg>
-                    </span>
-                    
-                    <span class="tag">
-                        
-                        <a href="/tags/项目开发/" style="color: #ff7d73">
-                            项目开发
-                        </a>
-                    </span>
-                    
-                </span>
-                
-            </div>
-        </div>
+                <a href="/tags/图/" style="color: #ff7d73">
+                    图
+                </a>
+            </span>
+            
+        </span>
+        
     </div>
-    
-    <div class="timeline">
-        <div class="timeline-tail"></div>
-        <div class="timeline-content">
-            <div class="item-time">2022/10/18</div>
-            <a href="/2022/10/18/Huffman树研究/">
-                <h3>Huffman树研究</h3>
-            </a>
-            <div class="info">
-                
-                
-                <span class="tags">
-                    <span class="icon">
-                        <svg class="fa-icon"><use xlink:href="#tags-solid"></use></svg>
-                    </span>
-                    
-                    <span class="tag">
-                        
-                        <a href="/tags/数据结构/" style="color: #ffa2c4">
-                            数据结构
-                        </a>
-                    </span>
-                    
-                    <span class="tag">
-                        
-                        <a href="/tags/树/" style="color: #ffa2c4">
-                            树
-                        </a>
-                    </span>
-                    
-                </span>
-                
-            </div>
-        </div>
+    <div class="content" v-pre>
+        <p>图有邻接表实现，也有邻接矩阵实现，本章用邻接表实现</p>
+<span id="more"></span>
+<h2 id="1-定义类型"><a href="#1-定义类型" class="headerlink" title="1.定义类型"></a>1.定义类型</h2><p>根据不同需求定义不同结点</p>
+<pre><code class="C">typedef char TableType;//顶点类型
+typedef int EdgeType;//权值类型
+</code></pre>
+<blockquote>
+<p>首先定义表中结点类型</p>
+</blockquote>
+<pre><code class="C">//定义表中结点类型
+typedef struct TableNode &#123;
+    TableType data;//数据
+    struct TableNode *firstEdge;//第一个边点
+&#125; TableNode, Table[MAX];
+</code></pre>
+<blockquote>
+<p>其次定义边的结点类型</p>
+</blockquote>
+<pre><code class="C">//定义边的结点类型
+typedef struct EdgeNode &#123;
+    EdgeType data;
+    struct EdgeNode* next;//下面点
+    int adjvex;//下标
+&#125; EdgeNode;
+</code></pre>
+<blockquote>
+<p>最后定义图的类型</p>
+</blockquote>
+<pre><code class="C">//定义图
+typedef struct &#123;
+    Table table;
+    int numNodes, numEdges;
+&#125; GraphList;
+</code></pre>
+<p>2.创建函数</p>
+<pre><code class="C">void CreateGraph(GraphList* Gp) &#123;
+    //输入个数
+    cout &lt;&lt; &quot;numNodes: &quot;;
+    cin &gt;&gt; Gp-&gt;numNodes;
+    cout &lt;&lt; &quot;numEdges: &quot;;
+    cin &gt;&gt; Gp-&gt;numEdges;
+
+    //输入点
+    for (int i = 0; i &lt; Gp-&gt;numNodes; ++i) &#123;
+        cin &gt;&gt; Gp-&gt;table[i].data;
+        Gp-&gt;table[i].firstEdge = nullptr;
+    &#125;
+
+    //输入边关系
+    for (int i = 0; i &lt; Gp-&gt;numEdges; ++i) &#123;
+        int point1, point2;
+        cin &gt;&gt; point1 &gt;&gt; point2;
+        //从TableNode表头处
+        EdgeNode* edgeNode = new EdgeNode;
+        edgeNode-&gt;adjvex = point2;
+        edgeNode-&gt;next = Gp-&gt;table[i].firstEdge;
+        Gp-&gt;table[i].firstEdge = edgeNode;
+    &#125;
+&#125;
+</code></pre>
+<p><em>要注意的是插入到TableNode的firstEdge</em></p>
+<h2 id="x3D-x3D-正在施工-x3D-x3D"><a href="#x3D-x3D-正在施工-x3D-x3D" class="headerlink" title="&#x3D;&#x3D;正在施工&#x3D;&#x3D;"></a>&#x3D;&#x3D;正在施工&#x3D;&#x3D;</h2>
     </div>
-    
-    <div class="timeline">
-        <div class="timeline-tail"></div>
-        <div class="timeline-content">
-            <div class="item-time">2022/10/12</div>
-            <a href="/2022/10/12/学习python的笔记本2/">
-                <h3>学习python的笔记本2</h3>
-            </a>
-            <div class="info">
-                
-                
-                <span class="tags">
-                    <span class="icon">
-                        <svg class="fa-icon"><use xlink:href="#tags-solid"></use></svg>
-                    </span>
-                    
-                    <span class="tag">
-                        
-                        <a href="/tags/python/" style="color: #ff7d73">
-                            python
-                        </a>
-                    </span>
-                    
-                </span>
-                
-            </div>
-        </div>
-    </div>
-    
-    <div class="timeline">
-        <div class="timeline-tail"></div>
-        <div class="timeline-content">
-            <div class="item-time">2022/10/8</div>
-            <a href="/2022/10/08/学习python的笔记本1/">
-                <h3>学习python的笔记本1</h3>
-            </a>
-            <div class="info">
-                
-                
-                <span class="tags">
-                    <span class="icon">
-                        <svg class="fa-icon"><use xlink:href="#tags-solid"></use></svg>
-                    </span>
-                    
-                    <span class="tag">
-                        
-                        <a href="/tags/python/" style="color: #03a9f4">
-                            python
-                        </a>
-                    </span>
-                    
-                </span>
-                
-            </div>
-        </div>
-    </div>
-    
-    <div class="timeline">
-        <div class="timeline-tail"></div>
-        <div class="timeline-content">
-            <div class="item-time">2022/10/7</div>
-            <a href="/2022/10/07/快速稀疏矩阵转置/">
-                <h3>快速稀疏矩阵转置</h3>
-            </a>
-            <div class="info">
-                
-                
-                <span class="tags">
-                    <span class="icon">
-                        <svg class="fa-icon"><use xlink:href="#tags-solid"></use></svg>
-                    </span>
-                    
-                    <span class="tag">
-                        
-                        <a href="/tags/数据结构/" style="color: #00bcd4">
-                            数据结构
-                        </a>
-                    </span>
-                    
-                    <span class="tag">
-                        
-                        <a href="/tags/算法/" style="color: #ff7d73">
-                            算法
-                        </a>
-                    </span>
-                    
-                </span>
-                
-            </div>
-        </div>
-    </div>
-    
-    <div class="timeline">
-        <div class="timeline-tail"></div>
-        <div class="timeline-content">
-            <div class="item-time">2022/10/6</div>
-            <a href="/2022/10/06/研究二叉树与相关操作/">
-                <h3>研究二叉树树与相关操作</h3>
-            </a>
-            <div class="info">
-                
-                
-                <span class="tags">
-                    <span class="icon">
-                        <svg class="fa-icon"><use xlink:href="#tags-solid"></use></svg>
-                    </span>
-                    
-                    <span class="tag">
-                        
-                        <a href="/tags/数据结构/" style="color: #03a9f4">
-                            数据结构
-                        </a>
-                    </span>
-                    
-                    <span class="tag">
-                        
-                        <a href="/tags/树/" style="color: #ffa2c4">
-                            树
-                        </a>
-                    </span>
-                    
-                </span>
-                
-            </div>
-        </div>
-    </div>
-    
 </div>
+
                 
 <footer id="footer">
     <div class="footer-wrap">
