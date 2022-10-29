@@ -132,7 +132,7 @@
             
             <span class="tag">
                 
-                <a href="/tags/项目开发/" style="color: #00bcd4">
+                <a href="/tags/项目开发/" style="color: #00a596">
                     项目开发
                 </a>
             </span>
@@ -143,7 +143,7 @@
     <div class="content" v-pre>
         <p>准备工作：<br>搭建前后端，和完成自动部署至远程服务器</p>
 <span id="more"></span>
-<h2 id="1-前端部分"><a href="#1-前端部分" class="headerlink" title="1.前端部分"></a>1.前端部分</h2><p>使用umi框架快速搭建项目，由于之前经常使用React，所以本次选择<strong>AntDesign</strong>开发。<br>可以简单分析下umi的文件树中主要文件:</p>
+<h2 id="1-前端部分"><a href="#1-前端部分" class="headerlink" title="1.前端部分"></a>1.前端部分</h2><p>使用umi框架快速搭建项目，由于之前经常使用React，所以本次选择<strong>AntDesign</strong>开发<br>可以简单分析下umi的文件树中主要文件:</p>
 <ul>
 <li>.husky用来自动部署服务器</li>
 <li>.umirc.ts用来配置<strong>路由</strong></li>
@@ -172,9 +172,39 @@
         &#125;
 </code></pre>
 <p>nginx服务器监听10086端口，使用根目录文件为TroForum<br><br>这样就完成项目的前端基础搭建与部署啦</p>
-<h2 id="2-后端部分"><a href="#2-后端部分" class="headerlink" title="2.后端部分"></a>2.后端部分</h2><p>采用<strong>kotlin+Gradle+SpringBoot</strong>进行开发，因为kotlin与java使用的JVM一样，就不用再配置其他环境了。<br><br>首先我们配置Gradle:</p>
+<h2 id="2-后端部分"><a href="#2-后端部分" class="headerlink" title="2.后端部分"></a>2.后端部分</h2><p>采用<strong>kotlin+Gradle+SpringBoot</strong>进行开发，因为kotlin与java使用的JVM一样，就不用再配置其他环境了<br><br>首先我们配置Gradle:</p>
+<pre><code class="text">plugins &#123;
+    kotlin(&quot;jvm&quot;) version &quot;1.6.10-RC&quot;
+    kotlin(&quot;plugin.spring&quot;) version &quot;1.6.21&quot;
+    id(&quot;org.springframework.boot&quot;) version &quot;2.7.5&quot;
+    id(&quot;io.spring.dependency-management&quot;) version &quot;1.0.15.RELEASE&quot;
+&#125;
+</code></pre>
 <blockquote>
+<p>配置插件，jvm,spring,springBoot框架这些都配上</p>
 </blockquote>
+<pre><code class="text">repositories &#123;
+    mavenCentral()
+&#125;
+</code></pre>
+<blockquote>
+<p>使用mavenCentral()为使用的配置仓库</p>
+</blockquote>
+<pre><code class="text">dependencies &#123;
+    implementation(&quot;org.springframework.boot:spring-boot-starter:2.7.5&quot;)
+    implementation(&quot;org.jetbrains.kotlin:kotlin-reflect&quot;)
+    implementation(&quot;org.jetbrains.kotlin:kotlin-stdlib-jdk8&quot;)
+    testImplementation(&quot;org.jetbrains.kotlin:kotlin-test:1.7.20&quot;)
+    implementation(kotlin(&quot;script-runtime&quot;))
+&#125;
+</code></pre>
+<blockquote>
+<p>配置依赖，依赖可以在 <a target="_blank" rel="noopener" href="https://mvnrepository.com/">mvnrepository.com</a> 查找</p>
+</blockquote>
+<p>配置好后即可构建项目啦，<del>成功就成功了</del></p>
+<h2 id="3-数据库部分"><a href="#3-数据库部分" class="headerlink" title="3.数据库部分"></a>3.数据库部分</h2><ul>
+<li>大致流程：<br>在创建数据库后，进入数据库，把user中目标账号的host改为%，该账号即可面向所有ip连接，<br>后再将配置信息中bind_address改为0.0.0.0即可</li>
+</ul>
 
     </div>
 </div>
