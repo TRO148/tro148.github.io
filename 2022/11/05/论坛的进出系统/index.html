@@ -132,7 +132,7 @@
             
             <span class="tag">
                 
-                <a href="/tags/论坛项目开发/" style="color: #ff7d73">
+                <a href="/tags/论坛项目开发/" style="color: #ffa2c4">
                     论坛项目开发
                 </a>
             </span>
@@ -143,9 +143,373 @@
     <div class="content" v-pre>
         <p>整体采用SaToken框架</p>
 <span id="more"></span>
-<h2 id="你好"><a href="#你好" class="headerlink" title="你好"></a>你好</h2><hr>
-<h2 id="hello"><a href="#hello" class="headerlink" title="hello"></a>hello</h2><p><em>你好</em></p>
-<p><strong>哈哈哈</strong></p>
+<p>写登录系统，需要处理以下问题:</p>
+<ul>
+<li>后端操作数据库</li>
+<li>token的设置</li>
+<li>后端异常拦截</li>
+<li>前端登陆页面</li>
+<li>前端request处理</li>
+</ul>
+<hr>
+<blockquote>
+<p>首先，我们先写后端操作数据库部分:</p>
+</blockquote>
+<p>我们采用DDD框架，将后端结构分为apis, application, domain, infrastructure四个分层。<br><br>先来写domain层部分: <br><br>在domain层(领域层)，建立领域实体类Account和相关映射。</p>
+<pre><code class="kotlin">//账号实体
+@TableName(value = &quot;account&quot;, autoResultMap = true)
+class Account &#123;
+    var userId: String = &quot;&quot;
+    var userName: String = &quot;&quot;
+    var role: String = &quot;&quot;
+    var password: String = &quot;&quot;
+    var deleted: Int = 0
+&#125;
+
+@Mapper
+interface AccountMapper: BaseMapper&lt;Account&gt;
+</code></pre>
+<p><em>这里一定记住mysql用_分开定义字段，而kotlin是用驼峰法定义字段。</em><br><br>在建立映射后，写领域服务AccountRepository:</p>
+<pre><code class="kotlin">//账号的仓库类，提供基本操作服务
+@Repository
+class AccountRepository(val accountMapper: AccountMapper) &#123;
+    fun selectAccountByName(userName: String): Account? &#123;
+        return accountMapper.selectOne(
+            QueryWrapper&lt;Account&gt;().eq(&quot;user_name&quot;, userName)
+        )
+    &#125;
+
+    fun selectAccountById(userId: String): Account? &#123;
+        return accountMapper.selectOne(
+            QueryWrapper&lt;Account&gt;().eq(&quot;user_id&quot;, userId)
+        )
+    &#125;
+
+    fun insertAccount(account: Account): Int &#123;
+        return accountMapper.insert(account)
+    &#125;
+
+    fun checkingUserName(userName: String): Boolean &#123;
+        return accountMapper.exists(
+            QueryWrapper&lt;Account&gt;().eq(&quot;user_name&quot;, userName)
+        )
+    &#125;
+&#125;
+</code></pre>
+<p>这里写了四个方法，用来登录时查询账号，登陆后查询账号，注册账号，查重用户名。<br><br>这样domain层部分就写好啦~</p>
+<hr>
+<blockquote>
+<p>开始写后端异常处理器部分</p>
+</blockquote>
+<p>在后端处理时，发生异常后，向前端抛出，前端也进行处理，完成异常的显示。<br><br>后端异常拦截部分:</p>
+<pre><code class="kotlin">//全局异常拦截
+@RestControllerAdvice
+class GlobalExceptionHandler &#123;
+    @ExceptionHandler
+    fun handlerException(exception: Exception): SaResult? &#123;
+        if ( exception is NotLoginException ) &#123;
+            return SaResult.code(501)
+        &#125;
+        return SaResult.error(exception.message)
+    &#125;
+&#125;
+</code></pre>
+<p><em>注意，默认返回code为500，不登录返回code为501，服务器寄了返回code为502</em><br><br>现在，前端Response:</p>
+<pre><code class="ts">export const request: RequestConfig = &#123;
+  timeout: 20000,
+  errorConfig: &#123;
+    errorHandler: (error) =&gt; &#123;
+      //responseInterceptors捕捉不到
+      // @ts-ignore
+      if (error.code === &#39;ERR_BAD_RESPONSE&#39;) &#123;
+        message.error(&#39;服务器寄了&#39;);
+        return;
+      &#125;
+      message.error(error.message);
+    &#125;,
+  &#125;,
+  responseInterceptors: [
+    (response) =&gt; &#123;
+      // @ts-ignore
+      const &#123;
+        data: &#123; code, msg &#125;,
+      &#125; = response;
+      switch (code) &#123;
+        case 500:
+          throw new Error(msg);
+        case 501:
+          message.error(&#39;未登录账号&#39;);
+          history.push(&#39;/login&#39;);
+          break;
+      &#125;
+      return response;
+    &#125;,
+  ],
+&#125;;
+</code></pre>
+<p>errorHandler用来拦截异常，responseInterceptors来监视Response。<br><br><em>nginx的502报错直接发给errorHandler</em></p>
+<hr>
+<blockquote>
+<p>现在，该写token部分了:</p>
+</blockquote>
+<p>我们采用SaToken框架，这个嘎嘎好用√<br><br>只要将SaTokenConfigure类暴露在容器中，就可以完成配置啦:</p>
+<pre><code class="kotlin">@Component
+class SaTokenConfigure: WebMvcConfigurer &#123;
+    override fun addInterceptors(registry: InterceptorRegistry) &#123;
+        registry.addInterceptor(SaAnnotationInterceptor())
+            .addPathPatterns(&quot;/**&quot;)
+    &#125;
+&#125;
+</code></pre>
+<p>在这里，我们启动了注解功能，可以校验是否登录。<br></p>
+<hr>
+<blockquote>
+<p>然后再来写application层(应用层)与apis(接口层):</p>
+</blockquote>
+<p>建立LoginService:</p>
+<pre><code class="kotlin">@Service
+class LoginService &#123;
+    @Autowired
+    private lateinit var accountRepository: AccountRepository
+
+    fun register(userName: String, password: String) &#123;
+        val timestamp = Instant.now()
+        var account = Account()
+        account.userId = timestamp.toEpochMilli().toString() + (100..999).random().toString()
+        account.userName = userName
+        if ( accountRepository.checkingUserName(userName) ) &#123;
+            throw Exception(&quot;用户名重复&quot;)
+        &#125;
+        account.password = BCrypt.hashpw(password, BCrypt.gensalt())
+        account.role = &quot;user&quot;
+        account.deleted = 0
+        try &#123;
+            accountRepository.insertAccount(account)
+        &#125; catch (e: Exception) &#123;
+            throw Exception(&quot;注册失败&quot;)
+        &#125;
+    &#125;
+
+    fun login(userName: String, password: String) &#123;
+        val user = accountRepository.selectAccountByName(userName)
+            ?: throw Exception(&quot;未查找到该用户&quot;)
+        if (BCrypt.checkpw(password, user.password)) &#123;
+            StpUtil.login(user.userId)
+            //录入user的缓存
+            StpUtil.getSession().set(&quot;user&quot;, user)
+        &#125; else &#123;
+            throw Exception(&quot;密码错误&quot;)
+        &#125;
+    &#125;
+
+    fun logout() &#123;
+        StpUtil.logout()
+    &#125;
+&#125;
+</code></pre>
+<ul>
+<li>先来说注册方法，我们采用<strong>时间戳来作id（因为没用户，时间戳就够了XD），然后查重用户名，重要的是<br>将前端发来的密码加密，采用BCrypt类提供的方法加密存入数据</strong>，最后将数据插入数据库就好啦。<br></li>
+</ul>
+<p>建立LoginController:</p>
+<pre><code class="kotlin">//提供进出系统的接口
+@RestController
+class LoginController &#123;
+    @Autowired
+    private lateinit var loginService: LoginService
+
+    data class LoginReq(
+        var userName: String,
+        var password: String
+    )
+
+    @PostMapping(&quot;/register&quot;)
+    fun signIn(@RequestBody req: LoginReq) &#123;
+        loginService.register(req.userName, req.password)
+    &#125;
+
+    @PostMapping(&quot;/login&quot;)
+    fun loginIn(@RequestBody req: LoginReq) &#123;
+        loginService.login(req.userName, req.password)
+    &#125;
+
+    @SaCheckLogin
+    @PostMapping(&quot;/logout&quot;)
+    fun loginOut(): String &#123;
+        loginService.logout()
+        return &quot;登出&quot;
+    &#125;
+
+    @PostMapping(&quot;/isLogin&quot;)
+    fun isLogin(): String &#123;
+        return if (loginService.isLogin()) &quot;在&quot; else  &quot;不在&quot;
+    &#125;
+
+&#125;
+</code></pre>
+<p>这里提供四个api，注册，登录，退出，判断在线。接口层主要关注传来参数与交付给应用层，所以这里直接调用应用层就好啦<br></p>
+<hr>
+<blockquote>
+<p>最后写前端页面：</p>
+</blockquote>
+<pre><code class="tsx">export default function Page() &#123;
+  return (
+    &lt;div className=&quot;min-h-screen min-w-screen bg-red-300&quot;&gt;
+      &lt;div className=&quot;flex items-center justify-center pt-20&quot;&gt;
+        &lt;ProCard
+          style=&#123;&#123; marginBlockStart: 75, maxWidth: 400 &#125;&#125;
+          gutter=&#123;8&#125;
+          title=&quot;登录&quot;
+          direction=&quot;column&quot;
+          hoverable
+          bordered
+          extra=&#123;&lt;Link to=&quot;/register&quot;&gt;跳转至注册&lt;/Link&gt;&#125;
+        &gt;
+          &lt;ProForm&lt;&#123;
+            userName: string;
+            password: string;
+          &#125;&gt;
+            onFinish=&#123;async (values) =&gt; &#123;
+              await PostLogin(values.userName, values.password);
+              message.success(&#39;登录成功&#39;);
+              history.push(&#39;/home&#39;);
+            &#125;&#125;
+            submitter=&#123;&#123;
+              resetButtonProps: &#123;
+                style: &#123;
+                  display: 'none',
+                &#125;,
+              &#125;,
+              render: (props) => &#123;
+                return [
+                  <button
+                    className="min-w-full text-gray-900 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-red-100 dark:focus:ring-red-400 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2"
+                    type="button"
+                    key="submit"
+                    onClick=&#123;() => props.form?.submit?.()&#125;
+                  >
+                    登录账号
+                  </button>,
+                ];
+              &#125;,
+            &#125;&#125;
+          &gt;
+            &lt;ProForm.Group&gt;
+              &lt;ProFormText
+                width=&quot;md&quot;
+                name=&quot;userName&quot;
+                required
+                label=&quot;用户名&quot;
+                placeholder=&quot;请输入用户名&quot;
+                tooltip=&quot;最长为32位&quot;
+              /&gt;
+            &lt;/ProForm.Group&gt;
+            &lt;ProForm.Group&gt;
+              &lt;ProFormText.Password
+                width=&quot;md&quot;
+                name=&quot;password&quot;
+                required
+                label=&quot;密码&quot;
+                placeholder=&quot;请输入密码&quot;
+              /&gt;
+            &lt;/ProForm.Group&gt;
+          &lt;/ProForm&gt;
+        &lt;/ProCard&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  );
+&#125;
+</code></pre>
+<p>注册页面：</p>
+<pre><code class="tsx">import React from &#39;react&#39;;
+import &#123; ProCard, ProForm, ProFormText &#125; from &#39;@ant-design/pro-components&#39;;
+import &#123; PostRegister &#125; from &#39;@/service/common/login&#39;;
+import &#123; message &#125; from &#39;antd&#39;;
+import &#123; history &#125; from &#39;@umijs/max&#39;;
+import &#123; Link &#125; from &#39;@@/exports&#39;;
+
+export default function Page() &#123;
+    return (
+        &lt;div className=&quot;min-h-screen min-w-screen bg-red-300&quot;&gt;
+            &lt;div className=&quot;flex min-h-full items-center justify-center pt-20&quot;&gt;
+                &lt;ProCard
+                    style=&#123;&#123; marginBlockStart: 75, maxWidth: 400 &#125;&#125;
+                    gutter=&#123;8&#125;
+                    title=&quot;注册&quot;
+                    direction=&quot;column&quot;
+                    hoverable
+                    bordered
+                    extra=&#123;&lt;Link to=&quot;/login&quot;&gt;跳转至登录&lt;/Link&gt;&#125;
+                &gt;
+                    &lt;ProForm&lt;&#123;
+                        userName: string;
+                        password: string;
+                        againPassword: string;
+                    &#125;&gt;
+                        onFinish=&#123;async (values) =&gt; &#123;
+                            if (values.againPassword !== values.password) &#123;
+                                message.error(&#39;密码不一致&#39;);
+                                return;
+                            &#125;
+                            await PostRegister(values.userName, values.password);
+                            message.success(&#39;注册成功了~&#39;);
+                            history.push(&#39;/login&#39;);
+                        &#125;&#125;
+                        submitter=&#123;&#123;
+                            resetButtonProps: &#123;
+                                style: &#123;
+                                    display: 'none',
+                                &#125;,
+                            &#125;,
+                            render: (props) => &#123;
+                                return [
+                                    <button
+                                        className="min-w-full text-gray-900 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-red-100 dark:focus:ring-red-400 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2"
+                                        type="button"
+                                        key="submit"
+                                        onClick=&#123;() => props.form?.submit?.()&#125;
+                                    >
+                                        注册账号
+                                    </button>,
+                                ];
+                            &#125;,
+                        &#125;&#125;
+                    &gt;
+                        &lt;ProForm.Group&gt;
+                            &lt;ProFormText
+                                width=&quot;md&quot;
+                                name=&quot;userName&quot;
+                                required
+                                label=&quot;用户名&quot;
+                                placeholder=&quot;请输入用户名&quot;
+                                tooltip=&quot;最长为32位&quot;
+                            /&gt;
+                        &lt;/ProForm.Group&gt;
+                        &lt;ProForm.Group&gt;
+                            &lt;ProFormText.Password
+                                width=&quot;md&quot;
+                                name=&quot;password&quot;
+                                required
+                                label=&quot;密码&quot;
+                                placeholder=&quot;请输入密码&quot;
+                            /&gt;
+                        &lt;/ProForm.Group&gt;
+                        &lt;ProForm.Group&gt;
+                            &lt;ProFormText.Password
+                                width=&quot;md&quot;
+                                name=&quot;againPassword&quot;
+                                required
+                                label=&quot;重复密码&quot;
+                                placeholder=&quot;请再次输入密码&quot;
+                            /&gt;
+                        &lt;/ProForm.Group&gt;
+                    &lt;/ProForm&gt;
+                &lt;/ProCard&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    );
+&#125;
+</code></pre>
+<p>前端写完，咱们的论坛进出系统就好啦~</p>
 
     </div>
 </div>
