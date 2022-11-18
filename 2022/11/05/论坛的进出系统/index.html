@@ -132,7 +132,7 @@
             
             <span class="tag">
                 
-                <a href="/tags/论坛项目开发/" style="color: #ffa2c4">
+                <a href="/tags/论坛项目开发/" style="color: #00a596">
                     论坛项目开发
                 </a>
             </span>
@@ -143,6 +143,7 @@
     <div class="content" v-pre>
         <p>整体采用SaToken框架</p>
 <span id="more"></span>
+
 <p>写登录系统，需要处理以下问题:</p>
 <ul>
 <li>后端操作数据库</li>
@@ -351,165 +352,6 @@ class LoginController &#123;
 <blockquote>
 <p>最后写前端页面：</p>
 </blockquote>
-<pre><code class="tsx">export default function Page() &#123;
-  return (
-    &lt;div className=&quot;min-h-screen min-w-screen bg-red-300&quot;&gt;
-      &lt;div className=&quot;flex items-center justify-center pt-20&quot;&gt;
-        &lt;ProCard
-          style=&#123;&#123; marginBlockStart: 75, maxWidth: 400 &#125;&#125;
-          gutter=&#123;8&#125;
-          title=&quot;登录&quot;
-          direction=&quot;column&quot;
-          hoverable
-          bordered
-          extra=&#123;&lt;Link to=&quot;/register&quot;&gt;跳转至注册&lt;/Link&gt;&#125;
-        &gt;
-          &lt;ProForm&lt;&#123;
-            userName: string;
-            password: string;
-          &#125;&gt;
-            onFinish=&#123;async (values) =&gt; &#123;
-              await PostLogin(values.userName, values.password);
-              message.success(&#39;登录成功&#39;);
-              history.push(&#39;/home&#39;);
-            &#125;&#125;
-            submitter=&#123;&#123;
-              resetButtonProps: &#123;
-                style: &#123;
-                  display: 'none',
-                &#125;,
-              &#125;,
-              render: (props) => &#123;
-                return [
-                  <button
-                    className="min-w-full text-gray-900 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-red-100 dark:focus:ring-red-400 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2"
-                    type="button"
-                    key="submit"
-                    onClick=&#123;() => props.form?.submit?.()&#125;
-                  >
-                    登录账号
-                  </button>,
-                ];
-              &#125;,
-            &#125;&#125;
-          &gt;
-            &lt;ProForm.Group&gt;
-              &lt;ProFormText
-                width=&quot;md&quot;
-                name=&quot;userName&quot;
-                required
-                label=&quot;用户名&quot;
-                placeholder=&quot;请输入用户名&quot;
-                tooltip=&quot;最长为32位&quot;
-              /&gt;
-            &lt;/ProForm.Group&gt;
-            &lt;ProForm.Group&gt;
-              &lt;ProFormText.Password
-                width=&quot;md&quot;
-                name=&quot;password&quot;
-                required
-                label=&quot;密码&quot;
-                placeholder=&quot;请输入密码&quot;
-              /&gt;
-            &lt;/ProForm.Group&gt;
-          &lt;/ProForm&gt;
-        &lt;/ProCard&gt;
-      &lt;/div&gt;
-    &lt;/div&gt;
-  );
-&#125;
-</code></pre>
-<p>注册页面：</p>
-<pre><code class="tsx">import React from &#39;react&#39;;
-import &#123; ProCard, ProForm, ProFormText &#125; from &#39;@ant-design/pro-components&#39;;
-import &#123; PostRegister &#125; from &#39;@/service/common/login&#39;;
-import &#123; message &#125; from &#39;antd&#39;;
-import &#123; history &#125; from &#39;@umijs/max&#39;;
-import &#123; Link &#125; from &#39;@@/exports&#39;;
-
-export default function Page() &#123;
-    return (
-        &lt;div className=&quot;min-h-screen min-w-screen bg-red-300&quot;&gt;
-            &lt;div className=&quot;flex min-h-full items-center justify-center pt-20&quot;&gt;
-                &lt;ProCard
-                    style=&#123;&#123; marginBlockStart: 75, maxWidth: 400 &#125;&#125;
-                    gutter=&#123;8&#125;
-                    title=&quot;注册&quot;
-                    direction=&quot;column&quot;
-                    hoverable
-                    bordered
-                    extra=&#123;&lt;Link to=&quot;/login&quot;&gt;跳转至登录&lt;/Link&gt;&#125;
-                &gt;
-                    &lt;ProForm&lt;&#123;
-                        userName: string;
-                        password: string;
-                        againPassword: string;
-                    &#125;&gt;
-                        onFinish=&#123;async (values) =&gt; &#123;
-                            if (values.againPassword !== values.password) &#123;
-                                message.error(&#39;密码不一致&#39;);
-                                return;
-                            &#125;
-                            await PostRegister(values.userName, values.password);
-                            message.success(&#39;注册成功了~&#39;);
-                            history.push(&#39;/login&#39;);
-                        &#125;&#125;
-                        submitter=&#123;&#123;
-                            resetButtonProps: &#123;
-                                style: &#123;
-                                    display: 'none',
-                                &#125;,
-                            &#125;,
-                            render: (props) => &#123;
-                                return [
-                                    <button
-                                        className="min-w-full text-gray-900 bg-gradient-to-r from-red-200 via-red-300 to-yellow-200 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-red-100 dark:focus:ring-red-400 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2"
-                                        type="button"
-                                        key="submit"
-                                        onClick=&#123;() => props.form?.submit?.()&#125;
-                                    >
-                                        注册账号
-                                    </button>,
-                                ];
-                            &#125;,
-                        &#125;&#125;
-                    &gt;
-                        &lt;ProForm.Group&gt;
-                            &lt;ProFormText
-                                width=&quot;md&quot;
-                                name=&quot;userName&quot;
-                                required
-                                label=&quot;用户名&quot;
-                                placeholder=&quot;请输入用户名&quot;
-                                tooltip=&quot;最长为32位&quot;
-                            /&gt;
-                        &lt;/ProForm.Group&gt;
-                        &lt;ProForm.Group&gt;
-                            &lt;ProFormText.Password
-                                width=&quot;md&quot;
-                                name=&quot;password&quot;
-                                required
-                                label=&quot;密码&quot;
-                                placeholder=&quot;请输入密码&quot;
-                            /&gt;
-                        &lt;/ProForm.Group&gt;
-                        &lt;ProForm.Group&gt;
-                            &lt;ProFormText.Password
-                                width=&quot;md&quot;
-                                name=&quot;againPassword&quot;
-                                required
-                                label=&quot;重复密码&quot;
-                                placeholder=&quot;请再次输入密码&quot;
-                            /&gt;
-                        &lt;/ProForm.Group&gt;
-                    &lt;/ProForm&gt;
-                &lt;/ProCard&gt;
-            &lt;/div&gt;
-        &lt;/div&gt;
-    );
-&#125;
-</code></pre>
-<p>前端写完，咱们的论坛进出系统就好啦~</p>
 
     </div>
 </div>
