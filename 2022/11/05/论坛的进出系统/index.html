@@ -132,7 +132,7 @@
             
             <span class="tag">
                 
-                <a href="/tags/论坛项目开发/" style="color: #ffa2c4">
+                <a href="/tags/论坛项目开发/" style="color: #00a596">
                     论坛项目开发
                 </a>
             </span>
@@ -348,77 +348,6 @@ class LoginController &#123;
 &#125;
 </code></pre>
 <p>这里提供四个api，注册，登录，退出，判断在线。接口层主要关注传来参数与交付给应用层，所以这里直接调用应用层就好啦<br></p>
-<hr>
-<blockquote>
-<p>最后写前端页面：</p>
-</blockquote>
-<pre><code class="text">export default function Page() &#123;
-  return (
-    &lt;div className=&quot;min-h-screen min-w-screen bg-red-300&quot;&gt;
-      &lt;div className=&quot;flex items-center justify-center pt-20&quot;&gt;
-        &lt;ProCard
-          style=&#123;&#123; marginBlockStart: 75, maxWidth: 400 &#125;&#125;
-          gutter=&#123;8&#125;
-          title=&quot;登录&quot;
-          direction=&quot;column&quot;
-          hoverable
-          bordered
-          extra=&#123;&lt;Link to=&quot;/register&quot;&gt;跳转至注册&lt;/Link&gt;&#125;
-        &gt;
-          &lt;ProForm&lt;&#123;
-            userName: string;
-            password: string;
-          &#125;&gt;
-            onFinish=&#123;async (values) =&gt; &#123;
-              await PostLogin(values.userName, values.password);
-              message.success(&#39;登录成功&#39;);
-              history.push(&#39;/home&#39;);
-            &#125;&#125;
-            submitter=&#123;&#123;
-              resetButtonProps: &#123;
-                style: &#123;
-                  display: 'none',
-                &#125;,
-              &#125;,
-              render: (props) => &#123;
-                return [
-                  <button
-                    type="button"
-                    key="submit"
-                    onClick=&#123;() => props.form?.submit?.()&#125;
-                  >
-                    登录账号
-                  </button>,
-                ];
-              &#125;,
-            &#125;&#125;
-          &gt;
-            &lt;ProForm.Group&gt;
-              &lt;ProFormText
-                width=&quot;md&quot;
-                name=&quot;userName&quot;
-                required
-                label=&quot;用户名&quot;
-                placeholder=&quot;请输入用户名&quot;
-                tooltip=&quot;最长为32位&quot;
-              /&gt;
-            &lt;/ProForm.Group&gt;
-            &lt;ProForm.Group&gt;
-              &lt;ProFormText.Password
-                width=&quot;md&quot;
-                name=&quot;password&quot;
-                required
-                label=&quot;密码&quot;
-                placeholder=&quot;请输入密码&quot;
-              /&gt;
-            &lt;/ProForm.Group&gt;
-          &lt;/ProForm&gt;
-        &lt;/ProCard&gt;
-      &lt;/div&gt;
-    &lt;/div&gt;
-  );
-&#125;
-</code></pre>
 <p>前端写完，咱们的论坛进出系统就好啦~</p>
 
     </div>
