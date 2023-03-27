@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0">
-    <title>Huffman树研究 | TroTro</title>
+    <title>Springboot集成websocket | TroTro</title>
     <meta name="author" content="TroTro">
     <meta name="description" content="">
     <meta name="keywords" content="">
@@ -128,14 +128,14 @@
                 
 <div class="article">
     <div>
-        <h1>Huffman树研究 </h1>
+        <h1>Springboot集成websocket </h1>
     </div>
     <div class="info">
         <span class="date">
             <span class="icon">
                 <svg class="fa-icon"><use xlink:href="#calendar-solid"></use></svg>
             </span>
-            2022/10/18
+            2023/3/22
         </span>
         
         
@@ -146,8 +146,8 @@
             
             <span class="tag">
                 
-                <a href="/tags/数据结构/" style="color: #ffa2c4">
-                    数据结构
+                <a href="/tags/技术/" style="color: #00bcd4">
+                    技术
                 </a>
             </span>
             
@@ -155,57 +155,25 @@
         
     </div>
     <div class="content" v-pre>
-        <p>记录研究Huffman树的实现</p>
+        <p>WebSocket协议，它实现了浏览器与服务器全叆工通信，允许服务端主动向客户端推送信息。这使得得到服务器数据的传送变得更加简单，更加实时。</p>
 <span id="more"></span>
-<p><em>大致思路为，Huffman树使用最优二叉树方式存储</em></p>
-<h2 id="1-创建节点"><a href="#1-创建节点" class="headerlink" title="1.创建节点"></a>1.创建节点</h2><pre><code class="C">typedef struct HuffmanTNode &#123;
-    ElemType data;
-    struct HuffmanTNode *left;
-    struct HuffmanTNode *right;
-    struct HuffmanTNode *parent;
-&#125; HuffmanTNode;
+
+<h2 id="依赖"><a href="#依赖" class="headerlink" title="依赖"></a>依赖</h2><pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-websocket&lt;/artifactId&gt;
+&lt;/dependency&gt;
 </code></pre>
-<h2 id="2-创建树"><a href="#2-创建树" class="headerlink" title="2.创建树"></a>2.创建树</h2><pre><code class="C">class Compare &#123;
-public:
-    bool operator()(HuffmanTNode *a, HuffmanTNode *b) &#123;
-        return a-&gt;data &gt; b-&gt;data;
+<h2 id="启用WebSocket"><a href="#启用WebSocket" class="headerlink" title="启用WebSocket"></a>启用WebSocket</h2><pre><code class="Kotlin">@Configuration
+class WebSocketStompConfig &#123;
+    //扫描注解成websocket
+    @Bean
+    fun serverEndpointExporter(): ServerEndpointExporter &#123;
+        return ServerEndpointExporter()
     &#125;
 &#125;
-
-HuffmanTNode * CreateHuffmanTNode() &#123;
-    priority_queue&lt;HuffmanTNode *, vector&lt;HuffmanTNode *&gt;, Compare&gt; nodes;
-    //先给nodes中输入数据，输入0则停止
-    while ( true ) &#123;
-        ElemType a;
-        cin &gt;&gt; a;
-        if ( a == 0 ) break;
-        HuffmanTNode* T = new HuffmanTNode;
-        T-&gt;data = a;
-        T-&gt;left = nullptr;
-        T-&gt;right = nullptr;
-        T-&gt;parent = nullptr;
-        nodes.push(T);
-    &#125;
-
-    while ( nodes.size() &gt; 1 ) &#123;
-        HuffmanTNode* a = nodes.top();
-        nodes.pop();
-        HuffmanTNode* b = nodes.top();
-        nodes.pop();
-        HuffmanTNode* cur = new HuffmanTNode;
-        cur-&gt;data = a-&gt;data + b-&gt;data;
-        cur-&gt;left = a;
-        cur-&gt;right = b;
-        a-&gt;parent = cur;
-        b-&gt;parent = cur;
-
-        nodes.push(cur);
-    &#125;
-
-    return nodes.top();
-&#125;
 </code></pre>
-<p>创建一个优先队列，使其从小到大排序，输入数值后，通过不断合并前两项，建立Huffman树</p>
+<h2 id="配置WebSocket服务"><a href="#配置WebSocket服务" class="headerlink" title="配置WebSocket服务"></a>配置WebSocket服务</h2><pre><code class="Kotlin">
+</code></pre>
 
     </div>
 </div>

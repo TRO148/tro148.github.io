@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0">
-    <title>Huffman树研究 | TroTro</title>
+    <title>TroTro</title>
     <meta name="author" content="TroTro">
     <meta name="description" content="">
     <meta name="keywords" content="">
@@ -125,87 +125,194 @@
 </nav>
             </div>
             <div id="main">
-                
-<div class="article">
-    <div>
-        <h1>Huffman树研究 </h1>
-    </div>
-    <div class="info">
+                <div id="home-head">
+        <div id="home-info" class="home-info">
+            <span class="loop"></span>
+            <span class="loop"></span>
+            <span class="loop"></span>
+            <span class="loop"></span>
+            <span class="info">
+            <div class="wrap">
+                <h1>TroTro</h1>
+                <div style="text-align:center;font-size:2rem;">
+                    <strong id="typed3"></strong>
+                </div>
+            </div>
+            </span>
+        </div>
+</div>
+
+<div id="home-posts-wrap">
+    <div id="home-posts">
+        <div id="posts">
+            
+
+<div class="post">
+    <a href="/2022/10/06/研究二叉树与相关操作/">
+        <h2 class="post-title">研究二叉树树与相关操作</h2>
+    </a>
+    <div class="category-and-date">
+        
         <span class="date">
             <span class="icon">
                 <svg class="fa-icon"><use xlink:href="#calendar-solid"></use></svg>
             </span>
-            2022/10/18
+            2022/10/6
+        </span>
+    </div>
+    <div class="excerpt">
+        <div class="content" v-pre>
+            
+            <blockquote>
+<p>尝试解读与写出二叉树的相关操作</p>
+</blockquote>
+            
+        </div>
+    </div>
+    <div class="post-tags">
+        
+        <span class="icon">
+            <svg class="fa-icon"><use xlink:href="#tags-solid"></use></svg>
         </span>
         
         
-        <span class="tags">
-            <span class="icon">
-                <svg class="fa-icon"><use xlink:href="#tags-solid"></use></svg>
-            </span>
+        <span class="tag">
             
-            <span class="tag">
-                
-                <a href="/tags/数据结构/" style="color: #ffa2c4">
-                    数据结构
-                </a>
-            </span>
-            
+            <a href="/tags/数据结构/" style="color: #00bcd4">
+                数据结构
+            </a>
         </span>
         
     </div>
-    <div class="content" v-pre>
-        <p>记录研究Huffman树的实现</p>
-<span id="more"></span>
-<p><em>大致思路为，Huffman树使用最优二叉树方式存储</em></p>
-<h2 id="1-创建节点"><a href="#1-创建节点" class="headerlink" title="1.创建节点"></a>1.创建节点</h2><pre><code class="C">typedef struct HuffmanTNode &#123;
-    ElemType data;
-    struct HuffmanTNode *left;
-    struct HuffmanTNode *right;
-    struct HuffmanTNode *parent;
-&#125; HuffmanTNode;
-</code></pre>
-<h2 id="2-创建树"><a href="#2-创建树" class="headerlink" title="2.创建树"></a>2.创建树</h2><pre><code class="C">class Compare &#123;
-public:
-    bool operator()(HuffmanTNode *a, HuffmanTNode *b) &#123;
-        return a-&gt;data &gt; b-&gt;data;
-    &#125;
-&#125;
+    <a href="/2022/10/06/研究二叉树与相关操作/" class="go-post">阅读全文</a>
+</div>
 
-HuffmanTNode * CreateHuffmanTNode() &#123;
-    priority_queue&lt;HuffmanTNode *, vector&lt;HuffmanTNode *&gt;, Compare&gt; nodes;
-    //先给nodes中输入数据，输入0则停止
-    while ( true ) &#123;
-        ElemType a;
-        cin &gt;&gt; a;
-        if ( a == 0 ) break;
-        HuffmanTNode* T = new HuffmanTNode;
-        T-&gt;data = a;
-        T-&gt;left = nullptr;
-        T-&gt;right = nullptr;
-        T-&gt;parent = nullptr;
-        nodes.push(T);
-    &#125;
+             
+<div class="page-current">
+    <div class="prev">
+        
+        <a href="/page/2/">
+            <span class="page-num">
+                <i class="fa-solid fa-caret-left fa-fw"></i>
+            </span>
+        </a>
+        
+    </div>
+    <div class="page-index">
+        
+        <span>
+            
+            
+                
+                <a href="/">
+                    <span class="page-num">1</span>
+                </a>
+                
+                
+            
+            <a href="/page/2/">
+                <span class="page-num">
+                    2
+                </span>
+            </a>
+        </span>
+        
+        <span class="current">
+            3
+        </span>
+        
+    </div>
+    <div class="next">
+        
+    </div>
+</div>
+        </div>
+    </div>
 
-    while ( nodes.size() &gt; 1 ) &#123;
-        HuffmanTNode* a = nodes.top();
-        nodes.pop();
-        HuffmanTNode* b = nodes.top();
-        nodes.pop();
-        HuffmanTNode* cur = new HuffmanTNode;
-        cur-&gt;data = a-&gt;data + b-&gt;data;
-        cur-&gt;left = a;
-        cur-&gt;right = b;
-        a-&gt;parent = cur;
-        b-&gt;parent = cur;
+    <div id="home-card">
+        <div style="position: relative; top: 0px">
+    <div class="card-style" style="width: 300px">
+        <div class="avatar">
+            <img data-src="https://gitcode.net/TroTro_/image/-/raw/master/touxiang.jpg" alt="avatar">
+        </div>
+        <div class="name">
+            <h1>TroTro</h1>
+            <span style="display: inline-block">
+                当前学习
+                <h3 style="display: inline-block; color: #9dd1ff">集群部署</h3>
+            </span>
+        </div>
+    </div>
+</div>
 
-        nodes.push(cur);
-    &#125;
+<div style="position: relative; top: 80px;">
+    <div class="card-style" style="width: 300px;
+        background-image: -moz-linear-gradient(180deg, rgb(251, 121, 169), rgb(247, 105, 159));
+        background-image: -webkit-linear-gradient(180deg, rgb(251, 121, 169), rgb(247, 105, 159));
+        background-image: linear-gradient(180deg, rgb(251, 121, 169), rgb(247, 105, 159));">
+        <div style="position: relative; left: 45px; display: block; height: 80px;">
+            <div class="lover">
+                <img data-src="https://gitcode.net/TroTro_/image/-/raw/master/loverLeft.jpg" alt="avatar">
+            </div>
+            <div class="lover-love">
+                <img data-src="https://gitcode.net/TroTro_/image/-/raw/master/love.png" alt="avatar">
+            </div>
+            <div class="lover">
+                <img data-src="https://gitcode.net/TroTro_/image/-/raw/master/loverRight.jpg" alt="avatar">
+            </div>
+        </div>
+        <div id="loveTime"></div>
+    </div>
+</div>
 
-    return nodes.top();
-&#125;
-</code></pre>
-<p>创建一个优先队列，使其从小到大排序，输入数值后，通过不断合并前两项，建立Huffman树</p>
+<script type="text/javascript">
+    setInterval(() => {
+        var date1 = '2022/06/25 00:00:00';
+        var date2 = new Date();
+        var date3 = date2.getTime() - new Date(date1).getTime();
+        var days = Math.floor(date3 / (24 * 3600 * 1000))
+        var leave1 = date3 % (24 * 3600 * 1000)
+        var hours = Math.floor(leave1 / (3600 * 1000))
+        var leave2 = leave1 % (3600 * 1000)
+        var minutes = Math.floor(leave2 / (60 * 1000))
+        var leave3 = leave2 % (60 * 1000)
+        var seconds = Math.round(leave3 / 1000)
+
+        document.getElementById("loveTime").innerHTML =
+            "<h3 style=\"color: white\" " + ">" + days + "天" + hours + "时" + minutes + "分" + seconds + "秒" + "</h3>"
+    }, 1000)
+</script>
+
+<div style="position: relative; top: 160px">
+    <div class="card-style" style="width: 300px; padding-top: 10px; background: rgba(240,202,252,0.73);">
+        <div style="background: rgba(255,255,255,0.8); width: 280px; margin: auto; border-radius: 10px; padding-left: 10px; padding-right: 10px">
+            <h1>知乎热搜</h1>
+            <div id="zhiHuHot"></div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    fetch("https://tenapi.cn/zhihuresou/").then(data => {
+        return data.json()
+    }).then(res => {
+        for (let i = 0; i < res.list.length; i++) {
+            let div = document.getElementById("zhiHuHot")
+            let elem = document.createElement("div")
+            let text = res.list[i].name
+
+            elem.innerHTML =
+                "<a style='font-size: large; color: rgba(0,0,0,0.45)' " +
+                "title=" + res.list[i].query +
+                " href=" + res.list[i].url + ">"
+                + text +
+                "</a>"
+            div.appendChild(elem)
+            div.appendChild(document.createElement("br"))
+        }
+    })
+</script>
+
 
     </div>
 </div>
