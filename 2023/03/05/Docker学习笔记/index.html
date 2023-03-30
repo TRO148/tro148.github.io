@@ -146,7 +146,7 @@
             
             <span class="tag">
                 
-                <a href="/tags/技术/" style="color: #ffa2c4">
+                <a href="/tags/技术/" style="color: #ff7d73">
                     技术
                 </a>
             </span>
@@ -187,6 +187,22 @@
 <p>yml配置参数为:<br>version版本<br>service：<br>  build：指定为构建镜像上下文路径或者对象（Dockerfile路径）<br>  其他参数看<a target="_blank" rel="noopener" href="https://www.runoob.com/docker/docker-compose.html">这里</a></p>
 </blockquote>
 <p><strong>当然直接用portainer也可以嗷</strong></p>
+<h2 id="Docker-Volume"><a href="#Docker-Volume" class="headerlink" title="Docker Volume"></a>Docker Volume</h2><p>docker存储卷，由于容器的生命周期是短暂的，容器内的数据也会随之消失，所以需要使用存储卷，可以将数据保存在本地，也可以保存在远程服务器上。</p>
+<ul>
+<li>docker volume create xxx创建存储卷</li>
+<li>docker volume ls查看存储卷</li>
+<li>docker volume inspect xxx查看存储卷信息</li>
+<li>docker volume rm xxx删除存储卷</li>
+</ul>
+<h2 id="Docker修改日志大小"><a href="#Docker修改日志大小" class="headerlink" title="Docker修改日志大小"></a>Docker修改日志大小</h2><p>docker默认日志大小为100M，可以通过修改配置文件来修改日志大小</p>
+<pre><code>&#123;
+  &quot;log-driver&quot;: &quot;json-file&quot;,
+  &quot;log-opts&quot;: &#123;
+    &quot;max-size&quot;: &quot;10m&quot;,
+    &quot;max-file&quot;: &quot;3&quot;
+  &#125;
+&#125;
+</code></pre>
 
     </div>
 </div>
