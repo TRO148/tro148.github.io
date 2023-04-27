@@ -146,7 +146,7 @@
             
             <span class="tag">
                 
-                <a href="/tags/技术/" style="color: #ff7d73">
+                <a href="/tags/技术/" style="color: #00a596">
                     技术
                 </a>
             </span>
@@ -165,7 +165,7 @@
 <li>进入容器 docker attach xxx(退出容器会导致容器停止)&#x2F;docker exec xxx(退出容器不会导致容器停止)</li>
 <li>退出容器 docker stop xxx</li>
 <li>导出与导入容器 docker export xxx &gt; xxx &#x2F; docker import xxxx</li>
-<li>删除容器docker rm -f xxx</li>
+<li>删除容器docker rm -f xxx<br>Docker容器与宿主机的文件共享，可以使用-v参数，将宿主机的文件夹挂载到容器中，这样就可以实现容器与宿主机的文件共享，<br>也可以使用存储卷，将数据保存在本地，也可以保存在远程服务器上。</li>
 </ul>
 <h2 id="Docker镜像使用"><a href="#Docker镜像使用" class="headerlink" title="Docker镜像使用"></a>Docker镜像使用</h2><p>容器都是根据镜像产生的，可以从镜像仓库下载产生，也可以自己生成，镜像的使用可以提供一个完整的环境。</p>
 <ul>
@@ -186,7 +186,7 @@
 <blockquote>
 <p>yml配置参数为:<br>version版本<br>service：<br>  build：指定为构建镜像上下文路径或者对象（Dockerfile路径）<br>  其他参数看<a target="_blank" rel="noopener" href="https://www.runoob.com/docker/docker-compose.html">这里</a></p>
 </blockquote>
-<p><strong>当然直接用portainer也可以嗷</strong></p>
+<p><strong>当然直接用portainer也可以嗷</strong><br><em>Partainer只需要安装一次即可，因为Partainer直接与Docker引擎交互，能够全局监控Docker的所有容器。</em></p>
 <h2 id="Docker-Volume"><a href="#Docker-Volume" class="headerlink" title="Docker Volume"></a>Docker Volume</h2><p>docker存储卷，由于容器的生命周期是短暂的，容器内的数据也会随之消失，所以需要使用存储卷，可以将数据保存在本地，也可以保存在远程服务器上。</p>
 <ul>
 <li>docker volume create xxx创建存储卷</li>
