@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="集合类是十分常用的一系列类，主体分为Map为根的实现类和Collection为根的实现类">
+<meta property="og:type" content="article">
+<meta property="og:title" content="细说集合类之Collection部分">
+<meta property="og:url" content="http://example.com/2023/06/24/%E7%BB%86%E8%AF%B4%E9%9B%86%E5%90%88%E7%B1%BB/index.html">
+<meta property="og:site_name" content="TroTro">
+<meta property="og:description" content="集合类是十分常用的一系列类，主体分为Map为根的实现类和Collection为根的实现类">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/pic/img.png">
+<meta property="article:published_time" content="2023-06-24T07:56:20.000Z">
+<meta property="article:modified_time" content="2023-06-25T09:32:47.598Z">
+<meta property="article:author" content="TroTro">
+<meta property="article:tag" content="Java">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/pic/img.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>细说集合类之Collection部分</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-NGQ4ZR4FTC"></script>
+  <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-NGQ4ZR4FTC');
+  </script>
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+      <link rel="alternate" href="/true" title="TroTro" type="application/atom+xml" />
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="顶部" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/search/">搜索</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="http://github.com/tro148">项目</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        
+        <li><a class="icon" aria-label="下一篇" href="/2023/06/23/%E4%BB%A3%E7%A0%81%E4%B8%AD%E8%AF%B4JUC-2/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="返回顶部" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="分享文章" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2023/06/24/%E7%BB%86%E8%AF%B4%E9%9B%86%E5%90%88%E7%B1%BB/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2023/06/24/%E7%BB%86%E8%AF%B4%E9%9B%86%E5%90%88%E7%B1%BB/&text=细说集合类之Collection部分"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2023/06/24/%E7%BB%86%E8%AF%B4%E9%9B%86%E5%90%88%E7%B1%BB/&title=细说集合类之Collection部分"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2023/06/24/%E7%BB%86%E8%AF%B4%E9%9B%86%E5%90%88%E7%B1%BB/&is_video=false&description=细说集合类之Collection部分"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=细说集合类之Collection部分&body=Check out this article: http://example.com/2023/06/24/%E7%BB%86%E8%AF%B4%E9%9B%86%E5%90%88%E7%B1%BB/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2023/06/24/%E7%BB%86%E8%AF%B4%E9%9B%86%E5%90%88%E7%B1%BB/&title=细说集合类之Collection部分"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2023/06/24/%E7%BB%86%E8%AF%B4%E9%9B%86%E5%90%88%E7%B1%BB/&title=细说集合类之Collection部分"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2023/06/24/%E7%BB%86%E8%AF%B4%E9%9B%86%E5%90%88%E7%B1%BB/&title=细说集合类之Collection部分"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2023/06/24/%E7%BB%86%E8%AF%B4%E9%9B%86%E5%90%88%E7%B1%BB/&title=细说集合类之Collection部分"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2023/06/24/%E7%BB%86%E8%AF%B4%E9%9B%86%E5%90%88%E7%B1%BB/&name=细说集合类之Collection部分&description=&lt;p&gt;集合类是十分常用的一系列类，主体分为Map为根的实现类和Collection为根的实现类&lt;/p&gt;"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2023/06/24/%E7%BB%86%E8%AF%B4%E9%9B%86%E5%90%88%E7%B1%BB/&t=细说集合类之Collection部分"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Collection"><span class="toc-number">1.</span> <span class="toc-text">Collection</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Collection%E6%8E%A5%E5%8F%A3"><span class="toc-number">1.1.</span> <span class="toc-text">Collection接口</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%86%E6%9E%90%E9%9B%86%E5%90%88%E7%B1%BB%E6%9E%84%E6%88%90"><span class="toc-number">1.2.</span> <span class="toc-text">分析集合类构成</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%86%E6%9E%90List"><span class="toc-number">1.3.</span> <span class="toc-text">分析List</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%9D%9EAbstractList%E4%B8%80%E6%97%8F"><span class="toc-number">1.3.1.</span> <span class="toc-text">非AbstractList一族</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#AbstractList%E4%B8%80%E6%97%8F"><span class="toc-number">1.3.2.</span> <span class="toc-text">AbstractList一族</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#Vector"><span class="toc-number">1.3.2.1.</span> <span class="toc-text">Vector</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%A2%9E%E5%8A%A0%E5%85%83%E7%B4%A0"><span class="toc-number">1.3.2.2.</span> <span class="toc-text">增加元素</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%88%A0%E9%99%A4%E5%85%83%E7%B4%A0"><span class="toc-number">1.3.2.3.</span> <span class="toc-text">删除元素</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E4%BF%AE%E6%94%B9%E5%85%83%E7%B4%A0"><span class="toc-number">1.3.2.4.</span> <span class="toc-text">修改元素</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%9F%A5%E6%89%BE%E5%85%83%E7%B4%A0"><span class="toc-number">1.3.2.5.</span> <span class="toc-text">查找元素</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%85%B6%E4%BB%96%E6%93%8D%E4%BD%9C"><span class="toc-number">1.3.2.6.</span> <span class="toc-text">其他操作</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#ArrayList"><span class="toc-number">1.3.2.7.</span> <span class="toc-text">ArrayList</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%85%B6%E4%BB%96%E6%93%8D%E4%BD%9C-1"><span class="toc-number">1.3.2.8.</span> <span class="toc-text">其他操作</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#AbstractSequentialList"><span class="toc-number">1.3.2.9.</span> <span class="toc-text">AbstractSequentialList</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%86%E6%9E%90Queue"><span class="toc-number">1.4.</span> <span class="toc-text">分析Queue</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#AbstractQueue"><span class="toc-number">1.4.1.</span> <span class="toc-text">AbstractQueue</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E9%9D%9EAbstractQueue%E4%B8%80%E6%97%8F-Deque%E6%8E%A5%E5%8F%A3"><span class="toc-number">1.4.1.1.</span> <span class="toc-text">非AbstractQueue一族 Deque接口</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%A2%9E%E5%8A%A0%E5%85%83%E7%B4%A0%EF%BC%9A"><span class="toc-number">1.4.1.2.</span> <span class="toc-text">增加元素：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%88%A0%E9%99%A4%E5%85%83%E7%B4%A0%EF%BC%9A"><span class="toc-number">1.4.1.3.</span> <span class="toc-text">删除元素：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%8E%B7%E5%8F%96%E5%85%83%E7%B4%A0%EF%BC%9A"><span class="toc-number">1.4.1.4.</span> <span class="toc-text">获取元素：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%85%B6%E4%BB%96%E6%93%8D%E4%BD%9C%EF%BC%9A"><span class="toc-number">1.4.1.5.</span> <span class="toc-text">其他操作：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#ArrayDeque-%E5%92%8C-LinkedList"><span class="toc-number">1.4.1.6.</span> <span class="toc-text">ArrayDeque 和 LinkedList</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#AbstractQueue%E4%B8%80%E6%97%8F"><span class="toc-number">1.4.2.</span> <span class="toc-text">AbstractQueue一族</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%86%E6%9E%90Set%E6%8E%A5%E5%8F%A3"><span class="toc-number">1.5.</span> <span class="toc-text">分析Set接口</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#SortedSet%E6%8E%A5%E5%8F%A3%E5%92%8CNavigableSet%E6%8E%A5%E5%8F%A3"><span class="toc-number">1.5.1.</span> <span class="toc-text">SortedSet接口和NavigableSet接口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#AbstractSet"><span class="toc-number">1.5.2.</span> <span class="toc-text">AbstractSet</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#EnumSet"><span class="toc-number">1.5.2.1.</span> <span class="toc-text">EnumSet</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#TreeSet-%E5%92%8C-HashSet"><span class="toc-number">1.5.2.2.</span> <span class="toc-text">TreeSet 和 HashSet</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Map"><span class="toc-number">2.</span> <span class="toc-text">Map</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        细说集合类之Collection部分
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">TroTro</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2023-06-24T07:56:20.000Z" class="dt-published" itemprop="datePublished">2023-06-24</time>
+        
+        (Updated: <time datetime="2023-06-25T09:32:47.598Z" class="dt-updated" itemprop="dateModified">2023-06-25</time>)
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/Java/" rel="tag">Java</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <p>集合类是十分常用的一系列类，主体分为Map为根的实现类和Collection为根的实现类</p>
+<span id="more"></span>
+
+<h2 id="Collection"><a href="#Collection" class="headerlink" title="Collection"></a>Collection</h2><p>咱们先以最常见的Collection说起，先看文档(机翻)</p>
+<blockquote>
+<p>集合层次结构中的根接口。<br>集合表示一组对象，称为其元素。<br>某些集合允许重复元素，而其他集合则不允许。有些是有序的，有些是无序的。<br>JDK 不提供此接口的任何直接实现：它提供了更具体的子接口（如 Set 和 List）的实现。<br>此接口通常用于传递集合，并在需要最大通用性的地方操作它们。</p>
+</blockquote>
+<p><em>由于集合类家族庞大，我们尽量以介绍接口为主，具体实现以重点为介绍。</em><br>根据官方介绍，可以看见Collection接口是用来粗略规定哪些是可以归纳进集合体系的，并且可以用于粗略操作和传递的。</p>
+<blockquote>
+<p>Collection接口下，整体设计思想为模板方法设计模式，<br>在这种模式中，定义一个操作的算法框架，并将一些步骤延迟到子类中实现。模板方法使得子类可以在不改变算法框架的情况下重新定义算法中的某些步骤。<br>在Java集合类中，接口定义了一些公共方法，而抽象类则提供了一些默认实现，具体的实现类可以根据需要选择性地实现这些方法。<br>例如，AbstractList类提供了一些通用的方法（如get、set、add、remove等），而具体的List实现类（如ArrayList、LinkedList等）只需要实现其中一些方法即可，其余方法则可以继承自AbstractList类。<br>这种模式的优点是可以避免代码重复，提高代码复用性，并且能够方便地扩展和修改代码。<br>看起来有些不知所以然？那就慢慢读下去，看到具体如何做，就一目了然啦~</p>
+</blockquote>
+<h3 id="Collection接口"><a href="#Collection接口" class="headerlink" title="Collection接口"></a>Collection接口</h3><p>基本规定了，增删改查，以及一些其他的方法，具体如下：<br><strong>增：</strong></p>
+<ul>
+<li>add(E e)</li>
+<li>确保此集合包含指定的元素（可选操作）。</li>
+<li>boolean addAll(Collection&lt;? extends E&gt; c)</li>
+<li>将指定集合中的所有元素添加到此集合（可选操作）。</li>
+</ul>
+<p><strong>删：</strong></p>
+<ul>
+<li>void clear()</li>
+<li>从此集合中删除所有元素（可选操作）。</li>
+<li>boolean remove(Object o)</li>
+<li>从该集合中删除指定元素的单个实例（如果存在）（可选操作）。</li>
+<li>boolean removeAll(Collection&lt;?&gt; c)</li>
+<li>删除指定集合中包含的所有此集合的元素（可选操作）。</li>
+<li>default boolean removeIf(Predicate&lt;? super E&gt; filter)</li>
+<li>删除满足给定谓词的此集合的所有元素。</li>
+<li>boolean retainAll(Collection&lt;?&gt; c)</li>
+<li>仅保留此集合中包含在指定集合中的元素（可选操作）。</li>
+</ul>
+<p><strong>改（没有改元素，只有改成）：</strong><br>分为改成Array(数组),Stream(流),Spliterator(迭代器)</p>
+<ul>
+<li>Object[] toArray()</li>
+<li>返回一个包含此集合中所有元素的数组。</li>
+<li>T[]    toArray(T[] a)</li>
+<li>返回包含此集合中所有元素的数组;返回的数组的运行时类型是指定数组的运行时类型。</li>
+<li>default Stream<E>    stream()</li>
+<li>返回以此集合作为源的顺序 Stream。</li>
+<li>default Stream<E>    parallelStream()</li>
+<li>返回可能并行的 Stream与此集合作为其来源。</li>
+<li>Iterator<E>    iterator()</li>
+<li>返回此集合中的元素的迭代器。</li>
+<li>default Spliterator<E>    spliterator()</li>
+<li>创建一个Spliterator在这个集合中的元素。</li>
+</ul>
+<p><strong>查：</strong><br>可以查的东西可太多了，例如查一查是否包含某个值或某些值，是否为空，长度为多少，还有重写了Object的equals和hashCode方法，可以用来比较两个集合是否相等</p>
+<ul>
+<li>boolean contains(Object o)</li>
+<li>如果此集合包含指定的元素，则返回 true 。</li>
+<li>boolean containsAll(Collection&lt;?&gt; c)</li>
+<li>如果此集合包含指定 集合中的所有元素，则返回true。</li>
+<li>boolean equals(Object o)</li>
+<li>将指定的对象与此集合进行比较以获得相等性。</li>
+<li>int hashCode()</li>
+<li>返回此集合的哈希码值。</li>
+<li>boolean isEmpty()</li>
+<li>如果此集合不包含元素，则返回 true 。</li>
+<li>int size()</li>
+<li>返回此集合中的元素数。</li>
+</ul>
+<p><strong>注意，这里并没有提供可以查到具体某个元素的方法，只是粗略查询，但有具体精准的删除方法</strong></p>
+<p>每个集合类都需要实现上面这些方法，每个集合类都有上面这些方法，方法虽然繁杂，但为后续使用提供便利。<br>但jdk并没有直接实现Collection接口，而是提供了更具体的实现接口，Set，List和Queue，同时还提供了AbstractCollection，用来给程序员进行快速实现。</p>
+<h3 id="分析集合类构成"><a href="#分析集合类构成" class="headerlink" title="分析集合类构成"></a>分析集合类构成</h3><p>jdk的集合类庞大，看一下图：<br><img src="/../pic/img.png" alt="img.png"><br>先别急着头大😫，我们庖丁解牛，一步一步来。 根据图，可以看到主要分为三大接口List,Set,Queue。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><code class="hljs Java"><span class="hljs-comment">//为了快速获取这个接口独特在哪里，写个函数查询不同方法很重要:</span><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br>    <span class="hljs-comment">/**</span><br><span class="hljs-comment">     * 本方法用于不同类的方法继承比较，来更好学习某类</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> son 待测类</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> father 父类</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> mapper 通过比较什么，而判断是否重复</span><br><span class="hljs-comment">     * <span class="hljs-doctag">@param</span> sout 输出什么</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@SafeVarargs</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">soutDistinct</span><span class="hljs-params">(Class&lt;?&gt; son, Class&lt;?&gt; father,</span><br><span class="hljs-params">                                   Function&lt;? <span class="hljs-built_in">super</span> Method, ? extends Object&gt; mapper,</span><br><span class="hljs-params">                                   Function&lt;? <span class="hljs-built_in">super</span> Method, ? extends Object&gt;... sout)</span> &#123;<br>        <span class="hljs-keyword">if</span> (!father.isAssignableFrom(son)) &#123;<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IllegalArgumentException</span>(<span class="hljs-string">&quot;待比较类无继承关系&quot;</span>);<br>        &#125;<br><br>        Method[] fatherMethods = father.getMethods();<br>        <span class="hljs-keyword">if</span> (fatherMethods.length == <span class="hljs-number">0</span>) &#123;<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IllegalArgumentException</span>(<span class="hljs-string">&quot;父类无方法&quot;</span>);<br>        &#125;<br><br>        <span class="hljs-keyword">if</span> (!Arrays.stream(sout).findAny().isPresent()) &#123;<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IllegalArgumentException</span>(<span class="hljs-string">&quot;输出类型不全&quot;</span>);<br>        &#125;<br><br>        List&lt;Object&gt; collect = Arrays.stream(fatherMethods).map(mapper).collect(Collectors.toList());<br>        Arrays.stream(son.getMethods())<br>                .distinct()<br>                .filter(i -&gt; !collect.contains(mapper.apply(i)))<br>                .forEach(i -&gt; &#123;<br>                    Arrays.stream(sout).forEach(j -&gt; System.out.print(j.apply(i) + <span class="hljs-string">&quot; &quot;</span>));<br>                    System.out.println();<br>                &#125;);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>通过上面这个方法，可以粗略得知：<br>List定位为有序集合（序列），可以通过索引访问，可以有重复元素，提供的方法也是以可索引访问而展开的方法。<br>Set定位为无重复集合，并没有扩展新的方法，而是改了约定。<br>Queue定位为队列，提供了队列操作的基本方法。</p>
+<p><strong>细心的朋友是否还记得还有个靠前的抽象类AbstractCollection，通过上面的方法，可以知道它扩展了作为类的基本操作。</strong><br><strong>注意这便是模板方法设计模式，后续List、Set、Queue也是类似使用方法</strong></p>
+<blockquote>
+<p>q: 那如何通过AbstractCollection来实现自己想要的集合类呢？<br>a: 为了实现一个不可修改的集合，程序员只需要扩展这个类并提供iterator和size方法的实现。 （<br>iterator方法返回的迭代器必须实现hasNext和next ）<br>要实现可修改的集合，程序员必须另外覆盖此类的add方法（否则将抛出UnsupportedOperationException<br>），并且由iterator方法返回的迭代器必须另外实现其remove方法。</p>
+</blockquote>
+<p>后续的AbstractXX类都是类似作用，通过可选择性实现某些方法，来实现自己想要的集合类</p>
+<p>在大致分析完Collection接口的直接继承接口后，我们开始具体分析吧~</p>
+<h3 id="分析List"><a href="#分析List" class="headerlink" title="分析List"></a>分析List</h3><p>List接口继承Collection接口，提供了一些新的方法，如下:<br>大致在改和查上有所体现</p>
+<ul>
+<li><p>get</p>
+</li>
+<li><p>根据索引获取值</p>
+</li>
+<li><p>indexOf</p>
+</li>
+<li><p>查看该元素首个位置</p>
+</li>
+<li><p>lastIndexOf</p>
+</li>
+<li><p>查看该元素最后的位置<br>可以通过索引找到元素，也可以通过元素找到索引</p>
+</li>
+<li><p>replaceAll</p>
+</li>
+<li><p>替换掉所有符合类型的元素</p>
+</li>
+<li><p>set</p>
+</li>
+<li><p>设置某元素<br>替换某些元素</p>
+</li>
+<li><p>subList</p>
+</li>
+<li><p>返回指定范围的视图</p>
+</li>
+<li><p>listIterator</p>
+</li>
+<li><p>返回列表迭代器（之前Collection也有规定其他样式的迭代器嗷）</p>
+</li>
+<li><p>sort</p>
+</li>
+<li><p>排序<br>改成或返回新的形式</p>
+</li>
+</ul>
+<p>通过观察类图可知，其主要实现的主要类为AbstractList，其他类继承该类。</p>
+<blockquote>
+<p>q: AbstractList是什么呢？<br>a: AbstractList是Java集合框架中的一个抽象类，实现了List接口并提供了一些通用的方法实现。它的主要作用是为具体的List实现类提供一个通用的模板，使得开发者可以更方便地实现自己的List类。<br>但注意由于AbstractList没有自己的数据，所以相关数据的操作，它是抛出异常的，当然这样算是实现了方法，某种意义上，和AbstractCollection一样可以关闭了某些方法使用<br>q：那如何通过AbstractList来实现自己的List类呢？<br>a: 要实现一个不可修改的列表，程序员只需要扩展这个类并提供get(int)和size()方法的实现。<br>要实现可修改的列表，程序员必须另外覆盖set(int, E)方法（否则会抛出一个UnsupportedOperationException ）。<br>如果列表是可变大小，则程序员必须另外覆盖add(int, E)和remove(int)方法。</p>
+</blockquote>
+<p>观察AbstractList，它有个关键字段modCount。<br>作用是记录被结构修改的次数，就是每一次操作记录一下，配合迭代器使用，可以在迭代器进行完后，检查是否和迭代器计数比对，来判断是否操作正常（考虑到了并发）。<br><em>形象的说，就是古代账房中的每次记录，最终需要考核来判断是不是中间算账的时候出现问题。</em></p>
+<p>注意AbstractList的关键是如何拓展，因为后续类也是职责也是由此而生的：<br>实现不可修改的列表：提供get(int),size()<br>实现可修改的列表：提供get(int),size(),set(int, E)<br>实现可变大小：提供get(int),size(),add(int, E, remove(int)</p>
+<h4 id="非AbstractList一族"><a href="#非AbstractList一族" class="headerlink" title="非AbstractList一族"></a>非AbstractList一族</h4><p>那不继承AbstractList的有哪些类？发现有SubList，RandomAccessSubList</p>
+<blockquote>
+<p>先看看机器人怎么说？<br>SubList是Java集合框架中的一个类，它是List接口的一个实现类，用于表示原List中的一个子列表。SubList可以看作是原List的一个视图，它提供了一种方便的方式来访问原List中的一部分元素。</p>
+</blockquote>
+<p>SubList的作用在于，它允许开发者对原List中的一个子列表进行操作，包括添加、删除、修改和遍历等。这种操作会直接影响原List中相应的元素，因为SubList只是原List的一个视图，它与原List共享相同的数据存储结构，对SubList的操作会直接反映在原List中。</p>
+<blockquote>
+<p>使用SubList的好处在于，它提供了一种方便的方式来对List中的一部分元素进行操作，避免了使用循环或索引访问等繁琐的操作。另外，SubList还可以用于将一个List分割成多个部分进行处理，使得代码更加可读、可维护。<br>需要注意的是，对SubList的操作可能会影响原List的结构，因此在使用SubList时需要格外小心，确保操作的正确性。此外，SubList并不是线程安全的，因此在多线程环境下使用时需要进行同步处理。</p>
+</blockquote>
+<p>这下明白了，为什么直接new不了，它是用于对子列表的操作的列表，能new出来就有怪了。<br>由于不是特别常用，就先不继续往下分析SubList了。</p>
+<h4 id="AbstractList一族"><a href="#AbstractList一族" class="headerlink" title="AbstractList一族"></a>AbstractList一族</h4><p>观察类图可以得知，终于到了能用的实现类了，有Vector，ArrayList和AbstractSequentialList(后续LinkList)<br>Vector和ArrayList是基于数组实现的，咱们先说Vector:</p>
+<h5 id="Vector"><a href="#Vector" class="headerlink" title="Vector"></a>Vector</h5><p>Vector是Java集合框架中的一个类，它实现了List接口以及一些其他的接口，如Cloneable、Serializable等接口，<br>可以看作是一种可自动扩容的数组。Vector类的功能和ArrayList类类似，不同之处在于，Vector是线程安全的，支持多线程并发访问，但是在多线程环境下性能较低。<br>Vector提供了以下方法：<br>还是增删改查，同时都是相关Element</p>
+<h5 id="增加元素"><a href="#增加元素" class="headerlink" title="增加元素"></a>增加元素</h5><ul>
+<li>addElement(E obj)：在Vector的末尾添加一个元素。</li>
+<li>insertElementAt(E obj, int index)：在Vector的指定位置插入一个元素。</li>
+</ul>
+<h5 id="删除元素"><a href="#删除元素" class="headerlink" title="删除元素"></a>删除元素</h5><ul>
+<li>removeElement(Object obj)：移除Vector中的指定元素。</li>
+<li>removeElementAt(int index)：移除Vector中指定位置的元素。</li>
+</ul>
+<h5 id="修改元素"><a href="#修改元素" class="headerlink" title="修改元素"></a>修改元素</h5><ul>
+<li>setElementAt(E obj, int index)：将Vector中指定位置的元素替换为指定元素。</li>
+</ul>
+<h5 id="查找元素"><a href="#查找元素" class="headerlink" title="查找元素"></a>查找元素</h5><ul>
+<li>elementAt(int index)：返回Vector中指定位置的元素。</li>
+<li>firstElement()：返回Vector中的第一个元素。</li>
+<li>lastElement()：返回Vector中的最后一个元素。</li>
+</ul>
+<h5 id="其他操作"><a href="#其他操作" class="headerlink" title="其他操作"></a>其他操作</h5><ul>
+<li>capacity()：返回Vector的容量大小。</li>
+<li>ensureCapacity(int minCapacity)：设置Vector的容量大小，如果当前容量小于指定容量，则自动增加容量。</li>
+<li>trimToSize()：将Vector的容量设置为当前元素数量，释放多余的空间。</li>
+</ul>
+<h5 id="ArrayList"><a href="#ArrayList" class="headerlink" title="ArrayList"></a>ArrayList</h5><p>通过之前的函数可以发现，ArrayList并没有提供关于增删改查的方法，只是提供了一些其他操作。<br>虽然它提供的方法基本和AbstractList的方法类似，但进行了具体实现（篇幅有限，先不说它），使其线程不安全，但操作较为快速。</p>
+<h5 id="其他操作-1"><a href="#其他操作-1" class="headerlink" title="其他操作"></a>其他操作</h5><ul>
+<li>clone()：赋值ArrayList。</li>
+<li>trimToSize()：将ArrayList的容量设置为当前元素数量，释放多余的空间。</li>
+<li>ensureCapacity(int minCapacity)：设置ArrayList的容量大小，如果当前容量小于指定容量，则自动增加容量。</li>
+</ul>
+<p>当然在ArrayList不止有本身类方法的重写，也写了许多内部类：SubList(服务于subList)、Ltr与ListLtr(服务于获取迭代器)。</p>
+<h5 id="AbstractSequentialList"><a href="#AbstractSequentialList" class="headerlink" title="AbstractSequentialList"></a>AbstractSequentialList</h5><blockquote>
+<p>q: AbstractSequentialList是什么？<br>a: 先来看看官方介绍：<br>此类提供的骨干实现List界面最小化以实现此接口由“连续访问”数据存储备份所需的工作（如链接列表）。<br>对于随机访问数据（如数组），AbstractList应优先于此类。</p>
+<p>q: 那如何通过AbstractSequentialList实现连续访问的List类呢？<br>a: 为了实现一个列表，程序员只需要扩展这个类，并提供listIterator和size方法的实现。<br>对于一个不可修改的列表，程序员只需要实现列表迭代器的hasNext，next，hasPrevious，previous和index方法。<br>对于可修改的列表，程序员应该另外实现list iterator的set方法。<br>对于可变大小的列表，程序员应该另外实现list iterator的remove和add方法。</p>
+</blockquote>
+<p>观察源码可以看到，AbstractSequentialList将它的方法(增add删remove改set查get)实现，并使用listIterator来实现。<br>所以我们重点是实现listIterator，相当于我们需要实现一个迭代器，并根据需求把迭代器的方法灵活调整，来灵活实现所需List</p>
+<h3 id="分析Queue"><a href="#分析Queue" class="headerlink" title="分析Queue"></a>分析Queue</h3><p>终于分析完了List</p>
+<p>Queue接口也是继承自Collection接口的，它表示一种队列的数据结构，支持在队列的末尾添加元素，在队列的头部移除元素，并支持查询队列的头部元素。<br>Queue接口提供了以下方法：</p>
+<ul>
+<li>offer</li>
+<li>在队列的末尾添加元素，如果队列已满则返回false</li>
+<li>poll</li>
+<li>移除队列的头部元素，如果队列为空则返回null</li>
+<li>element</li>
+<li>返回队列的头部元素，如果队列为空则抛出异常</li>
+<li>peek</li>
+<li>返回队列的头部元素，如果队列为空则返回null</li>
+<li>另外，Queue接口还继承了Collection接口中的一些方法，例如size、isEmpty、contains、iterator等方法，这些方法的含义与Collection接口中的含义相同。</li>
+</ul>
+<p>类似List，Queue也是主要依靠AbstractQueue来作为模板，来编写实现类的。</p>
+<h4 id="AbstractQueue"><a href="#AbstractQueue" class="headerlink" title="AbstractQueue"></a>AbstractQueue</h4><p>观察源码可以看到，它把之前AbstractCollection所需的方法进行了拓展和修改，</p>
+<blockquote>
+<p>此类提供某些Queue操作的框架实现。当基实现不允许空元素时，此类中的实现是合适的。<br>方法 add、 和 分别基于 offer、 poll remove和 element peek，但会引发异常，而不是通过 false 或 null 返回来指示失败。</p>
+</blockquote>
+<p>同样的模板方法设计模式，我们只需要实现offer、poll、peek、size方法即可，之前的Collection所需方法被用offer、poll、peek来实现了。<br>我们类似之前的写作手法，先看看不使用模板方法的接口Deque</p>
+<h5 id="非AbstractQueue一族-Deque接口"><a href="#非AbstractQueue一族-Deque接口" class="headerlink" title="非AbstractQueue一族 Deque接口"></a>非AbstractQueue一族 Deque接口</h5><p>Deque是Java集合框架中的双端队列接口，它继承了Queue接口，并提供了一系列在队列两端进行插入、删除、获取元素的方法。<br>Deque可以被实现为线程安全的或非线程安全的，具体实现类有ArrayDeque和LinkedList等。<br>以下是Deque接口中定义的常用方法：</p>
+<h5 id="增加元素："><a href="#增加元素：" class="headerlink" title="增加元素："></a>增加元素：</h5><ul>
+<li>addFirst(E e)：将指定元素插入Deque的开头；</li>
+<li>addLast(E e)：将指定元素插入Deque的结尾；</li>
+<li>offerFirst(E e)：将指定元素插入Deque的开头，如果Deque已满，则返回false；</li>
+<li>offerLast(E e)：将指定元素插入Deque的结尾，如果Deque已满，则返回false；</li>
+<li>push(E e)：将指定元素插入Deque的开头，相当于addFirst方法。</li>
+</ul>
+<h5 id="删除元素："><a href="#删除元素：" class="headerlink" title="删除元素："></a>删除元素：</h5><ul>
+<li>removeFirst()：移除Deque的开头元素，如果Deque为空，则抛出NoSuchElementException异常；</li>
+<li>removeLast()：移除Deque的结尾元素，如果Deque为空，则抛出NoSuchElementException异常；</li>
+<li>pollFirst()：移除Deque的开头元素，如果Deque为空，则返回null；</li>
+<li>pollLast()：移除Deque的结尾元素，如果Deque为空，则返回null；</li>
+<li>pop()：移除Deque的开头元素，相当于removeFirst方法。</li>
+</ul>
+<h5 id="获取元素："><a href="#获取元素：" class="headerlink" title="获取元素："></a>获取元素：</h5><ul>
+<li>getFirst()：获取Deque的开头元素，如果Deque为空，则抛出NoSuchElementException异常；</li>
+<li>getLast()：获取Deque的结尾元素，如果Deque为空，则抛出NoSuchElementException异常；</li>
+<li>peekFirst()：获取Deque的开头元素，如果Deque为空，则返回null；</li>
+<li>peekLast()：获取Deque的结尾元素，如果Deque为空，则返回null；</li>
+<li>element()：获取Deque的开头元素，相当于getFirst方法。</li>
+</ul>
+<h5 id="其他操作："><a href="#其他操作：" class="headerlink" title="其他操作："></a>其他操作：</h5><ul>
+<li>removeFirstOccurrence(Object o)：移除Deque中第一次出现的指定元素；</li>
+<li>removeLastOccurrence(Object o)：移除Deque中最后一次出现的指定元素；</li>
+<li>descendingIterator()：返回一个反向迭代器，可以从Deque的尾部向头部迭代。</li>
+</ul>
+<p>需要注意的是，如果Deque是空的，调用getFirst、getLast、element等方法会抛出NoSuchElementException异常。<br>如果调用addFirst、addLast、offerFirst、offerLast等方法时，Deque已满，则会抛出IllegalStateException异常。</p>
+<h5 id="ArrayDeque-和-LinkedList"><a href="#ArrayDeque-和-LinkedList" class="headerlink" title="ArrayDeque 和 LinkedList"></a>ArrayDeque 和 LinkedList</h5><p>那我们说一下ArrayDeque，它是Deque接口的一个实现类，它是基于数组实现的双端队列，它没有容量上限，可以根据需要自动扩容（具体自动扩容可以详细查看源码）。<br>LinkedList是Deque接口的另一个实现类，它是基于链表实现的双端队列，它没有容量上限，也可以根据需要自动扩容。</p>
+<blockquote>
+<p>比较一下两者</p>
+</blockquote>
+<ul>
+<li>内部实现：ArrayDeque采用循环数组的形式实现，而LinkedList则采用链表的形式实现。循环数组可以更好地利用计算机内存的缓存机制，因此在插入、删除、获取元素等操作中具有更优秀的性能。而链表则可以很方便地进行元素的插入和删除操作，但是在访问元素时需要遍历整个链表，因此访问元素的性能相对较低。</li>
+<li>内存占用：相比于ArrayDeque，LinkedList具有较大的内存占用。由于LinkedList采用链表的形式实现，需要为每个元素分配独立的内存空间。而ArrayDeque则采用一个数组存储所有元素，因此可以避免为每个元素分配独立的内存空间带来的开销。</li>
+<li>线程安全性：ArrayDeque是非线程安全的，不支持多线程并发访问。而LinkedList则是非线程安全的，但可以通过Collections.synchronizedList方法或者使用ConcurrentLinkedDeque等线程安全的类来实现多线程并发访问。</li>
+</ul>
+<h4 id="AbstractQueue一族"><a href="#AbstractQueue一族" class="headerlink" title="AbstractQueue一族"></a>AbstractQueue一族</h4><p>让我们说回AbstractQueue部分，在类图中可以看到只有PriorityQueue(当然在别的地方也有继承，但在这里先不讨论)<br>继承了AbstractQueue，那让我们来分析它。</p>
+<blockquote>
+<p>PriorityQueue是什么呢？<br>PriorityQueue是堆结构，它可以用于对元素进行排序并快速地获取优先级最高的元素。PriorityQueue可以存储任何可比较的元素，包括基本数据类型和自定义对象。<br>PriorityQueue的实现基于二叉堆数据结构，它是一种完全二叉树，并且具有以下性质：<br>父节点的值小于或等于其子节点的值（小根堆）<br>父节点的值大于或等于其子节点的值（大根堆）<br>PriorityQueue默认采用小根堆的形式实现，也可以通过传入一个Comparator对象来修改为大根堆。<br>在PriorityQueue中，插入元素和删除元素的时间复杂度均为O(log n)，其中n为队列中元素的个数。</p>
+</blockquote>
+<p>观察PriorityQueue，可以发现它并没有扩展方法，类似之前的AbstractSequentialList的设计模式（模板方法）一样，并使用比较器贯穿所有方法，以此实现堆。</p>
+<h3 id="分析Set接口"><a href="#分析Set接口" class="headerlink" title="分析Set接口"></a>分析Set接口</h3><p>前文说到Set并没有扩展新方法，而是增加了约定。</p>
+<blockquote>
+<p>先来看看官方定义:<br>不包含重复元素的集合。更正式地，集合不包含一对元素e1和e2，使得e1.equals(e2)，并且最多一个空元素。正如其名称所暗示的那样，这个接口模拟了数学集抽象。<br>Set接口除了继承自Collection接口的所有构造函数的合同以及add,equals和hashCode方法的合同外，还增加了其他规定。</p>
+</blockquote>
+<p>和前文一样，使用模板方法设计模式的AbstractSet来进行实现Set类，但是这次我们先分析不使用AbstractSet的SortedSet</p>
+<h4 id="SortedSet接口和NavigableSet接口"><a href="#SortedSet接口和NavigableSet接口" class="headerlink" title="SortedSet接口和NavigableSet接口"></a>SortedSet接口和NavigableSet接口</h4><p>SortedSet是Java集合框架中的一种有序集合，它继承自Set接口，保证其中的元素是按照某种特定的排序方式进行排序的。<br>SortedSet中新增的方法主要是与排序有关的方法，包括：</p>
+<ul>
+<li>first()：返回集合中的第一个元素。</li>
+<li>last()：返回集合中的最后一个元素。</li>
+<li>headSet(E toElement)：返回一个子集合，其中包含小于指定元素的所有元素。</li>
+<li>subSet(E fromElement, E toElement)：返回一个子集合，其中包含大于等于fromElement且小于toElement的所有元素。</li>
+<li>tailSet(E fromElement)：返回一个子集合，其中包含大于等于指定元素的所有元素。</li>
+</ul>
+<p>很明显由于该集合有一定顺序，所以提供的方法可以只通过元素来获取一段子集合，而不需要通过索引来获取。</p>
+<p>而我们下面要讲述的NavigableSet接口是SortedSet接口的拓展，它提供了一些导航方法，可以更灵活的对集合进行操作。</p>
+<ul>
+<li><p>lower(E e)：返回集合中小于指定元素的最大元素。</p>
+</li>
+<li><p>floor(E e)：返回集合中小于等于指定元素的最大元素。</p>
+</li>
+<li><p>ceiling(E e)：返回集合中大于等于指定元素的最小元素。</p>
+</li>
+<li><p>higher(E e)：返回集合中大于指定元素的最小元素。<br>返回指定一定范围的某个元素。</p>
+</li>
+<li><p>pollFirst()：返回集合中的第一个元素，并在集合中删除该元素。</p>
+</li>
+<li><p>pollLast()：返回集合中的最后一个元素，并在集合中删除该元素。<br>删除元素。</p>
+</li>
+<li><p>descendingSet()：返回集合中的逆序集合。</p>
+</li>
+<li><p>descendingIterator()：返回集合中的逆序迭代器。<br>返回逆序集合或逆序迭代器。</p>
+</li>
+</ul>
+<p>值得注意的是NavigableSet并没有对之前Set接口进行实现，提供了扩展方法接口。</p>
+<h4 id="AbstractSet"><a href="#AbstractSet" class="headerlink" title="AbstractSet"></a>AbstractSet</h4><blockquote>
+<p>说回我们的AbstractSet，此类提供 Set 接口的框架实现，以最大程度地减少实现此接口所需的工作量。<br>通过扩展此类实现集合的过程与通过扩展 AbstractCollection 实现集合的过程相同，只是此类子类中的所有方法和构造函数都必须遵守 Set 接口施加的其他约束</p>
+</blockquote>
+<p>观察源码可以发现，它只是实现了equals,hashCode,removeAll方法，除此并没有进行其他操作了，这样的简便使得后续Set的实现变得简单和多样。<br>AbstractSet下分三个类，分别是HashSet,TreeSet,EnumSet。我们简单介绍一下： </p>
+<h5 id="EnumSet"><a href="#EnumSet" class="headerlink" title="EnumSet"></a>EnumSet</h5><p>EnumSet是Java集合框架中的一种特殊的集合，它专门用于存储枚举类型的元素。<br>由于枚举类型的取值是有限的、固定的，EnumSet可以使用位向量来表示集合元素，从而提高了性能和空间效率。EnumSet提供了多种操作方法，如add()、remove()、contains()等，同时它还实现了Set接口，因此可以直接使用Set中的大部分方法。</p>
+<p>EnumSet是用来配合枚举类使用的，可以较为方便的管理枚举类<br>提供下面的方法，用来生成EnumSet：</p>
+<ul>
+<li>allOf(类<E> elementType)</li>
+<li>创建一个包含指定元素类型中所有元素的枚举集。</li>
+<li>EnumSet<E>	clone()</li>
+<li>返回此集合的副本。</li>
+<li>EnumSet<E>	complementOf(EnumSet<E> s)</li>
+<li>创建与指定枚举集具有相同元素类型的枚举集，最初包含此类型的所有元素，该元素 不包含在指定的集合中。</li>
+<li>EnumSet<E>	copyOf(Collection<E> c)</li>
+<li>创建从指定集合初始化的枚举集。</li>
+<li>EnumSet<E>	copyOf(EnumSet<E> s)</li>
+<li>创建与指定的枚举集相同的元素类型的枚举集，最初包含相同的元素（如果有）。</li>
+<li>EnumSet<E>	noneOf(类<E> elementType)</li>
+<li>使用指定的元素类型创建一个空的枚举集。</li>
+<li>EnumSet<E>	of(E e)</li>
+<li>创建一个最初包含指定元素的枚举集。</li>
+<li>EnumSet<E>	range(E from, E to)</li>
+<li>创建最初包含由两个指定端点定义的范围内的所有元素的枚举集。</li>
+</ul>
+<h5 id="TreeSet-和-HashSet"><a href="#TreeSet-和-HashSet" class="headerlink" title="TreeSet 和 HashSet"></a>TreeSet 和 HashSet</h5><p>由于我们篇幅有限，底层原理先不具体说，所以暂且将两个拿在一起介绍。</p>
+<p>TreeSet是Java集合框架中的一种有序集合，它实现了SortedSet接口，可以根据元素的自然排序或者指定的Comparator进行排序。<br>TreeSet底层是基于红黑树实现的，因此插入、删除、查找等操作的时间复杂度都是O(logN)。TreeSet提供了多种操作方法，如add()、remove()、contains()等，同时它还实现了NavigableSet接口，提供了一些导航方法，如lower()、floor()、ceiling()、higher()等。</p>
+<p>HashSet是Java集合框架中的一种无序集合，它底层是基于HashMap实现的，元素被存储在HashMap的key中，而value是一个常量Object对象，因此具有HashMap的优点，如快速插入、删除、查找等操作。<br>HashSet中的元素是无序的，并且不允许重复元素的存在。HashSet提供了多种操作方法，如add()、remove()、contains()等，同时实现了Set接口，因此可以直接使用Set中的大部分方法。</p>
+<p>它们的使用场景不同：<br>HashSet适用于快速插入、删除、查找元素，并且不需要考虑元素的顺序的场景，如去重、查找等。而TreeSet适用于对元素进行排序和范围查找的场景，如按照年龄、姓名等进行排序和查找。</p>
+<h2 id="Map"><a href="#Map" class="headerlink" title="Map"></a>Map</h2><p>MAP部分也是个大内容，时间关系，挖个坑以后填😀</p>
+
+  </div>
+</article>
+
+
+    <div class="blog-post-comments">
+        <div id="utterances_thread">
+            <noscript>加载评论需要在浏览器启用 JavaScript 脚本支持。</noscript>
+        </div>
+    </div>
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">首页</a></li>
+        
+          <li><a href="/archives/">文章</a></li>
+        
+          <li><a href="/search/">搜索</a></li>
+        
+          <li><a target="_blank" rel="noopener" href="http://github.com/tro148">项目</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Collection"><span class="toc-number">1.</span> <span class="toc-text">Collection</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Collection%E6%8E%A5%E5%8F%A3"><span class="toc-number">1.1.</span> <span class="toc-text">Collection接口</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%86%E6%9E%90%E9%9B%86%E5%90%88%E7%B1%BB%E6%9E%84%E6%88%90"><span class="toc-number">1.2.</span> <span class="toc-text">分析集合类构成</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%86%E6%9E%90List"><span class="toc-number">1.3.</span> <span class="toc-text">分析List</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%9D%9EAbstractList%E4%B8%80%E6%97%8F"><span class="toc-number">1.3.1.</span> <span class="toc-text">非AbstractList一族</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#AbstractList%E4%B8%80%E6%97%8F"><span class="toc-number">1.3.2.</span> <span class="toc-text">AbstractList一族</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#Vector"><span class="toc-number">1.3.2.1.</span> <span class="toc-text">Vector</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%A2%9E%E5%8A%A0%E5%85%83%E7%B4%A0"><span class="toc-number">1.3.2.2.</span> <span class="toc-text">增加元素</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%88%A0%E9%99%A4%E5%85%83%E7%B4%A0"><span class="toc-number">1.3.2.3.</span> <span class="toc-text">删除元素</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E4%BF%AE%E6%94%B9%E5%85%83%E7%B4%A0"><span class="toc-number">1.3.2.4.</span> <span class="toc-text">修改元素</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%9F%A5%E6%89%BE%E5%85%83%E7%B4%A0"><span class="toc-number">1.3.2.5.</span> <span class="toc-text">查找元素</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%85%B6%E4%BB%96%E6%93%8D%E4%BD%9C"><span class="toc-number">1.3.2.6.</span> <span class="toc-text">其他操作</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#ArrayList"><span class="toc-number">1.3.2.7.</span> <span class="toc-text">ArrayList</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%85%B6%E4%BB%96%E6%93%8D%E4%BD%9C-1"><span class="toc-number">1.3.2.8.</span> <span class="toc-text">其他操作</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#AbstractSequentialList"><span class="toc-number">1.3.2.9.</span> <span class="toc-text">AbstractSequentialList</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%86%E6%9E%90Queue"><span class="toc-number">1.4.</span> <span class="toc-text">分析Queue</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#AbstractQueue"><span class="toc-number">1.4.1.</span> <span class="toc-text">AbstractQueue</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E9%9D%9EAbstractQueue%E4%B8%80%E6%97%8F-Deque%E6%8E%A5%E5%8F%A3"><span class="toc-number">1.4.1.1.</span> <span class="toc-text">非AbstractQueue一族 Deque接口</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%A2%9E%E5%8A%A0%E5%85%83%E7%B4%A0%EF%BC%9A"><span class="toc-number">1.4.1.2.</span> <span class="toc-text">增加元素：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%88%A0%E9%99%A4%E5%85%83%E7%B4%A0%EF%BC%9A"><span class="toc-number">1.4.1.3.</span> <span class="toc-text">删除元素：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%8E%B7%E5%8F%96%E5%85%83%E7%B4%A0%EF%BC%9A"><span class="toc-number">1.4.1.4.</span> <span class="toc-text">获取元素：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%85%B6%E4%BB%96%E6%93%8D%E4%BD%9C%EF%BC%9A"><span class="toc-number">1.4.1.5.</span> <span class="toc-text">其他操作：</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#ArrayDeque-%E5%92%8C-LinkedList"><span class="toc-number">1.4.1.6.</span> <span class="toc-text">ArrayDeque 和 LinkedList</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#AbstractQueue%E4%B8%80%E6%97%8F"><span class="toc-number">1.4.2.</span> <span class="toc-text">AbstractQueue一族</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%86%E6%9E%90Set%E6%8E%A5%E5%8F%A3"><span class="toc-number">1.5.</span> <span class="toc-text">分析Set接口</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#SortedSet%E6%8E%A5%E5%8F%A3%E5%92%8CNavigableSet%E6%8E%A5%E5%8F%A3"><span class="toc-number">1.5.1.</span> <span class="toc-text">SortedSet接口和NavigableSet接口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#AbstractSet"><span class="toc-number">1.5.2.</span> <span class="toc-text">AbstractSet</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#EnumSet"><span class="toc-number">1.5.2.1.</span> <span class="toc-text">EnumSet</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#TreeSet-%E5%92%8C-HashSet"><span class="toc-number">1.5.2.2.</span> <span class="toc-text">TreeSet 和 HashSet</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Map"><span class="toc-number">2.</span> <span class="toc-text">Map</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2023/06/24/%E7%BB%86%E8%AF%B4%E9%9B%86%E5%90%88%E7%B1%BB/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2023/06/24/%E7%BB%86%E8%AF%B4%E9%9B%86%E5%90%88%E7%B1%BB/&text=细说集合类之Collection部分"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2023/06/24/%E7%BB%86%E8%AF%B4%E9%9B%86%E5%90%88%E7%B1%BB/&title=细说集合类之Collection部分"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2023/06/24/%E7%BB%86%E8%AF%B4%E9%9B%86%E5%90%88%E7%B1%BB/&is_video=false&description=细说集合类之Collection部分"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=细说集合类之Collection部分&body=Check out this article: http://example.com/2023/06/24/%E7%BB%86%E8%AF%B4%E9%9B%86%E5%90%88%E7%B1%BB/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2023/06/24/%E7%BB%86%E8%AF%B4%E9%9B%86%E5%90%88%E7%B1%BB/&title=细说集合类之Collection部分"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2023/06/24/%E7%BB%86%E8%AF%B4%E9%9B%86%E5%90%88%E7%B1%BB/&title=细说集合类之Collection部分"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2023/06/24/%E7%BB%86%E8%AF%B4%E9%9B%86%E5%90%88%E7%B1%BB/&title=细说集合类之Collection部分"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2023/06/24/%E7%BB%86%E8%AF%B4%E9%9B%86%E5%90%88%E7%B1%BB/&title=细说集合类之Collection部分"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2023/06/24/%E7%BB%86%E8%AF%B4%E9%9B%86%E5%90%88%E7%B1%BB/&name=细说集合类之Collection部分&description=&lt;p&gt;集合类是十分常用的一系列类，主体分为Map为根的实现类和Collection为根的实现类&lt;/p&gt;"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2023/06/24/%E7%BB%86%E8%AF%B4%E9%9B%86%E5%90%88%E7%B1%BB/&t=细说集合类之Collection部分"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2021-2023
+    TroTro
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/search/">搜索</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="http://github.com/tro148">项目</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板！\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功！");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+    <script type="text/javascript">
+      var utterances_repo = 'tro148/tro148.github.io';
+      var utterances_issue_term = 'comment';
+      var utterances_label = 'Comment';
+      var utterances_theme = 'github-light';
+
+      (function(){
+          var script = document.createElement('script');
+
+          script.src = 'https://utteranc.es/client.js';
+          script.setAttribute('repo', utterances_repo);
+          script.setAttribute('issue-term', 'pathname');
+          script.setAttribute('label', utterances_label);
+          script.setAttribute('theme', utterances_theme);
+          script.setAttribute('crossorigin', 'anonymous');
+          script.async = true;
+          (document.getElementById('utterances_thread')).appendChild(script);
+      }());
+  </script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginModelPath":"assets/","model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/wanko.model.json"},"display":{"superSample":2,"width":250,"height":500,"position":"right","hOffset":0,"vOffset":-20},"mobile":{"show":false,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"pluginJsPath":"lib/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

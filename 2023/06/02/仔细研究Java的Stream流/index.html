@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="Stream流是jdk8以后的特性，通过stream流，实现对Collection集合的便利操作。本文研究创建Stream和使用Stream，但注意并不是全面的，只是大致流程。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="细聊Java的Stream流(看源码)">
+<meta property="og:url" content="http://example.com/2023/06/02/%E4%BB%94%E7%BB%86%E7%A0%94%E7%A9%B6Java%E7%9A%84Stream%E6%B5%81/index.html">
+<meta property="og:site_name" content="TroTro">
+<meta property="og:description" content="Stream流是jdk8以后的特性，通过stream流，实现对Collection集合的便利操作。本文研究创建Stream和使用Stream，但注意并不是全面的，只是大致流程。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/image/img.png">
+<meta property="article:published_time" content="2023-06-02T07:05:23.000Z">
+<meta property="article:modified_time" content="2023-06-02T17:35:26.261Z">
+<meta property="article:author" content="TroTro">
+<meta property="article:tag" content="Java">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/image/img.png">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>细聊Java的Stream流(看源码)</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-NGQ4ZR4FTC"></script>
+  <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-NGQ4ZR4FTC');
+  </script>
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+      <link rel="alternate" href="/true" title="TroTro" type="application/atom+xml" />
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="顶部" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/search/">搜索</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="http://github.com/tro148">项目</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="上一篇" href="/2023/06/23/%E4%BB%A3%E7%A0%81%E4%B8%AD%E8%AF%B4JUC-1/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="下一篇" href="/2023/05/28/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E7%BA%BF%E7%A8%8B%E5%85%B1%E4%BA%AB%E7%9A%84%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="返回顶部" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="分享文章" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2023/06/02/%E4%BB%94%E7%BB%86%E7%A0%94%E7%A9%B6Java%E7%9A%84Stream%E6%B5%81/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2023/06/02/%E4%BB%94%E7%BB%86%E7%A0%94%E7%A9%B6Java%E7%9A%84Stream%E6%B5%81/&text=细聊Java的Stream流(看源码)"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2023/06/02/%E4%BB%94%E7%BB%86%E7%A0%94%E7%A9%B6Java%E7%9A%84Stream%E6%B5%81/&title=细聊Java的Stream流(看源码)"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2023/06/02/%E4%BB%94%E7%BB%86%E7%A0%94%E7%A9%B6Java%E7%9A%84Stream%E6%B5%81/&is_video=false&description=细聊Java的Stream流(看源码)"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=细聊Java的Stream流(看源码)&body=Check out this article: http://example.com/2023/06/02/%E4%BB%94%E7%BB%86%E7%A0%94%E7%A9%B6Java%E7%9A%84Stream%E6%B5%81/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2023/06/02/%E4%BB%94%E7%BB%86%E7%A0%94%E7%A9%B6Java%E7%9A%84Stream%E6%B5%81/&title=细聊Java的Stream流(看源码)"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2023/06/02/%E4%BB%94%E7%BB%86%E7%A0%94%E7%A9%B6Java%E7%9A%84Stream%E6%B5%81/&title=细聊Java的Stream流(看源码)"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2023/06/02/%E4%BB%94%E7%BB%86%E7%A0%94%E7%A9%B6Java%E7%9A%84Stream%E6%B5%81/&title=细聊Java的Stream流(看源码)"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2023/06/02/%E4%BB%94%E7%BB%86%E7%A0%94%E7%A9%B6Java%E7%9A%84Stream%E6%B5%81/&title=细聊Java的Stream流(看源码)"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2023/06/02/%E4%BB%94%E7%BB%86%E7%A0%94%E7%A9%B6Java%E7%9A%84Stream%E6%B5%81/&name=细聊Java的Stream流(看源码)&description=&lt;p&gt;Stream流是jdk8以后的特性，通过stream流，实现对Collection集合的便利操作。&lt;br&gt;本文研究创建Stream和使用Stream，但注意并不是全面的，只是大致流程。&lt;/p&gt;"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2023/06/02/%E4%BB%94%E7%BB%86%E7%A0%94%E7%A9%B6Java%E7%9A%84Stream%E6%B5%81/&t=细聊Java的Stream流(看源码)"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%88%9B%E5%BB%BAStream"><span class="toc-number">1.</span> <span class="toc-text">创建Stream</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%86%E6%9E%90%E6%B6%89%E5%8F%8A%E7%AE%A1%E9%81%93%E7%9A%84%E7%BB%93%E6%9E%84"><span class="toc-number">1.1.</span> <span class="toc-text">分析涉及管道的结构</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8Stream"><span class="toc-number">2.</span> <span class="toc-text">使用Stream</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%AD%E9%97%B4%E6%93%8D%E4%BD%9C"><span class="toc-number">2.1.</span> <span class="toc-text">中间操作</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%88%E7%AB%AF%E6%93%8D%E4%BD%9C"><span class="toc-number">2.2.</span> <span class="toc-text">终端操作</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">2.2.1.</span> <span class="toc-text">总结</span></a></li></ol></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        细聊Java的Stream流(看源码)
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">TroTro</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2023-06-02T07:05:23.000Z" class="dt-published" itemprop="datePublished">2023-06-02</time>
+        
+        (Updated: <time datetime="2023-06-02T17:35:26.261Z" class="dt-updated" itemprop="dateModified">2023-06-03</time>)
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/Java/" rel="tag">Java</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <p>Stream流是jdk8以后的特性，通过stream流，实现对Collection集合的便利操作。<br>本文研究创建Stream和使用Stream，但注意并不是全面的，只是大致流程。</p>
+<span id="more"></span>
+<p>整体分为创建Stream和使用Stream（重点）</p>
+<h1 id="创建Stream"><a href="#创建Stream" class="headerlink" title="创建Stream"></a>创建Stream</h1><p><img src="/../../image/img.png" alt="img.png"><br>通过idea分析图，可知Stream有多个接口，含有Stream、IntStream、LongStream、DoubleStream，XXStream是Stream的XX原始特化，<br>它们提供描述方法和限制，和默认实现。可以使用stream()，生成流（实际是XPipeline管道），实际流程如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs Java"><span class="hljs-comment">// 使用Stream.of(..)直接创建时候，调用</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span>&lt;T&gt; Stream&lt;T&gt; <span class="hljs-title function_">of</span><span class="hljs-params">(T... values)</span> &#123;<br>        <span class="hljs-keyword">return</span> Arrays.stream(values);<br>    &#125;<br><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span>&lt;T&gt; Stream&lt;T&gt; <span class="hljs-title function_">of</span><span class="hljs-params">(T t)</span> &#123;<br>        <span class="hljs-keyword">return</span> StreamSupport.stream(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Streams</span>.StreamBuilderImpl&lt;&gt;(t), <span class="hljs-literal">false</span>);<br>    &#125;<br><br><span class="hljs-comment">//比如使用Collection.stream()时候，调用</span><br><span class="hljs-keyword">default</span> Stream&lt;E&gt; <span class="hljs-title function_">stream</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-keyword">return</span> StreamSupport.stream(spliterator(), <span class="hljs-literal">false</span>);<br>    &#125;<br><br><span class="hljs-comment">// 使用Arrays.stream(array)时候，调用</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> &lt;T&gt; Stream&lt;T&gt; <span class="hljs-title function_">stream</span><span class="hljs-params">(T[] array)</span> &#123;<br>        <span class="hljs-keyword">return</span> stream(array, <span class="hljs-number">0</span>, array.length);<br>    &#125;<br><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> &lt;T&gt; Stream&lt;T&gt; <span class="hljs-title function_">stream</span><span class="hljs-params">(T[] array, <span class="hljs-type">int</span> startInclusive, <span class="hljs-type">int</span> endExclusive)</span> &#123;<br>        <span class="hljs-keyword">return</span> StreamSupport.stream(spliterator(array, startInclusive, endExclusive), <span class="hljs-literal">false</span>);<br>    &#125;<br><span class="hljs-comment">// 注意使用double, Int。只是把数组拆分开，然后仍然调用Arrays.stream(array)</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> IntStream <span class="hljs-title function_">of</span><span class="hljs-params">(<span class="hljs-type">int</span>... values)</span> &#123;<br>        <span class="hljs-keyword">return</span> Arrays.stream(values);<br>    &#125;<br>    <br><span class="hljs-comment">// 其他类似</span><br></code></pre></td></tr></table></figure>
+<p>可以看到都是最终调用StreamSupport的静态方法stream， stream的两个参数spliterator和parallel是什么呢？</p>
+<blockquote>
+<p>StreamSupport 提供创建和操作流的低级实用方法。</p>
+</blockquote>
+<p>Spliterator 是用来遍历和划分源元素的对象，可以单独遍历元素和按顺序批量遍历，类似Iterator，再往下就不研究了，属于别的内容了，总之Stream就是用它来进行一系列操作。</p>
+<p>parallel 是用来选择是顺序流(false)还是并行流(true)。</p>
+<p>当然，StreamSupport也提供了其他的创建流方式，这里说：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs Java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> &lt;T&gt; Stream&lt;T&gt; <span class="hljs-title function_">stream</span><span class="hljs-params">(Supplier&lt;? extends Spliterator&lt;T&gt;&gt; supplier,</span><br><span class="hljs-params">                                       <span class="hljs-type">int</span> characteristics,</span><br><span class="hljs-params">                                       <span class="hljs-type">boolean</span> parallel)</span> &#123;<br>        Objects.requireNonNull(supplier);<br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ReferencePipeline</span>.Head&lt;&gt;(supplier,<br>                                            StreamOpFlag.fromCharacteristics(characteristics),<br>                                            parallel);<br>    &#125;<br></code></pre></td></tr></table></figure>
+<p>supplier是函数接口，用来提供Spliterator。<br>characteristics是与流和操作的特征相对应的标志。流框架使用标志来控制、专门化或优化计算，可用于描述与流关联的几个不同实体的特征：流源、中间操作和终端操作。<br>parallel 和上述的一样作用</p>
+<p>继续深入，可以发现不同的Stream对应不同的Pipeline，Pipeline调用父类构造函数，构造Pipeline</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs Java">AbstractPipeline(Supplier&lt;? <span class="hljs-keyword">extends</span> <span class="hljs-title class_">Spliterator</span>&lt;?&gt;&gt; source,<br>                     <span class="hljs-type">int</span> sourceFlags, <span class="hljs-type">boolean</span> parallel) &#123;<br>        <span class="hljs-built_in">this</span>.previousStage = <span class="hljs-literal">null</span>;<br>        <span class="hljs-built_in">this</span>.sourceSupplier = source;<br>        <span class="hljs-built_in">this</span>.sourceStage = <span class="hljs-built_in">this</span>;<br>        <span class="hljs-built_in">this</span>.sourceOrOpFlags = sourceFlags &amp; StreamOpFlag.STREAM_MASK;<br>        <span class="hljs-comment">// The following is an optimization of:</span><br>        <span class="hljs-comment">// StreamOpFlag.combineOpFlags(sourceOrOpFlags, StreamOpFlag.INITIAL_OPS_VALUE);</span><br>        <span class="hljs-built_in">this</span>.combinedFlags = (~(sourceOrOpFlags &lt;&lt; <span class="hljs-number">1</span>)) &amp; StreamOpFlag.INITIAL_OPS_VALUE;<br>        <span class="hljs-built_in">this</span>.depth = <span class="hljs-number">0</span>;<br>        <span class="hljs-built_in">this</span>.parallel = parallel;<br>    &#125;<br></code></pre></td></tr></table></figure>
+<p>在这里设置了头部节点，源Spliterator，源节点，流合并，流合并用的，头深度，并行流。<br>可以发现AbstractPipeline才是我们流的关键，所有Pipeline调用AbstractPipeline构造，同时所有Stream使用StreamSupport来调用Pipeline创建管道。<br>这里官方文档(机翻)：</p>
+<blockquote>
+<p>“管道”类的抽象基类，它们是 Stream 接口及其原始特化的核心实现。管理流管道的建设和评估。<br>AbstractPipeline表示流管道的初始部分，封装流源和零个或多个中间操作。各个AbstractPipeline对象通常称为阶段，其中每个阶段描述流源或中间操作。<br>具体的中间阶段通常是从AbstractPipeline构建的，一个扩展它的形状特定的管道类（例如， IntPipeline ）也是抽象的，以及一个扩展它的特定于操作的具体类。 AbstractPipeline包含评估管道的大部分机制，并实现操作将使用的方法；特定于形状的类添加了辅助方法，用于将结果集合处理到适当的特定于形状的容器中。<br>在链接新的中间操作或执行终端操作后，流被认为已被消耗，并且不允许对该流实例进行更多的中间或终端操作。<br>实际说明：<br>对于顺序流和没有有状态中间操作的并行流，并行流，管道评估是在一次通过中完成的，它将所有操作“堵塞”在一起。对于有状态操作的并行流，执行被分成多个段，其中每个有状态操作标记一个段的结束，每个段被单独评估，并将结果用作下一个段的输入。在所有情况下，直到终端操作开始时才使用源数据。</p>
+</blockquote>
+<p>总结一下,stream每次创建实际对象为X_Pipeline.<Head>类型，我们可以通过研究X_Pipeline.<Head>获取我们想要知道的实际方法，<br>当然在使用过程时，由于方法返回的是不同的实现Stream方法的类和其他返回类型，所以我们要具体分析。</p>
+<blockquote>
+<p>注意，Stream.of和Arrays.stream均使用Arrays.stream，它有多个不同参数，如果明确为基本类型的，就会返回IntStream、LongStream、DoubleStream，<br>如果为其他，则为Stream<T>。虽然实际类型为X_Pipeline.<Head>管道类型，但是类引用的类型是不同的，所能使用的方法是不同的。</p>
+</blockquote>
+<h2 id="分析涉及管道的结构"><a href="#分析涉及管道的结构" class="headerlink" title="分析涉及管道的结构"></a>分析涉及管道的结构</h2><p>刚才我们顺着整体的创建过程分析，可以发现用方法是流，实际载体是管道，StreamSupport连接这二者。<br>其中StreamSupport返回的new __Pipeline.Head类型，正是，我们管道结构的头。<br>分析管道数据属性：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs Java"><span class="hljs-comment">// 链表的头节点</span><br><span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> AbstractPipeline sourceStage;<br><span class="hljs-comment">// 前一个节点</span><br><span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> AbstractPipeline previousStage;<br><span class="hljs-comment">// 用于合并</span><br><span class="hljs-keyword">protected</span> <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> sourceOrOpFlags;<br><span class="hljs-comment">// 下一个节点</span><br><span class="hljs-keyword">private</span> AbstractPipeline nextStage;<br><span class="hljs-comment">// 节点深度</span><br><span class="hljs-keyword">private</span> <span class="hljs-type">int</span> depth;<br><span class="hljs-comment">// 用于合并</span><br><span class="hljs-keyword">private</span> <span class="hljs-type">int</span> combinedFlags;<br><br><span class="hljs-comment">// 源Spliterator，用于处理数据</span><br><span class="hljs-keyword">private</span> Spliterator&lt;?&gt; sourceSpliterator;<br><span class="hljs-comment">// 和Spliterator类似</span><br><span class="hljs-keyword">private</span> Supplier&lt;? <span class="hljs-keyword">extends</span> <span class="hljs-title class_">Spliterator</span>&lt;?&gt;&gt; sourceSupplier;<br><br><span class="hljs-comment">// 判断是否管道被连接或者消费</span><br><span class="hljs-keyword">private</span> <span class="hljs-type">boolean</span> linkedOrConsumed;<br><span class="hljs-comment">// 是否是有状态的操作</span><br><span class="hljs-keyword">private</span> <span class="hljs-type">boolean</span> sourceAnyStateful;<br><span class="hljs-comment">// 可以用于多线程关闭的</span><br><span class="hljs-keyword">private</span> Runnable sourceCloseAction;<br><span class="hljs-comment">// 并行流</span><br><span class="hljs-keyword">private</span> <span class="hljs-type">boolean</span> parallel;<br></code></pre></td></tr></table></figure>
+<p>再分析重要内部类:<br>无状态阶段:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs Java"><span class="hljs-keyword">abstract</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">StatelessOp</span>&lt;E_IN, E_OUT&gt;<br>            <span class="hljs-keyword">extends</span> <span class="hljs-title class_">ReferencePipeline</span>&lt;E_IN, E_OUT&gt; &#123;<br>        StatelessOp(AbstractPipeline&lt;?, E_IN, ?&gt; upstream,<br>                    StreamShape inputShape,<br>                    <span class="hljs-type">int</span> opFlags) &#123;<br>            <span class="hljs-built_in">super</span>(upstream, opFlags);<br>            <span class="hljs-keyword">assert</span> upstream.getOutputShape() == inputShape;<br>        &#125;<br><br>        <span class="hljs-meta">@Override</span><br>        <span class="hljs-keyword">final</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">opIsStateful</span><span class="hljs-params">()</span> &#123;<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;<br>        &#125;<br>    &#125;<br></code></pre></td></tr></table></figure>
+<p>有状态阶段：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs Java"><span class="hljs-keyword">abstract</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">StatefulOp</span>&lt;E_IN, E_OUT&gt;<br>            <span class="hljs-keyword">extends</span> <span class="hljs-title class_">ReferencePipeline</span>&lt;E_IN, E_OUT&gt; &#123;<br>        StatefulOp(AbstractPipeline&lt;?, E_IN, ?&gt; upstream,<br>                   StreamShape inputShape,<br>                   <span class="hljs-type">int</span> opFlags) &#123;<br>            <span class="hljs-built_in">super</span>(upstream, opFlags);<br>            <span class="hljs-keyword">assert</span> upstream.getOutputShape() == inputShape;<br>        &#125;<br><br>        <span class="hljs-meta">@Override</span><br>        <span class="hljs-keyword">final</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">opIsStateful</span><span class="hljs-params">()</span> &#123;<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;<br>        &#125;<br><br>        <span class="hljs-meta">@Override</span><br>        <span class="hljs-keyword">abstract</span> &lt;P_IN&gt; Node&lt;E_OUT&gt; <span class="hljs-title function_">opEvaluateParallel</span><span class="hljs-params">(PipelineHelper&lt;E_OUT&gt; helper,</span><br><span class="hljs-params">                                                       Spliterator&lt;P_IN&gt; spliterator,</span><br><span class="hljs-params">                                                       IntFunction&lt;E_OUT[]&gt; generator)</span>;<br>    &#125;<br></code></pre></td></tr></table></figure>
+<p>可以看到它们继承ReferencePipeline(当然其他Pipeline里，继承其他Pipeline)，可以看作一片一片的管道，它们存储操作，最终再进行操作，<br>它们通过调用父节点，实现链表的连接，形成下面的结构：<br>Head &lt;&#x3D;&#x3D;&gt; StatelessOp &lt;&#x3D;&#x3D;&gt; StatelessOp</p>
+<blockquote>
+<p>重点是通过重写StatelessOp的opWrapSink方法，然后在最后操作时候被调用，因为其实现了Consumer的接口，可以被源Spliterator调用</p>
+</blockquote>
+<p>Sink是操作元对象，官方文档如下（机翻）:</p>
+<blockquote>
+<p>Consumer的扩展，用于通过流管道的各个阶段传递值，并使用其他方法来管理大小信息、控制流等。在第一次调用Sink上的accept()方法之前，必须先调用begin()方法来通知它数据即将到来（可选地通知接收器有多少数据即将到来），并且在发送完所有数据之后，您必须调用end()方法。在调用end()之后，你不应该在没有再次调用begin()下调用accept() 。 Sink还提供了一种机制，通过该机制，sink 可以协同发出信号表示它不想再接收任何数据（ cancellationRequested()方法），源可以在向Sink发送更多数据之前对其进行轮询。<br>接收器可能处于两种状态之一：初始状态和活动状态。它以初始状态开始； begin()方法将其转换为活动状态， end()方法将其转换回初始状态，以便重新使用。数据接受方法（如accept()仅在活动状态下有效。<br>API说明：<br>流管道由源、零个或多个中间阶段（例如过滤或映射）和终端阶段（例如归约或 for-each）组成。具体来说，考虑管道：<br>int longestStringLengthStartingWith &#x3D; strings.stream().filter(s -&gt; s.startsWith(“A”)).mapToInt(String::length).max();<br>在这里，我们有三个阶段，过滤、映射和减少。过滤阶段使用字符串并发出这些字符串的一个子集；映射阶段使用字符串并发出整数；缩减阶段使用这些整数并计算最大值。<br>Sink实例用于表示此管道的每个阶段，无论该阶段接受对象、整数、长整数还是双精度数。 Sink 具有accept(Object) 、 accept( int )等的入口点，因此我们不需要为每个原始特化提供专门的接口。 （对于这种杂食性趋势，它可能被称为“厨房水槽”。）管道的入口点是过滤阶段的Sink ，它向“下游”发送一些元素——进入映射阶段的Sink ，而水槽又将整数值向下游发送到Sink以进行缩减阶段。与给定阶段关联的Sink实现应该知道下一阶段的数据类型，并在其下游Sink上调用正确的accept方法。同样，每个阶段都必须实现与其接受的数据类型相对应的正确accept方法。<br>Sink.OfInt等专用子类型覆盖accept(Object)以调用accept的适当原语特化，实现Consumer的适当原语特化，并重新抽象accept的适当原语特化。<br>Sink.ChainedInt等链接子类型不仅实现了Sink.OfInt ，还维护了一个代表下游Sink downstream字段，并实现了begin() 、 end()和cancellationRequested()方法委托给下游Sink 。大多数中间操作的实现将使用这些链接包装器。例如，上面示例中的映射阶段如下所示：<br>IntSink is &#x3D; new Sink.ChainedReference<U>(sink) {public void accept(U u) {downstream.accept(mapper.applyAsInt(u));}};<br>在这里，我们实现了Sink.ChainedReference<U> ，这意味着我们希望接收U类型的元素作为输入，并将下游接收器传递给构造函数。因为下一阶段需要接收整数，所以我们必须在向下游发出值时调用accept( int )方法。 accept()方法将映射函数从U应用到int并将结果值传递给下游Sink 。</p>
+</blockquote>
+<p>最终Sink在最后被excute执行，完成了Stream流一系列操作</p>
+<h1 id="使用Stream"><a href="#使用Stream" class="headerlink" title="使用Stream"></a>使用Stream</h1><p>Stream是惰性流，中间操作实际是存储lambda函数，终端操作是把这个链表的方法执行。<br>Stream分为中间操作和终端操作，我们分开来说。</p>
+<h2 id="中间操作"><a href="#中间操作" class="headerlink" title="中间操作"></a>中间操作</h2><p>中间操作在源码层面上，就是创建一个继承ReferencePipeline的StatelessOp<br>在这里，我们使用样例，来进行更好的理解：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs Java">Stream&lt;String&gt; s = Stream.of(<span class="hljs-string">&quot;一-1&quot;</span>, <span class="hljs-string">&quot;二-2&quot;</span>, <span class="hljs-string">&quot;三-3&quot;</span>, <span class="hljs-string">&quot;四-4&quot;</span>, <span class="hljs-string">&quot;五-5&quot;</span>);<br></code></pre></td></tr></table></figure>
+<blockquote>
+<p>lambda函数可以是本对象的方法，还可以是静态用到参数的，或者自己定的</p>
+</blockquote>
+<p>我们先分析Stream，它规范了很多接口，其中用于使用的中间操作如下:</p>
+<ul>
+<li><p>Stream<T> filter(Predicate&lt;? super T&gt; predicate);<br>传入的lambda函数返回bool值，用来进行筛选，不多解释</p>
+</li>
+<li><p>map 系列相关的：</p>
+</li>
+<li><p>Stream<R> map(Function&lt;? super T, ? extends R&gt; mapper); lambda函数返回值不做要求，结果转化为新流</p>
+</li>
+<li><p>IntStream mapToInt(ToIntFunction&lt;? super T&gt; mapper); lambda函数返回值需要为int类型，结果转化为新流</p>
+</li>
+<li><p>LongStream mapToLong(ToLongFunction&lt;? super T&gt; mapper); lambda函数返回值需要为long类型，结果转化为新流</p>
+</li>
+<li><p>DoubleStream mapToDouble(ToDoubleFunction&lt;? super T&gt; mapper); lambda函数返回值需要为double类型，结果转化为新流<br>也好理解些，难理解的在后面</p>
+</li>
+<li><p>flatMap 系列：</p>
+</li>
+<li><p>Stream<R> flatMap(Function&lt;? super T, ? extends Stream&lt;? extends R&gt;&gt; mapper); 返回值需要继承Stream，它可以遍历流元素，并形成新的流进行处理</p>
+</li>
+<li><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs Java">s.flatMap(r -&gt; Arrays.stream(r.split(<span class="hljs-string">&quot;-&quot;</span>)).map(r2 -&gt; r2 + <span class="hljs-string">&quot;空格&quot;</span>)).forEach(System.out::println);<br></code></pre></td></tr></table></figure></li>
+<li><p>IntStream flatMapToInt(Function&lt;? super T, ? extends IntStream&gt; mapper); 返回值需要继承IntStream，它可以遍历流元素，并形成新的流进行处理</p>
+</li>
+<li><p>LongStream flatMapToLong(Function&lt;? super T, ? extends LongStream&gt; mapper); 返回值需要继承LongStream，它可以遍历流元素，并形成新的流进行处理</p>
+</li>
+<li><p>DoubleStream flatMapToDouble(Function&lt;? super T, ? extends DoubleStream&gt; mapper);  返回值需要继承DoubleStream，它可以遍历流元素，并形成新的流进行处理</p>
+</li>
+<li></li>
+<li><p>Stream<T> distinct(); 用来去重</p>
+</li>
+<li><p>sort() &#x2F; sort(comparator) 用来比较，并排序</p>
+</li>
+<li><p>Stream<T> limit(long maxSize); 用来缩小范围</p>
+</li>
+<li><p>Stream<T> skip(long n); 用来跳过区间</p>
+</li>
+<li><p>Stream<T> peek(Consumer&lt;? super T&gt; action); 类似forEach，但是只有在最后执行（本身如此）</p>
+</li>
+</ul>
+<h2 id="终端操作"><a href="#终端操作" class="headerlink" title="终端操作"></a>终端操作</h2><ul>
+<li><p>forEach系列</p>
+</li>
+<li><p>void forEach(Consumer&lt;? super T&gt; action); 对流的每个元素执行一个操作</p>
+</li>
+<li><p>void forEachOrdered(Consumer&lt;? super T&gt; action); 如流可以有顺序，则先进行顺序处理</p>
+</li>
+<li><p>reduce 系列</p>
+</li>
+<li><p>T reduce(T identity, BinaryOperator<T> accumulator); &#x2F;&#x2F; 累加器</p>
+</li>
+<li><p>Optional<T> reduce(BinaryOperator<T> accumulator);</p>
+</li>
+<li><p>U reduce(U identity,BiFunction, ? super T, U&gt; accumulator, BinaryOperator combiner);</p>
+</li>
+<li><p>collect 系列</p>
+</li>
+<li><p>R collect(Supplier supplier,BiConsumer&lt;R, ? super T&gt; accumulator,BiConsumer&lt;R, R&gt; combiner);</p>
+</li>
+<li><p>R collect(Collector&lt;? super T, A, R&gt; collector); &#x2F;&#x2F;Collector里有可以转化的方式</p>
+</li>
+<li><p>Optional<T> min(Comparator&lt;? super T&gt; comparator); &#x2F;&#x2F;最小的那个</p>
+</li>
+<li><p>Optional<T> max(Comparator&lt;? super T&gt; comparator); &#x2F;&#x2F;最大的那个</p>
+</li>
+<li><p>long count(); &#x2F;&#x2F;统计数量</p>
+</li>
+<li><p>boolean anyMatch(Predicate&lt;? super T&gt; predicate); &#x2F;&#x2F;是否存在一个匹配</p>
+</li>
+<li><p>boolean allMatch(Predicate&lt;? super T&gt; predicate); &#x2F;&#x2F;是否全部匹配</p>
+</li>
+<li><p>boolean noneMatch(Predicate&lt;? super T&gt; predicate); &#x2F;&#x2F;是否没有匹配</p>
+</li>
+<li><p>Optional<T> findFirst(); &#x2F;&#x2F;找到第一个，并返回</p>
+</li>
+<li><p>Optional<T> findAny(); &#x2F;&#x2F;找到就行，并返回</p>
+</li>
+<li><p>toArray() 转化为Array</p>
+</li>
+<li><p>toList() 转化为List</p>
+</li>
+</ul>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>本文分析了Stream的创建，结构和使用，当然重点在使用，可以提高操作Collection的效率</p>
+
+  </div>
+</article>
+
+
+    <div class="blog-post-comments">
+        <div id="utterances_thread">
+            <noscript>加载评论需要在浏览器启用 JavaScript 脚本支持。</noscript>
+        </div>
+    </div>
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">首页</a></li>
+        
+          <li><a href="/archives/">文章</a></li>
+        
+          <li><a href="/search/">搜索</a></li>
+        
+          <li><a target="_blank" rel="noopener" href="http://github.com/tro148">项目</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%88%9B%E5%BB%BAStream"><span class="toc-number">1.</span> <span class="toc-text">创建Stream</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%86%E6%9E%90%E6%B6%89%E5%8F%8A%E7%AE%A1%E9%81%93%E7%9A%84%E7%BB%93%E6%9E%84"><span class="toc-number">1.1.</span> <span class="toc-text">分析涉及管道的结构</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8Stream"><span class="toc-number">2.</span> <span class="toc-text">使用Stream</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%AD%E9%97%B4%E6%93%8D%E4%BD%9C"><span class="toc-number">2.1.</span> <span class="toc-text">中间操作</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BB%88%E7%AB%AF%E6%93%8D%E4%BD%9C"><span class="toc-number">2.2.</span> <span class="toc-text">终端操作</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">2.2.1.</span> <span class="toc-text">总结</span></a></li></ol></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2023/06/02/%E4%BB%94%E7%BB%86%E7%A0%94%E7%A9%B6Java%E7%9A%84Stream%E6%B5%81/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2023/06/02/%E4%BB%94%E7%BB%86%E7%A0%94%E7%A9%B6Java%E7%9A%84Stream%E6%B5%81/&text=细聊Java的Stream流(看源码)"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2023/06/02/%E4%BB%94%E7%BB%86%E7%A0%94%E7%A9%B6Java%E7%9A%84Stream%E6%B5%81/&title=细聊Java的Stream流(看源码)"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2023/06/02/%E4%BB%94%E7%BB%86%E7%A0%94%E7%A9%B6Java%E7%9A%84Stream%E6%B5%81/&is_video=false&description=细聊Java的Stream流(看源码)"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=细聊Java的Stream流(看源码)&body=Check out this article: http://example.com/2023/06/02/%E4%BB%94%E7%BB%86%E7%A0%94%E7%A9%B6Java%E7%9A%84Stream%E6%B5%81/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2023/06/02/%E4%BB%94%E7%BB%86%E7%A0%94%E7%A9%B6Java%E7%9A%84Stream%E6%B5%81/&title=细聊Java的Stream流(看源码)"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2023/06/02/%E4%BB%94%E7%BB%86%E7%A0%94%E7%A9%B6Java%E7%9A%84Stream%E6%B5%81/&title=细聊Java的Stream流(看源码)"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2023/06/02/%E4%BB%94%E7%BB%86%E7%A0%94%E7%A9%B6Java%E7%9A%84Stream%E6%B5%81/&title=细聊Java的Stream流(看源码)"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2023/06/02/%E4%BB%94%E7%BB%86%E7%A0%94%E7%A9%B6Java%E7%9A%84Stream%E6%B5%81/&title=细聊Java的Stream流(看源码)"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2023/06/02/%E4%BB%94%E7%BB%86%E7%A0%94%E7%A9%B6Java%E7%9A%84Stream%E6%B5%81/&name=细聊Java的Stream流(看源码)&description=&lt;p&gt;Stream流是jdk8以后的特性，通过stream流，实现对Collection集合的便利操作。&lt;br&gt;本文研究创建Stream和使用Stream，但注意并不是全面的，只是大致流程。&lt;/p&gt;"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2023/06/02/%E4%BB%94%E7%BB%86%E7%A0%94%E7%A9%B6Java%E7%9A%84Stream%E6%B5%81/&t=细聊Java的Stream流(看源码)"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2021-2023
+    TroTro
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/search/">搜索</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="http://github.com/tro148">项目</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板！\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功！");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+    <script type="text/javascript">
+      var utterances_repo = 'tro148/tro148.github.io';
+      var utterances_issue_term = 'comment';
+      var utterances_label = 'Comment';
+      var utterances_theme = 'github-light';
+
+      (function(){
+          var script = document.createElement('script');
+
+          script.src = 'https://utteranc.es/client.js';
+          script.setAttribute('repo', utterances_repo);
+          script.setAttribute('issue-term', 'pathname');
+          script.setAttribute('label', utterances_label);
+          script.setAttribute('theme', utterances_theme);
+          script.setAttribute('crossorigin', 'anonymous');
+          script.async = true;
+          (document.getElementById('utterances_thread')).appendChild(script);
+      }());
+  </script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginModelPath":"assets/","model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/wanko.model.json"},"display":{"superSample":2,"width":250,"height":500,"position":"right","hOffset":0,"vOffset":-20},"mobile":{"show":false,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"pluginJsPath":"lib/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="整体采用SaToken框架">
+<meta property="og:type" content="article">
+<meta property="og:title" content="论坛的进出系统">
+<meta property="og:url" content="http://example.com/2022/11/05/%E8%AE%BA%E5%9D%9B%E7%9A%84%E8%BF%9B%E5%87%BA%E7%B3%BB%E7%BB%9F/index.html">
+<meta property="og:site_name" content="TroTro">
+<meta property="og:description" content="整体采用SaToken框架">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-11-05T11:42:20.000Z">
+<meta property="article:modified_time" content="2023-04-27T12:05:50.228Z">
+<meta property="article:author" content="TroTro">
+<meta property="article:tag" content="项目">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>论坛的进出系统</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-NGQ4ZR4FTC"></script>
+  <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-NGQ4ZR4FTC');
+  </script>
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+      <link rel="alternate" href="/true" title="TroTro" type="application/atom+xml" />
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="顶部" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/search/">搜索</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="http://github.com/tro148">项目</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="上一篇" href="/2023/03/05/MongoDB%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="下一篇" href="/2022/10/25/%E8%AE%BA%E5%9D%9B%E7%9A%84%E5%89%8D%E5%90%8E%E7%AB%AF%E5%9F%BA%E6%9C%AC%E6%90%AD%E5%BB%BA%E4%B8%8E%E9%83%A8%E7%BD%B2/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="返回顶部" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="分享文章" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2022/11/05/%E8%AE%BA%E5%9D%9B%E7%9A%84%E8%BF%9B%E5%87%BA%E7%B3%BB%E7%BB%9F/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2022/11/05/%E8%AE%BA%E5%9D%9B%E7%9A%84%E8%BF%9B%E5%87%BA%E7%B3%BB%E7%BB%9F/&text=论坛的进出系统"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2022/11/05/%E8%AE%BA%E5%9D%9B%E7%9A%84%E8%BF%9B%E5%87%BA%E7%B3%BB%E7%BB%9F/&title=论坛的进出系统"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2022/11/05/%E8%AE%BA%E5%9D%9B%E7%9A%84%E8%BF%9B%E5%87%BA%E7%B3%BB%E7%BB%9F/&is_video=false&description=论坛的进出系统"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=论坛的进出系统&body=Check out this article: http://example.com/2022/11/05/%E8%AE%BA%E5%9D%9B%E7%9A%84%E8%BF%9B%E5%87%BA%E7%B3%BB%E7%BB%9F/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2022/11/05/%E8%AE%BA%E5%9D%9B%E7%9A%84%E8%BF%9B%E5%87%BA%E7%B3%BB%E7%BB%9F/&title=论坛的进出系统"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2022/11/05/%E8%AE%BA%E5%9D%9B%E7%9A%84%E8%BF%9B%E5%87%BA%E7%B3%BB%E7%BB%9F/&title=论坛的进出系统"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2022/11/05/%E8%AE%BA%E5%9D%9B%E7%9A%84%E8%BF%9B%E5%87%BA%E7%B3%BB%E7%BB%9F/&title=论坛的进出系统"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2022/11/05/%E8%AE%BA%E5%9D%9B%E7%9A%84%E8%BF%9B%E5%87%BA%E7%B3%BB%E7%BB%9F/&title=论坛的进出系统"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2022/11/05/%E8%AE%BA%E5%9D%9B%E7%9A%84%E8%BF%9B%E5%87%BA%E7%B3%BB%E7%BB%9F/&name=论坛的进出系统&description=&lt;p&gt;整体采用SaToken框架&lt;/p&gt;"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2022/11/05/%E8%AE%BA%E5%9D%9B%E7%9A%84%E8%BF%9B%E5%87%BA%E7%B3%BB%E7%BB%9F/&t=论坛的进出系统"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        论坛的进出系统
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">TroTro</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2022-11-05T11:42:20.000Z" class="dt-published" itemprop="datePublished">2022-11-05</time>
+        
+        (Updated: <time datetime="2023-04-27T12:05:50.228Z" class="dt-updated" itemprop="dateModified">2023-04-27</time>)
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/%E9%A1%B9%E7%9B%AE/" rel="tag">项目</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <p>整体采用SaToken框架</p>
+<span id="more"></span>
+
+<p>写登录系统，需要处理以下问题:</p>
+<ul>
+<li>后端操作数据库</li>
+<li>token的设置</li>
+<li>后端异常拦截</li>
+<li>前端登陆页面</li>
+<li>前端request处理</li>
+</ul>
+<hr>
+<blockquote>
+<p>首先，我们先写后端操作数据库部分:</p>
+</blockquote>
+<p>我们采用DDD框架，将后端结构分为apis, application, domain, infrastructure四个分层。<br><br>先来写domain层部分: <br><br>在domain层(领域层)，建立领域实体类Account和相关映射。</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs kotlin"><span class="hljs-comment">//账号实体</span><br><span class="hljs-meta">@TableName(value = <span class="hljs-string">&quot;account&quot;</span>, autoResultMap = true)</span><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Account</span> &#123;<br>    <span class="hljs-keyword">var</span> userId: String = <span class="hljs-string">&quot;&quot;</span><br>    <span class="hljs-keyword">var</span> userName: String = <span class="hljs-string">&quot;&quot;</span><br>    <span class="hljs-keyword">var</span> role: String = <span class="hljs-string">&quot;&quot;</span><br>    <span class="hljs-keyword">var</span> password: String = <span class="hljs-string">&quot;&quot;</span><br>    <span class="hljs-keyword">var</span> deleted: <span class="hljs-built_in">Int</span> = <span class="hljs-number">0</span><br>&#125;<br><br><span class="hljs-meta">@Mapper</span><br><span class="hljs-keyword">interface</span> <span class="hljs-title class_">AccountMapper</span>: <span class="hljs-type">BaseMapper</span>&lt;<span class="hljs-type">Account</span>&gt;<br></code></pre></td></tr></table></figure>
+<p><em>这里一定记住mysql用_分开定义字段，而kotlin是用驼峰法定义字段。</em><br><br>在建立映射后，写领域服务AccountRepository:</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs kotlin"><span class="hljs-comment">//账号的仓库类，提供基本操作服务</span><br><span class="hljs-meta">@Repository</span><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">AccountRepository</span>(<span class="hljs-keyword">val</span> accountMapper: AccountMapper) &#123;<br>    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">selectAccountByName</span><span class="hljs-params">(userName: <span class="hljs-type">String</span>)</span></span>: Account? &#123;<br>        <span class="hljs-keyword">return</span> accountMapper.selectOne(<br>            QueryWrapper&lt;Account&gt;().eq(<span class="hljs-string">&quot;user_name&quot;</span>, userName)<br>        )<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">selectAccountById</span><span class="hljs-params">(userId: <span class="hljs-type">String</span>)</span></span>: Account? &#123;<br>        <span class="hljs-keyword">return</span> accountMapper.selectOne(<br>            QueryWrapper&lt;Account&gt;().eq(<span class="hljs-string">&quot;user_id&quot;</span>, userId)<br>        )<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">insertAccount</span><span class="hljs-params">(account: <span class="hljs-type">Account</span>)</span></span>: <span class="hljs-built_in">Int</span> &#123;<br>        <span class="hljs-keyword">return</span> accountMapper.insert(account)<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">checkingUserName</span><span class="hljs-params">(userName: <span class="hljs-type">String</span>)</span></span>: <span class="hljs-built_in">Boolean</span> &#123;<br>        <span class="hljs-keyword">return</span> accountMapper.exists(<br>            QueryWrapper&lt;Account&gt;().eq(<span class="hljs-string">&quot;user_name&quot;</span>, userName)<br>        )<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>这里写了四个方法，用来登录时查询账号，登陆后查询账号，注册账号，查重用户名。<br><br>这样domain层部分就写好啦~</p>
+<hr>
+<blockquote>
+<p>开始写后端异常处理器部分</p>
+</blockquote>
+<p>在后端处理时，发生异常后，向前端抛出，前端也进行处理，完成异常的显示。<br><br>后端异常拦截部分:</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs kotlin"><span class="hljs-comment">//全局异常拦截</span><br><span class="hljs-meta">@RestControllerAdvice</span><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">GlobalExceptionHandler</span> &#123;<br>    <span class="hljs-meta">@ExceptionHandler</span><br>    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">handlerException</span><span class="hljs-params">(exception: <span class="hljs-type">Exception</span>)</span></span>: SaResult? &#123;<br>        <span class="hljs-keyword">if</span> ( exception <span class="hljs-keyword">is</span> NotLoginException ) &#123;<br>            <span class="hljs-keyword">return</span> SaResult.code(<span class="hljs-number">501</span>)<br>        &#125;<br>        <span class="hljs-keyword">return</span> SaResult.error(exception.message)<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p><em>注意，默认返回code为500，不登录返回code为501，服务器寄了返回code为502</em><br><br>现在，前端Response:</p>
+<figure class="highlight ts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs ts"><span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> <span class="hljs-attr">request</span>: <span class="hljs-title class_">RequestConfig</span> = &#123;<br>  <span class="hljs-attr">timeout</span>: <span class="hljs-number">20000</span>,<br>  <span class="hljs-attr">errorConfig</span>: &#123;<br>    <span class="hljs-attr">errorHandler</span>: <span class="hljs-function">(<span class="hljs-params">error</span>) =&gt;</span> &#123;<br>      <span class="hljs-comment">//responseInterceptors捕捉不到</span><br>      <span class="hljs-comment">// @ts-ignore</span><br>      <span class="hljs-keyword">if</span> (error.<span class="hljs-property">code</span> === <span class="hljs-string">&#x27;ERR_BAD_RESPONSE&#x27;</span>) &#123;<br>        message.<span class="hljs-title function_">error</span>(<span class="hljs-string">&#x27;服务器寄了&#x27;</span>);<br>        <span class="hljs-keyword">return</span>;<br>      &#125;<br>      message.<span class="hljs-title function_">error</span>(error.<span class="hljs-property">message</span>);<br>    &#125;,<br>  &#125;,<br>  <span class="hljs-attr">responseInterceptors</span>: [<br>    <span class="hljs-function">(<span class="hljs-params">response</span>) =&gt;</span> &#123;<br>      <span class="hljs-comment">// @ts-ignore</span><br>      <span class="hljs-keyword">const</span> &#123;<br>        <span class="hljs-attr">data</span>: &#123; code, msg &#125;,<br>      &#125; = response;<br>      <span class="hljs-keyword">switch</span> (code) &#123;<br>        <span class="hljs-keyword">case</span> <span class="hljs-number">500</span>:<br>          <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(msg);<br>        <span class="hljs-keyword">case</span> <span class="hljs-number">501</span>:<br>          message.<span class="hljs-title function_">error</span>(<span class="hljs-string">&#x27;未登录账号&#x27;</span>);<br>          history.<span class="hljs-title function_">push</span>(<span class="hljs-string">&#x27;/login&#x27;</span>);<br>          <span class="hljs-keyword">break</span>;<br>      &#125;<br>      <span class="hljs-keyword">return</span> response;<br>    &#125;,<br>  ],<br>&#125;;<br></code></pre></td></tr></table></figure>
+<p>errorHandler用来拦截异常，responseInterceptors来监视Response。<br><br><em>nginx的502报错直接发给errorHandler</em></p>
+<hr>
+<blockquote>
+<p>现在，该写token部分了:</p>
+</blockquote>
+<p>我们采用SaToken框架，这个嘎嘎好用√<br><br>只要将SaTokenConfigure类暴露在容器中，就可以完成配置啦:</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs kotlin"><span class="hljs-meta">@Component</span><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">SaTokenConfigure</span>: <span class="hljs-type">WebMvcConfigurer</span> &#123;<br>    <span class="hljs-keyword">override</span> <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">addInterceptors</span><span class="hljs-params">(registry: <span class="hljs-type">InterceptorRegistry</span>)</span></span> &#123;<br>        registry.addInterceptor(SaAnnotationInterceptor())<br>            .addPathPatterns(<span class="hljs-string">&quot;/**&quot;</span>)<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>在这里，我们启动了注解功能，可以校验是否登录。<br></p>
+<hr>
+<blockquote>
+<p>然后再来写application层(应用层)与apis(接口层):</p>
+</blockquote>
+<p>建立LoginService:</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><code class="hljs kotlin"><span class="hljs-meta">@Service</span><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">LoginService</span> &#123;<br>    <span class="hljs-meta">@Autowired</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">lateinit</span> <span class="hljs-keyword">var</span> accountRepository: AccountRepository<br><br>    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">register</span><span class="hljs-params">(userName: <span class="hljs-type">String</span>, password: <span class="hljs-type">String</span>)</span></span> &#123;<br>        <span class="hljs-keyword">val</span> timestamp = Instant.now()<br>        <span class="hljs-keyword">var</span> account = Account()<br>        account.userId = timestamp.toEpochMilli().toString() + (<span class="hljs-number">100.</span><span class="hljs-number">.999</span>).random().toString()<br>        account.userName = userName<br>        <span class="hljs-keyword">if</span> ( accountRepository.checkingUserName(userName) ) &#123;<br>            <span class="hljs-keyword">throw</span> Exception(<span class="hljs-string">&quot;用户名重复&quot;</span>)<br>        &#125;<br>        account.password = BCrypt.hashpw(password, BCrypt.gensalt())<br>        account.role = <span class="hljs-string">&quot;user&quot;</span><br>        account.deleted = <span class="hljs-number">0</span><br>        <span class="hljs-keyword">try</span> &#123;<br>            accountRepository.insertAccount(account)<br>        &#125; <span class="hljs-keyword">catch</span> (e: Exception) &#123;<br>            <span class="hljs-keyword">throw</span> Exception(<span class="hljs-string">&quot;注册失败&quot;</span>)<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">login</span><span class="hljs-params">(userName: <span class="hljs-type">String</span>, password: <span class="hljs-type">String</span>)</span></span> &#123;<br>        <span class="hljs-keyword">val</span> user = accountRepository.selectAccountByName(userName)<br>            ?: <span class="hljs-keyword">throw</span> Exception(<span class="hljs-string">&quot;未查找到该用户&quot;</span>)<br>        <span class="hljs-keyword">if</span> (BCrypt.checkpw(password, user.password)) &#123;<br>            StpUtil.login(user.userId)<br>            <span class="hljs-comment">//录入user的缓存</span><br>            StpUtil.getSession().<span class="hljs-keyword">set</span>(<span class="hljs-string">&quot;user&quot;</span>, user)<br>        &#125; <span class="hljs-keyword">else</span> &#123;<br>            <span class="hljs-keyword">throw</span> Exception(<span class="hljs-string">&quot;密码错误&quot;</span>)<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">logout</span><span class="hljs-params">()</span></span> &#123;<br>        StpUtil.logout()<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<ul>
+<li>先来说注册方法，我们采用<strong>时间戳来作id（因为没用户，时间戳就够了XD），然后查重用户名，重要的是<br>将前端发来的密码加密，采用BCrypt类提供的方法加密存入数据</strong>，最后将数据插入数据库就好啦。<br></li>
+</ul>
+<p>建立LoginController:</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><code class="hljs kotlin"><span class="hljs-comment">//提供进出系统的接口</span><br><span class="hljs-meta">@RestController</span><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">LoginController</span> &#123;<br>    <span class="hljs-meta">@Autowired</span><br>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">lateinit</span> <span class="hljs-keyword">var</span> loginService: LoginService<br><br>    <span class="hljs-keyword">data</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">LoginReq</span>(<br>        <span class="hljs-keyword">var</span> userName: String,<br>        <span class="hljs-keyword">var</span> password: String<br>    )<br><br>    <span class="hljs-meta">@PostMapping(<span class="hljs-string">&quot;/register&quot;</span>)</span><br>    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">signIn</span><span class="hljs-params">(<span class="hljs-meta">@RequestBody</span> req: <span class="hljs-type">LoginReq</span>)</span></span> &#123;<br>        loginService.register(req.userName, req.password)<br>    &#125;<br><br>    <span class="hljs-meta">@PostMapping(<span class="hljs-string">&quot;/login&quot;</span>)</span><br>    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">loginIn</span><span class="hljs-params">(<span class="hljs-meta">@RequestBody</span> req: <span class="hljs-type">LoginReq</span>)</span></span> &#123;<br>        loginService.login(req.userName, req.password)<br>    &#125;<br><br>    <span class="hljs-meta">@SaCheckLogin</span><br>    <span class="hljs-meta">@PostMapping(<span class="hljs-string">&quot;/logout&quot;</span>)</span><br>    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">loginOut</span><span class="hljs-params">()</span></span>: String &#123;<br>        loginService.logout()<br>        <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;登出&quot;</span><br>    &#125;<br><br>    <span class="hljs-meta">@PostMapping(<span class="hljs-string">&quot;/isLogin&quot;</span>)</span><br>    <span class="hljs-function"><span class="hljs-keyword">fun</span> <span class="hljs-title">isLogin</span><span class="hljs-params">()</span></span>: String &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">if</span> (loginService.isLogin()) <span class="hljs-string">&quot;在&quot;</span> <span class="hljs-keyword">else</span>  <span class="hljs-string">&quot;不在&quot;</span><br>    &#125;<br><br>&#125;<br></code></pre></td></tr></table></figure>
+<p>这里提供四个api，注册，登录，退出，判断在线。接口层主要关注传来参数与交付给应用层，所以这里直接调用应用层就好啦<br></p>
+<hr>
+<p><em>咳咳，一页写不下前端页面部分了，就不写了XD，大致就是写个页面加服务就行啦!</em><br>这样比较简陋的论坛进出系统就写好了。</p>
+
+  </div>
+</article>
+
+
+    <div class="blog-post-comments">
+        <div id="utterances_thread">
+            <noscript>加载评论需要在浏览器启用 JavaScript 脚本支持。</noscript>
+        </div>
+    </div>
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">首页</a></li>
+        
+          <li><a href="/archives/">文章</a></li>
+        
+          <li><a href="/search/">搜索</a></li>
+        
+          <li><a target="_blank" rel="noopener" href="http://github.com/tro148">项目</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2022/11/05/%E8%AE%BA%E5%9D%9B%E7%9A%84%E8%BF%9B%E5%87%BA%E7%B3%BB%E7%BB%9F/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2022/11/05/%E8%AE%BA%E5%9D%9B%E7%9A%84%E8%BF%9B%E5%87%BA%E7%B3%BB%E7%BB%9F/&text=论坛的进出系统"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2022/11/05/%E8%AE%BA%E5%9D%9B%E7%9A%84%E8%BF%9B%E5%87%BA%E7%B3%BB%E7%BB%9F/&title=论坛的进出系统"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2022/11/05/%E8%AE%BA%E5%9D%9B%E7%9A%84%E8%BF%9B%E5%87%BA%E7%B3%BB%E7%BB%9F/&is_video=false&description=论坛的进出系统"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=论坛的进出系统&body=Check out this article: http://example.com/2022/11/05/%E8%AE%BA%E5%9D%9B%E7%9A%84%E8%BF%9B%E5%87%BA%E7%B3%BB%E7%BB%9F/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2022/11/05/%E8%AE%BA%E5%9D%9B%E7%9A%84%E8%BF%9B%E5%87%BA%E7%B3%BB%E7%BB%9F/&title=论坛的进出系统"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2022/11/05/%E8%AE%BA%E5%9D%9B%E7%9A%84%E8%BF%9B%E5%87%BA%E7%B3%BB%E7%BB%9F/&title=论坛的进出系统"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2022/11/05/%E8%AE%BA%E5%9D%9B%E7%9A%84%E8%BF%9B%E5%87%BA%E7%B3%BB%E7%BB%9F/&title=论坛的进出系统"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2022/11/05/%E8%AE%BA%E5%9D%9B%E7%9A%84%E8%BF%9B%E5%87%BA%E7%B3%BB%E7%BB%9F/&title=论坛的进出系统"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2022/11/05/%E8%AE%BA%E5%9D%9B%E7%9A%84%E8%BF%9B%E5%87%BA%E7%B3%BB%E7%BB%9F/&name=论坛的进出系统&description=&lt;p&gt;整体采用SaToken框架&lt;/p&gt;"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2022/11/05/%E8%AE%BA%E5%9D%9B%E7%9A%84%E8%BF%9B%E5%87%BA%E7%B3%BB%E7%BB%9F/&t=论坛的进出系统"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2021-2023
+    TroTro
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/search/">搜索</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="http://github.com/tro148">项目</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板！\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功！");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+    <script type="text/javascript">
+      var utterances_repo = 'tro148/tro148.github.io';
+      var utterances_issue_term = 'comment';
+      var utterances_label = 'Comment';
+      var utterances_theme = 'github-light';
+
+      (function(){
+          var script = document.createElement('script');
+
+          script.src = 'https://utteranc.es/client.js';
+          script.setAttribute('repo', utterances_repo);
+          script.setAttribute('issue-term', 'pathname');
+          script.setAttribute('label', utterances_label);
+          script.setAttribute('theme', utterances_theme);
+          script.setAttribute('crossorigin', 'anonymous');
+          script.async = true;
+          (document.getElementById('utterances_thread')).appendChild(script);
+      }());
+  </script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginModelPath":"assets/","model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/wanko.model.json"},"display":{"superSample":2,"width":250,"height":500,"position":"right","hOffset":0,"vOffset":-20},"mobile":{"show":false,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"pluginJsPath":"lib/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="java虚拟机首先要做的事情就是搜索class文件，这里我们用go来实现搜索class文件的功能。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="用go写jvm之搜索class文件">
+<meta property="og:url" content="http://example.com/2023/05/23/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E6%90%9C%E7%B4%A2class%E6%96%87%E4%BB%B6/index.html">
+<meta property="og:site_name" content="TroTro">
+<meta property="og:description" content="java虚拟机首先要做的事情就是搜索class文件，这里我们用go来实现搜索class文件的功能。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-05-23T13:12:27.000Z">
+<meta property="article:modified_time" content="2023-06-23T13:10:30.439Z">
+<meta property="article:author" content="TroTro">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="项目">
+<meta property="article:tag" content="JVM">
+<meta property="article:tag" content="JAVA">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>用go写jvm之搜索class文件</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-NGQ4ZR4FTC"></script>
+  <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-NGQ4ZR4FTC');
+  </script>
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+      <link rel="alternate" href="/true" title="TroTro" type="application/atom+xml" />
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="顶部" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/search/">搜索</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="http://github.com/tro148">项目</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="上一篇" href="/2023/05/26/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E8%A7%A3%E6%9E%90class%E6%96%87%E4%BB%B6/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="下一篇" href="/2023/05/19/gin%E7%9A%84%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%8E%9F%E7%90%86%E7%AE%80%E5%8D%95%E5%AE%9E%E7%8E%B0/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="返回顶部" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="分享文章" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2023/05/23/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E6%90%9C%E7%B4%A2class%E6%96%87%E4%BB%B6/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2023/05/23/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E6%90%9C%E7%B4%A2class%E6%96%87%E4%BB%B6/&text=用go写jvm之搜索class文件"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2023/05/23/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E6%90%9C%E7%B4%A2class%E6%96%87%E4%BB%B6/&title=用go写jvm之搜索class文件"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2023/05/23/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E6%90%9C%E7%B4%A2class%E6%96%87%E4%BB%B6/&is_video=false&description=用go写jvm之搜索class文件"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=用go写jvm之搜索class文件&body=Check out this article: http://example.com/2023/05/23/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E6%90%9C%E7%B4%A2class%E6%96%87%E4%BB%B6/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2023/05/23/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E6%90%9C%E7%B4%A2class%E6%96%87%E4%BB%B6/&title=用go写jvm之搜索class文件"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2023/05/23/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E6%90%9C%E7%B4%A2class%E6%96%87%E4%BB%B6/&title=用go写jvm之搜索class文件"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2023/05/23/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E6%90%9C%E7%B4%A2class%E6%96%87%E4%BB%B6/&title=用go写jvm之搜索class文件"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2023/05/23/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E6%90%9C%E7%B4%A2class%E6%96%87%E4%BB%B6/&title=用go写jvm之搜索class文件"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2023/05/23/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E6%90%9C%E7%B4%A2class%E6%96%87%E4%BB%B6/&name=用go写jvm之搜索class文件&description=&lt;p&gt;java虚拟机首先要做的事情就是搜索class文件，这里我们用go来实现搜索class文件的功能。&lt;/p&gt;"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2023/05/23/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E6%90%9C%E7%B4%A2class%E6%96%87%E4%BB%B6/&t=用go写jvm之搜索class文件"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B4%E4%BD%93%E6%B5%81%E7%A8%8B"><span class="toc-number">1.</span> <span class="toc-text">整体流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B1%BB%E8%B7%AF%E5%BE%84"><span class="toc-number">2.</span> <span class="toc-text">类路径</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%86%E6%9E%90%E7%B1%BB%E8%B7%AF%E5%BE%84%E8%A7%A3%E6%9E%90%E9%83%A8%E5%88%86"><span class="toc-number">2.1.</span> <span class="toc-text">分析类路径解析部分</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%86%E6%9E%90%E8%AF%BB%E5%8F%96class%E6%96%87%E4%BB%B6%E9%83%A8%E5%88%86"><span class="toc-number">2.2.</span> <span class="toc-text">分析读取class文件部分</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B1%BB%E8%B7%AF%E5%BE%84%E9%A1%B9"><span class="toc-number">3.</span> <span class="toc-text">类路径项</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B5%8B%E8%AF%95"><span class="toc-number">4.</span> <span class="toc-text">测试</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">4.1.</span> <span class="toc-text">总结</span></a></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        用go写jvm之搜索class文件
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">TroTro</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2023-05-23T13:12:27.000Z" class="dt-published" itemprop="datePublished">2023-05-23</time>
+        
+        (Updated: <time datetime="2023-06-23T13:10:30.439Z" class="dt-updated" itemprop="dateModified">2023-06-23</time>)
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/Go/" rel="tag">Go</a>, <a class="p-category" href="/tags/JAVA/" rel="tag">JAVA</a>, <a class="p-category" href="/tags/JVM/" rel="tag">JVM</a>, <a class="p-category" href="/tags/%E9%A1%B9%E7%9B%AE/" rel="tag">项目</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <p>java虚拟机首先要做的事情就是搜索class文件，这里我们用go来实现搜索class文件的功能。</p>
+<span id="more"></span>
+<h2 id="整体流程"><a href="#整体流程" class="headerlink" title="整体流程"></a>整体流程</h2><p>Oracle的Java虚拟机根据类路径来搜索类，<br>我们可以创建类路径，存储类路径项。</p>
+<blockquote>
+<p>类路径可以分为启动类路径，扩展类路径，用户类路径<br>类路径项可以分为普通Entry，目录Entry，压缩包或JarEntry，复合Entry</p>
+</blockquote>
+<h2 id="类路径"><a href="#类路径" class="headerlink" title="类路径"></a>类路径</h2><figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br></pre></td><td class="code"><pre><code class="hljs Golang"><span class="hljs-comment">// ClassPath 结构体，存放三种类路径</span><br><span class="hljs-keyword">type</span> ClassPath <span class="hljs-keyword">struct</span> &#123;<br>	<span class="hljs-comment">// 启动类路径</span><br>	bootClasspath Entry<br>	<span class="hljs-comment">// 扩展类路径</span><br>	extClasspath Entry<br>	<span class="hljs-comment">// 用户类路径</span><br>	userClasspath Entry<br>&#125;<br><br><span class="hljs-comment">// Parse 解析类路径</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">Parse</span><span class="hljs-params">(jreOption, cpOption <span class="hljs-type">string</span>)</span></span> *ClassPath &#123;<br>	cp := &amp;ClassPath&#123;&#125;<br>	<span class="hljs-comment">// 解析启动类路径和扩展类路径</span><br>	cp.parseBootAndExtClasspath(jreOption)<br>	<span class="hljs-comment">// 解析用户类路径</span><br>	cp.parseUserClasspath(cpOption)<br><br>	<span class="hljs-keyword">return</span> cp<br>&#125;<br><br><span class="hljs-comment">// parseBootAndExtClasspath 解析启动类路径和扩展类路径</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(self *ClassPath)</span></span> parseBootAndExtClasspath(jreOption <span class="hljs-type">string</span>) &#123;<br>	<span class="hljs-comment">// 对jre目录进行判断</span><br>	jreDir := getJreDir(jreOption)<br><br>	<span class="hljs-comment">// jre/lib/* 解析启动类路径</span><br>	jreLibPath := filepath.Join(jreDir, <span class="hljs-string">&quot;lib&quot;</span>, <span class="hljs-string">&quot;*&quot;</span>)<br>	self.bootClasspath = newWildcardEntry(jreLibPath)<br><br>	<span class="hljs-comment">// jre/lib/ext/* 解析扩展类路径</span><br>	jreExtPath := filepath.Join(jreDir, <span class="hljs-string">&quot;lib&quot;</span>, <span class="hljs-string">&quot;ext&quot;</span>, <span class="hljs-string">&quot;*&quot;</span>)<br>	self.extClasspath = newWildcardEntry(jreExtPath)<br>&#125;<br><br><span class="hljs-comment">// 辅助函数 getJreDir 获取jre目录</span><br><span class="hljs-comment">// 优先使用用户输入-Xjre选项作为jre目录，</span><br><span class="hljs-comment">// 如果没有，就用当前目录下的jre目录，如果找不到，就尝试使用JAVA_HOME环境变量</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">getJreDir</span><span class="hljs-params">(jreOption <span class="hljs-type">string</span>)</span></span> <span class="hljs-type">string</span> &#123;<br>	<span class="hljs-keyword">if</span> jreOption != <span class="hljs-string">&quot;&quot;</span> &amp;&amp; exists(jreOption) &#123;<br>		<span class="hljs-keyword">return</span> jreOption<br>	&#125;<br>	<span class="hljs-keyword">if</span> exists(<span class="hljs-string">&quot;./jre&quot;</span>) &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-string">&quot;./jre&quot;</span><br>	&#125;<br>	<span class="hljs-keyword">if</span> jh := os.Getenv(<span class="hljs-string">&quot;JAVA_HOME&quot;</span>); jh != <span class="hljs-string">&quot;&quot;</span> &#123;<br>		<span class="hljs-keyword">return</span> filepath.Join(jh, <span class="hljs-string">&quot;jre&quot;</span>)<br>	&#125;<br>	<span class="hljs-built_in">panic</span>(<span class="hljs-string">&quot;找不到jre目录！&quot;</span>)<br>&#125;<br><br><span class="hljs-comment">// 辅助函数 exists 判断文件是否存在</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">exists</span><span class="hljs-params">(path <span class="hljs-type">string</span>)</span></span> <span class="hljs-type">bool</span> &#123;<br>	<span class="hljs-comment">// 如果返回的错误为nil，说明文件或者目录存在</span><br>	<span class="hljs-keyword">if</span> _, err := os.Stat(path); err != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-comment">// 再次确认错误类型是否为不存在，还是其他</span><br>		<span class="hljs-keyword">if</span> os.IsNotExist(err) &#123;<br>			<span class="hljs-keyword">return</span> <span class="hljs-literal">false</span><br>		&#125;<br>	&#125;<br>	<span class="hljs-keyword">return</span> <span class="hljs-literal">true</span><br>&#125;<br><br><span class="hljs-comment">// parseUserClasspath 解析用户类路径</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(self *ClassPath)</span></span> parseUserClasspath(cpOption <span class="hljs-type">string</span>) &#123;<br>	<span class="hljs-comment">// 如果用户没有提供-classpath/-cp选项，则使用当前目录作为用户类路径</span><br>	<span class="hljs-keyword">if</span> cpOption == <span class="hljs-string">&quot;&quot;</span> &#123;<br>		cpOption = <span class="hljs-string">&quot;.&quot;</span><br>	&#125;<br>	self.userClasspath = newEntry(cpOption)<br>&#125;<br><br><span class="hljs-comment">// ReadClass 读取</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(self *ClassPath)</span></span> ReadClass(className <span class="hljs-type">string</span>) ([]<span class="hljs-type">byte</span>, Entry, <span class="hljs-type">error</span>) &#123;<br>	<span class="hljs-comment">// 将类名转换为相对路径</span><br>	className = className + <span class="hljs-string">&quot;.class&quot;</span><br>	<span class="hljs-comment">// 依次从启动类路径、扩展类路径和用户类路径中搜索class文件</span><br>	<span class="hljs-keyword">if</span> data, entry, err := self.bootClasspath.readClass(className); err == <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span> data, entry, err<br>	&#125;<br>	<span class="hljs-keyword">if</span> data, entry, err := self.extClasspath.readClass(className); err == <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span> data, entry, err<br>	&#125;<br>	<span class="hljs-keyword">return</span> self.userClasspath.readClass(className)<br>&#125;<br><br><span class="hljs-comment">// String 转化为字符串</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(self *ClassPath)</span></span> String() <span class="hljs-type">string</span> &#123;<br>	<span class="hljs-keyword">return</span> self.userClasspath.String()<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>在这里，我们实现了类路径的解析，以及读取class文件的功能。</p>
+<h3 id="分析类路径解析部分"><a href="#分析类路径解析部分" class="headerlink" title="分析类路径解析部分"></a>分析类路径解析部分</h3><blockquote>
+<p>通过jreOption与cpOption来解析类路径，jreOption是-Xjre选项，cpOption是-classpath&#x2F;-cp选项。</p>
+<p>启动类与拓展类使用jreOption，它们是lib或lib&#x2F;ext目录下的所有类，<br>所以首先采用通配符Entry生成，将目录全部分析，然后再向下不断分析。<br>注意的是，我们应该先对Jre目录进行判断，先看jreOption是否存在，如果不存在，再看当前目录下是否存在jre目录，如果还是不存在，再看JAVA_HOME环境变量是否存在，如果还是不存在，就抛出异常。</p>
+<p>cpOption是用户类路径，如果用户没有提供-classpath&#x2F;-cp选项，则使用当前目录作为用户类路径。</p>
+</blockquote>
+<h3 id="分析读取class文件部分"><a href="#分析读取class文件部分" class="headerlink" title="分析读取class文件部分"></a>分析读取class文件部分</h3><blockquote>
+<p>读取class文件，首先将类名转换为相对路径，然后依次从启动类路径、扩展类路径和用户类路径中搜索class文件。</p>
+</blockquote>
+<h2 id="类路径项"><a href="#类路径项" class="headerlink" title="类路径项"></a>类路径项</h2><figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><code class="hljs Golang"><span class="hljs-comment">// Entry 接口</span><br><span class="hljs-keyword">const</span> pathListSeparator = <span class="hljs-type">string</span>(os.PathListSeparator)<br><br><span class="hljs-comment">// Entry 类路径项</span><br><span class="hljs-comment">// 举例作用：假设要读取java.lang.Object类，传入参数应该是java/lang/Object.class，</span><br><span class="hljs-comment">// 返回读取到的字节数据，最终定位到class文件的Entry</span><br><span class="hljs-keyword">type</span> Entry <span class="hljs-keyword">interface</span> &#123;<br>	<span class="hljs-comment">// readClass 用来寻找和加载class文件</span><br>	readClass(className <span class="hljs-type">string</span>) ([]<span class="hljs-type">byte</span>, Entry, <span class="hljs-type">error</span>)<br>	<span class="hljs-comment">// String 类似返回变量的字符串表示</span><br>	String() <span class="hljs-type">string</span><br>&#125;<br><br><span class="hljs-comment">// newEntry 创建新的Entry</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">newEntry</span><span class="hljs-params">(path <span class="hljs-type">string</span>)</span></span> Entry &#123;<br>	<span class="hljs-comment">// 如果包含分隔符，说明是复合Entry</span><br>	<span class="hljs-comment">// 例如: java -cp a.jar;b.jar;c.jar; com.example.Main</span><br>	<span class="hljs-keyword">if</span> strings.Contains(path, pathListSeparator) &#123;<br>		<span class="hljs-keyword">return</span> newCompositeEntry(path)<br>	&#125;<br><br>	<span class="hljs-comment">// 如果是*结尾，说明是通配符Entry</span><br>	<span class="hljs-comment">// 例如: java -cp * com.example.Main</span><br>	<span class="hljs-keyword">if</span> strings.HasSuffix(path, <span class="hljs-string">&quot;*&quot;</span>) &#123;<br>		<span class="hljs-keyword">return</span> newWildcardEntry(path)<br>	&#125;<br><br>	<span class="hljs-comment">// 如果是zip或者jar包，说明是zip或者jar包Entry</span><br>	<span class="hljs-comment">// 例如: java -cp a.jar com.example.Main</span><br>	<span class="hljs-keyword">if</span> strings.HasSuffix(path, <span class="hljs-string">&quot;.jar&quot;</span>) || strings.HasSuffix(path, <span class="hljs-string">&quot;.JAR&quot;</span>) ||<br>		strings.HasSuffix(path, <span class="hljs-string">&quot;.zip&quot;</span>) || strings.HasSuffix(path, <span class="hljs-string">&quot;.ZIP&quot;</span>) &#123;<br>		<span class="hljs-keyword">return</span> newZipEntry(path)<br>	&#125;<br><br>	<span class="hljs-comment">// 否则是目录Entry</span><br>	<span class="hljs-comment">// 例如: java -cp com/example Main</span><br>	<span class="hljs-keyword">return</span> newDirEntry(path)<br>&#125;<br></code></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://github.com/TRO148/TroJvm/tree/master/classpath">其他Entry实现在TRO148&#x2F;TroJvm中</a></p>
+<h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2><figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs Golang">   cp := classpath.Parse(XjreOption, cpOption)<br><span class="hljs-comment">// 把.全部替换成/</span><br>className := strings.Replace(cmd.class, <span class="hljs-string">&quot;.&quot;</span>, <span class="hljs-string">&quot;/&quot;</span>, <span class="hljs-number">-1</span>)<br>classData, _, err := cp.ReadClass(className)<br></code></pre></td></tr></table></figure>
+
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>就这样，我们完成了类路径的解析，以及读取class文件的功能。</p>
+
+  </div>
+</article>
+
+
+    <div class="blog-post-comments">
+        <div id="utterances_thread">
+            <noscript>加载评论需要在浏览器启用 JavaScript 脚本支持。</noscript>
+        </div>
+    </div>
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">首页</a></li>
+        
+          <li><a href="/archives/">文章</a></li>
+        
+          <li><a href="/search/">搜索</a></li>
+        
+          <li><a target="_blank" rel="noopener" href="http://github.com/tro148">项目</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B4%E4%BD%93%E6%B5%81%E7%A8%8B"><span class="toc-number">1.</span> <span class="toc-text">整体流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B1%BB%E8%B7%AF%E5%BE%84"><span class="toc-number">2.</span> <span class="toc-text">类路径</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%86%E6%9E%90%E7%B1%BB%E8%B7%AF%E5%BE%84%E8%A7%A3%E6%9E%90%E9%83%A8%E5%88%86"><span class="toc-number">2.1.</span> <span class="toc-text">分析类路径解析部分</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%86%E6%9E%90%E8%AF%BB%E5%8F%96class%E6%96%87%E4%BB%B6%E9%83%A8%E5%88%86"><span class="toc-number">2.2.</span> <span class="toc-text">分析读取class文件部分</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%B1%BB%E8%B7%AF%E5%BE%84%E9%A1%B9"><span class="toc-number">3.</span> <span class="toc-text">类路径项</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B5%8B%E8%AF%95"><span class="toc-number">4.</span> <span class="toc-text">测试</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">4.1.</span> <span class="toc-text">总结</span></a></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2023/05/23/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E6%90%9C%E7%B4%A2class%E6%96%87%E4%BB%B6/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2023/05/23/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E6%90%9C%E7%B4%A2class%E6%96%87%E4%BB%B6/&text=用go写jvm之搜索class文件"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2023/05/23/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E6%90%9C%E7%B4%A2class%E6%96%87%E4%BB%B6/&title=用go写jvm之搜索class文件"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2023/05/23/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E6%90%9C%E7%B4%A2class%E6%96%87%E4%BB%B6/&is_video=false&description=用go写jvm之搜索class文件"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=用go写jvm之搜索class文件&body=Check out this article: http://example.com/2023/05/23/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E6%90%9C%E7%B4%A2class%E6%96%87%E4%BB%B6/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2023/05/23/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E6%90%9C%E7%B4%A2class%E6%96%87%E4%BB%B6/&title=用go写jvm之搜索class文件"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2023/05/23/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E6%90%9C%E7%B4%A2class%E6%96%87%E4%BB%B6/&title=用go写jvm之搜索class文件"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2023/05/23/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E6%90%9C%E7%B4%A2class%E6%96%87%E4%BB%B6/&title=用go写jvm之搜索class文件"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2023/05/23/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E6%90%9C%E7%B4%A2class%E6%96%87%E4%BB%B6/&title=用go写jvm之搜索class文件"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2023/05/23/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E6%90%9C%E7%B4%A2class%E6%96%87%E4%BB%B6/&name=用go写jvm之搜索class文件&description=&lt;p&gt;java虚拟机首先要做的事情就是搜索class文件，这里我们用go来实现搜索class文件的功能。&lt;/p&gt;"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2023/05/23/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E6%90%9C%E7%B4%A2class%E6%96%87%E4%BB%B6/&t=用go写jvm之搜索class文件"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2021-2023
+    TroTro
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/search/">搜索</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="http://github.com/tro148">项目</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板！\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功！");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+    <script type="text/javascript">
+      var utterances_repo = 'tro148/tro148.github.io';
+      var utterances_issue_term = 'comment';
+      var utterances_label = 'Comment';
+      var utterances_theme = 'github-light';
+
+      (function(){
+          var script = document.createElement('script');
+
+          script.src = 'https://utteranc.es/client.js';
+          script.setAttribute('repo', utterances_repo);
+          script.setAttribute('issue-term', 'pathname');
+          script.setAttribute('label', utterances_label);
+          script.setAttribute('theme', utterances_theme);
+          script.setAttribute('crossorigin', 'anonymous');
+          script.async = true;
+          (document.getElementById('utterances_thread')).appendChild(script);
+      }());
+  </script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginModelPath":"assets/","model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/wanko.model.json"},"display":{"superSample":2,"width":250,"height":500,"position":"right","hOffset":0,"vOffset":-20},"mobile":{"show":false,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"pluginJsPath":"lib/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

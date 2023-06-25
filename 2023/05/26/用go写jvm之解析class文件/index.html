@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="在搜索到class文件后，得到字节码数据，然后将它解析为class文件结构">
+<meta property="og:type" content="article">
+<meta property="og:title" content="用go写jvm之解析class文件">
+<meta property="og:url" content="http://example.com/2023/05/26/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E8%A7%A3%E6%9E%90class%E6%96%87%E4%BB%B6/index.html">
+<meta property="og:site_name" content="TroTro">
+<meta property="og:description" content="在搜索到class文件后，得到字节码数据，然后将它解析为class文件结构">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-05-26T07:13:13.000Z">
+<meta property="article:modified_time" content="2023-06-23T13:10:30.450Z">
+<meta property="article:author" content="TroTro">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="项目">
+<meta property="article:tag" content="JVM">
+<meta property="article:tag" content="JAVA">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>用go写jvm之解析class文件</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-NGQ4ZR4FTC"></script>
+  <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-NGQ4ZR4FTC');
+  </script>
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+      <link rel="alternate" href="/true" title="TroTro" type="application/atom+xml" />
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="顶部" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/search/">搜索</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="http://github.com/tro148">项目</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="上一篇" href="/2023/05/26/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="下一篇" href="/2023/05/23/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E6%90%9C%E7%B4%A2class%E6%96%87%E4%BB%B6/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="返回顶部" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="分享文章" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2023/05/26/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E8%A7%A3%E6%9E%90class%E6%96%87%E4%BB%B6/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2023/05/26/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E8%A7%A3%E6%9E%90class%E6%96%87%E4%BB%B6/&text=用go写jvm之解析class文件"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2023/05/26/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E8%A7%A3%E6%9E%90class%E6%96%87%E4%BB%B6/&title=用go写jvm之解析class文件"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2023/05/26/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E8%A7%A3%E6%9E%90class%E6%96%87%E4%BB%B6/&is_video=false&description=用go写jvm之解析class文件"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=用go写jvm之解析class文件&body=Check out this article: http://example.com/2023/05/26/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E8%A7%A3%E6%9E%90class%E6%96%87%E4%BB%B6/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2023/05/26/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E8%A7%A3%E6%9E%90class%E6%96%87%E4%BB%B6/&title=用go写jvm之解析class文件"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2023/05/26/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E8%A7%A3%E6%9E%90class%E6%96%87%E4%BB%B6/&title=用go写jvm之解析class文件"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2023/05/26/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E8%A7%A3%E6%9E%90class%E6%96%87%E4%BB%B6/&title=用go写jvm之解析class文件"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2023/05/26/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E8%A7%A3%E6%9E%90class%E6%96%87%E4%BB%B6/&title=用go写jvm之解析class文件"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2023/05/26/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E8%A7%A3%E6%9E%90class%E6%96%87%E4%BB%B6/&name=用go写jvm之解析class文件&description=&lt;p&gt;在搜索到class文件后，得到字节码数据，然后将它解析为class文件结构&lt;/p&gt;"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2023/05/26/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E8%A7%A3%E6%9E%90class%E6%96%87%E4%BB%B6/&t=用go写jvm之解析class文件"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Class%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84"><span class="toc-number">1.</span> <span class="toc-text">Class文件结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A7%A3%E6%9E%90Class"><span class="toc-number">2.</span> <span class="toc-text">解析Class</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%86%E6%9E%90%E5%B8%B8%E9%87%8F%E6%B1%A0"><span class="toc-number">3.</span> <span class="toc-text">分析常量池</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A7%A3%E6%9E%90%E5%AD%97%E6%AE%B5%E5%92%8C%E6%96%B9%E6%B3%95%E8%A1%A8"><span class="toc-number">4.</span> <span class="toc-text">解析字段和方法表</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A7%A3%E6%9E%90%E5%B1%9E%E6%80%A7%E8%A1%A8"><span class="toc-number">5.</span> <span class="toc-text">解析属性表</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BB%93%E6%9D%9F"><span class="toc-number">5.1.</span> <span class="toc-text">结束</span></a></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        用go写jvm之解析class文件
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">TroTro</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2023-05-26T07:13:13.000Z" class="dt-published" itemprop="datePublished">2023-05-26</time>
+        
+        (Updated: <time datetime="2023-06-23T13:10:30.450Z" class="dt-updated" itemprop="dateModified">2023-06-23</time>)
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/Go/" rel="tag">Go</a>, <a class="p-category" href="/tags/JAVA/" rel="tag">JAVA</a>, <a class="p-category" href="/tags/JVM/" rel="tag">JVM</a>, <a class="p-category" href="/tags/%E9%A1%B9%E7%9B%AE/" rel="tag">项目</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <p>在搜索到class文件后，得到字节码数据，然后将它解析为class文件结构</p>
+<span id="more"></span>
+<h2 id="Class文件结构"><a href="#Class文件结构" class="headerlink" title="Class文件结构"></a>Class文件结构</h2><p>分析class文件结构，可以发现它主要是由以下部分组成：</p>
+<ul>
+<li>魔数、版本号、访问标志、类索引、父类索引</li>
+<li>常量池</li>
+<li>字段表、方法表</li>
+<li>属性表<br>据此建立class文件结构体，然后将字节码数据解析为结构体。<figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs Golang"><span class="hljs-keyword">type</span> ClassFile <span class="hljs-keyword">struct</span> &#123;<br>	minorVersion <span class="hljs-type">uint16</span> <span class="hljs-comment">// 次版本号</span><br>	majorVersion <span class="hljs-type">uint16</span> <span class="hljs-comment">// 主版本号</span><br><br>	constantPool ConstantPool <span class="hljs-comment">// 常量池</span><br><br>	accessFlags <span class="hljs-type">uint16</span> <span class="hljs-comment">// 访问标志</span><br>	thisClass   <span class="hljs-type">uint16</span> <span class="hljs-comment">// 类索引</span><br>	superClass  <span class="hljs-type">uint16</span> <span class="hljs-comment">// 父类索引</span><br><br>	interfaces []<span class="hljs-type">uint16</span> <span class="hljs-comment">// 接口索引表</span><br><br>	fields  []*MemberInfo <span class="hljs-comment">// 字段表</span><br>	methods []*MemberInfo <span class="hljs-comment">// 方法表</span><br><br>	attributes []AttributeInfo <span class="hljs-comment">// 属性表</span><br>&#125;<br></code></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="解析Class"><a href="#解析Class" class="headerlink" title="解析Class"></a>解析Class</h2><figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><code class="hljs Golang"><span class="hljs-comment">// Parse 解析class文件</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">Parse</span><span class="hljs-params">(classData []<span class="hljs-type">byte</span>)</span></span> (cf *ClassFile, err <span class="hljs-type">error</span>) &#123;<br>	<span class="hljs-comment">// defer + recover做到异常捕获</span><br>	<span class="hljs-keyword">defer</span> <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">()</span></span> &#123;<br>		<span class="hljs-comment">// 尝试恢复，如果恢复成功，将err赋值为恢复的错误</span><br>		<span class="hljs-keyword">if</span> r := <span class="hljs-built_in">recover</span>(); r != <span class="hljs-literal">nil</span> &#123;<br>			<span class="hljs-keyword">var</span> ok <span class="hljs-type">bool</span><br>			err, ok = r.(<span class="hljs-type">error</span>) <span class="hljs-comment">// 类型断言</span><br>			<span class="hljs-keyword">if</span> !ok &#123;<br>				err = fmt.Errorf(<span class="hljs-string">&quot;%v&quot;</span>, r)<br>			&#125;<br>		&#125;<br>	&#125;()<br><br>	<span class="hljs-comment">// 读取数据</span><br>	cr := &amp;ClassReader&#123;classData&#125;<br>	cf = &amp;ClassFile&#123;&#125;<br><br>	<span class="hljs-comment">// 装填数据</span><br>	cf.read(cr)<br>	<span class="hljs-keyword">return</span><br>&#125;<br><br><span class="hljs-comment">// read 读取</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(self *ClassFile)</span></span> read(reader *ClassReader) &#123;<br>	self.readAndCheckMagic(reader)               <span class="hljs-comment">// 读取并检查魔数</span><br>	self.readAndCheckVersion(reader)             <span class="hljs-comment">// 读取并检查版本号</span><br>	self.constantPool = readConstantPool(reader) <span class="hljs-comment">// 读取常量池</span><br><br>	self.accessFlags = reader.readUint16() <span class="hljs-comment">// 读取访问标志</span><br>	self.thisClass = reader.readUint16()   <span class="hljs-comment">// 读取类索引</span><br>	self.superClass = reader.readUint16()  <span class="hljs-comment">// 读取父类索引</span><br>	self.interfaces = reader.readUint16s() <span class="hljs-comment">// 读取接口索引表</span><br><br>	self.fields = readMembers(reader, self.constantPool)        <span class="hljs-comment">// 读取字段表</span><br>	self.methods = readMembers(reader, self.constantPool)       <span class="hljs-comment">// 读取方法表</span><br>	self.attributes = readAttributes(reader, self.constantPool) <span class="hljs-comment">// 读取属性表</span><br>&#125;<br></code></pre></td></tr></table></figure>
+<p>模拟tryCatch，然后读取数据，根据class文件的字节码顺序，进行读取，将数据存储在classfile中。</p>
+<h2 id="分析常量池"><a href="#分析常量池" class="headerlink" title="分析常量池"></a>分析常量池</h2><p>常量池，是存储常量（Constant_Info）的表，读取常量池大小，然后读取常量。</p>
+<figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs Golang"><span class="hljs-comment">// ConstantPool 常量池，常量的表</span><br><span class="hljs-keyword">type</span> ConstantPool []ConstantInfo<br><br><span class="hljs-comment">// readConstantPool 读取常量池</span><br><span class="hljs-comment">// 需要注意的是表头给出的常量大小比实际大1</span><br><span class="hljs-comment">// 0是无效索引，不指向任何常量</span><br><span class="hljs-comment">// CONSTANT_Long_info和CONSTANT_Double_info各占两个位置，实际常量数量比n-1还小</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">readConstantPool</span><span class="hljs-params">(reader *ClassReader)</span></span> ConstantPool &#123;<br>	<span class="hljs-comment">// 读取常量池大小</span><br>	cpCount := <span class="hljs-type">int</span>(reader.readUint16())<br>	<span class="hljs-comment">// 生成常量池</span><br>	cp := <span class="hljs-built_in">make</span>([]ConstantInfo, cpCount)<br><br>	<span class="hljs-keyword">for</span> i := <span class="hljs-number">1</span>; i &lt; cpCount; i++ &#123;<br>		cp[i] = readConstantInfo(reader, cp)<br>		<span class="hljs-comment">// 根据类型进行操作</span><br>		<span class="hljs-keyword">switch</span> cp[i].(<span class="hljs-keyword">type</span>) &#123;<br>		<span class="hljs-keyword">case</span> *ConstantLongInfo, *ConstantDoubleInfo:<br>			i++<br>		&#125;<br>	&#125;<br><br>	<span class="hljs-keyword">return</span> cp<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>读取常量部分，采用不同类型，进行不同操作，生成不同常量</p>
+<figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><code class="hljs Golang"><span class="hljs-comment">// ConstantInfo 定义常量信息接口</span><br><span class="hljs-keyword">type</span> ConstantInfo <span class="hljs-keyword">interface</span> &#123;<br>	<span class="hljs-comment">// 读取常量信息</span><br>	readInfo(reader *ClassReader)<br>&#125;<br><span class="hljs-comment">// readConstantInfo 读取常量信息</span><br><span class="hljs-comment">// 先读出tag值，创建具体的常量，最后调用常量的readInfo()方法读取常量信息</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">readConstantInfo</span><span class="hljs-params">(reader *ClassReader, cp ConstantPool)</span></span> ConstantInfo &#123;<br>	<span class="hljs-comment">// 读出什么类型的</span><br>	tag := reader.readUint8()<br>	<span class="hljs-comment">// 创建常量</span><br>	c := newConstantInfo(tag, cp)<br>	<span class="hljs-comment">// 读取常量信息</span><br>	c.readInfo(reader)<br>	<span class="hljs-keyword">return</span> c<br>&#125;<br><span class="hljs-comment">// newConstantInfo 生成常量信息</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">newConstantInfo</span><span class="hljs-params">(tag <span class="hljs-type">uint8</span>, cp ConstantPool)</span></span> ConstantInfo &#123;<br>	<span class="hljs-keyword">switch</span> tag &#123;<br>	<span class="hljs-keyword">case</span> CONSTANT_Integer:<br>		<span class="hljs-keyword">return</span> &amp;ConstantIntegerInfo&#123;&#125;<br>	<span class="hljs-keyword">case</span> CONSTANT_Float:<br>		<span class="hljs-keyword">return</span> &amp;ConstantFloatInfo&#123;&#125;<br>	<span class="hljs-keyword">case</span> CONSTANT_Long:<br>		<span class="hljs-keyword">return</span> &amp;ConstantLongInfo&#123;&#125;<br>	<span class="hljs-keyword">case</span> CONSTANT_Double:<br>		<span class="hljs-keyword">return</span> &amp;ConstantDoubleInfo&#123;&#125;<br>	<span class="hljs-keyword">case</span> CONSTANT_Utf8:<br>		<span class="hljs-keyword">return</span> &amp;ConstantUtf8Info&#123;&#125;<br>	<span class="hljs-keyword">case</span> CONSTANT_String:<br>		<span class="hljs-keyword">return</span> &amp;ConstantStringInfo&#123;cp: cp&#125;<br>	<span class="hljs-keyword">case</span> CONSTANT_Class:<br>		<span class="hljs-keyword">return</span> &amp;ConstantClassInfo&#123;cp: cp&#125;<br>	<span class="hljs-keyword">case</span> COMSTANT_Fieldref:<br>		<span class="hljs-keyword">return</span> &amp;ConstantFieldrefInfo&#123;ConstantMemberrefInfo&#123;cp: cp&#125;&#125;<br>	<span class="hljs-keyword">case</span> CONSTANT_Methodref:<br>		<span class="hljs-keyword">return</span> &amp;ConstantMethodrefInfo&#123;ConstantMemberrefInfo&#123;cp: cp&#125;&#125;<br>	<span class="hljs-keyword">case</span> CONSTANT_InterfaceMethodref:<br>		<span class="hljs-keyword">return</span> &amp;ConstantInterfaceMethodrefInfo&#123;ConstantMemberrefInfo&#123;cp: cp&#125;&#125;<br>	<span class="hljs-keyword">case</span> CONSTANT_NameAndType:<br>		<span class="hljs-keyword">return</span> &amp;ConstantNameAndTypeInfo&#123;&#125;<br>		<span class="hljs-comment">// 目的解析invokedynamic指令</span><br>	<span class="hljs-keyword">default</span>:<br>		<span class="hljs-built_in">panic</span>(<span class="hljs-string">&quot;java.lang.ClassFormatError: constant pool tag!&quot;</span>)<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>对于不同的常量处理过程，详见<a target="_blank" rel="noopener" href="https://github.com/TRO148/TroJvm/tree/master/classfile">这里</a></p>
+<h2 id="解析字段和方法表"><a href="#解析字段和方法表" class="headerlink" title="解析字段和方法表"></a>解析字段和方法表</h2><p>由于字段表和方法表采用相同的结构，所以采用相同的方法进行解析。</p>
+<figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><code class="hljs Golang"><span class="hljs-comment">// MemberInfo 字段和方法表</span><br><span class="hljs-keyword">type</span> MemberInfo <span class="hljs-keyword">struct</span> &#123;<br>	cp              ConstantPool    <span class="hljs-comment">// 常量池</span><br>	accessFlags     <span class="hljs-type">uint16</span>          <span class="hljs-comment">//访问标志</span><br>	nameIndex       <span class="hljs-type">uint16</span>          <span class="hljs-comment">//常量池索引,给出字段名或方法名</span><br>	descriptorIndex <span class="hljs-type">uint16</span>          <span class="hljs-comment">//常量池索引,给出字段或方法描述符</span><br>	attributes      []AttributeInfo <span class="hljs-comment">//属性表</span><br>&#125;<br><br><span class="hljs-comment">// readMembers 生成读取字段表和方法表的函数</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">readMembers</span><span class="hljs-params">(reader *ClassReader, cp ConstantPool)</span></span> []*MemberInfo &#123;<br>	<span class="hljs-comment">// 读取字段表或方法表的成员数量</span><br>	memberCount := reader.readUint16()<br>	<span class="hljs-comment">// 生成字段表或方法表</span><br>	members := <span class="hljs-built_in">make</span>([]*MemberInfo, memberCount)<br>	<span class="hljs-keyword">for</span> i := <span class="hljs-keyword">range</span> members &#123;<br>		members[i] = readMember(reader, cp)<br>	&#125;<br>	<span class="hljs-keyword">return</span> members<br>&#125;<br><br><span class="hljs-comment">// 辅助函数 readMember 用来读取字段或方法数据</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">readMember</span><span class="hljs-params">(reader *ClassReader, cp ConstantPool)</span></span> *MemberInfo &#123;<br>	<span class="hljs-comment">// 依次读取数据</span><br>	<span class="hljs-keyword">return</span> &amp;MemberInfo&#123;<br>		cp:              cp,<br>		accessFlags:     reader.readUint16(),        <span class="hljs-comment">// 访问标志</span><br>		nameIndex:       reader.readUint16(),        <span class="hljs-comment">// 名称索引</span><br>		descriptorIndex: reader.readUint16(),        <span class="hljs-comment">// 描述符索引</span><br>		attributes:      readAttributes(reader, cp), <span class="hljs-comment">// 属性表</span><br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<h2 id="解析属性表"><a href="#解析属性表" class="headerlink" title="解析属性表"></a>解析属性表</h2><figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><code class="hljs Golang"><span class="hljs-comment">// AttributeInfo 属性信息接口</span><br><span class="hljs-comment">// 按照用户，23种预定义属性可分为三组，第一组是实现Java虚拟机所必需的，共有5种；第二组是Java类库所必需的，共有12种；第三组是可选的，共有6种。</span><br><span class="hljs-keyword">type</span> AttributeInfo <span class="hljs-keyword">interface</span> &#123;<br>	readInfo(reader *ClassReader)<br>&#125;<br><br><span class="hljs-comment">// readAttributes 读取属性表</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">readAttributes</span><span class="hljs-params">(reader *ClassReader, cp ConstantPool)</span></span> []AttributeInfo &#123;<br>	<span class="hljs-comment">// 读取属性表长度</span><br>	attributesCount := reader.readUint16()<br>	<span class="hljs-comment">// 创建属性表</span><br>	attributes := <span class="hljs-built_in">make</span>([]AttributeInfo, attributesCount)<br>	<span class="hljs-keyword">for</span> i := <span class="hljs-keyword">range</span> attributes &#123;<br>		attributes[i] = readAttribute(reader, cp)<br>	&#125;<br>	<span class="hljs-keyword">return</span> attributes<br>&#125;<br><br><span class="hljs-comment">// readAttribute 读取属性</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">readAttribute</span><span class="hljs-params">(reader *ClassReader, cp ConstantPool)</span></span> AttributeInfo &#123;<br>	<span class="hljs-comment">// 读取属性名索引</span><br>	attrNameIndex := reader.readUint16()<br>	<span class="hljs-comment">// 在常量池中查询属性名</span><br>	attrName := cp.getUtf8(attrNameIndex)<br>	<span class="hljs-comment">// 读取属性长度</span><br>	attrLen := reader.readUint32()<br>	<span class="hljs-comment">// 创建属性信息</span><br>	attrInfo := newAttributeInfo(attrName, attrLen, cp)<br>	<span class="hljs-comment">// 读取属性信息reader</span><br>	attrInfo.readInfo(reader)<br>	<span class="hljs-keyword">return</span> attrInfo<br>&#125;<br><br><span class="hljs-comment">// newAttributeInfo 创建属性信息 23种属性</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">newAttributeInfo</span><span class="hljs-params">(attrName <span class="hljs-type">string</span>, attrLen <span class="hljs-type">uint32</span>, cp ConstantPool)</span></span> AttributeInfo &#123;<br>	<span class="hljs-keyword">switch</span> attrName &#123;<br><br>	<span class="hljs-comment">// 标识的</span><br>	<span class="hljs-comment">// Deprecated是最简单的属性之一，仅起到标记作用，不包含任何数据，可出现在ClassFile、field_info和method_info结构中。</span><br>	<span class="hljs-comment">// Deprecated 用于表示不建议使用的属性，可以在java中使用@Deprecated标签指出编译器给出警告信息。</span><br>	<span class="hljs-keyword">case</span> <span class="hljs-string">&quot;Deprecated&quot;</span>:<br>		<span class="hljs-keyword">return</span> &amp;DeprecatedAttribute&#123;&#125;<br>		<span class="hljs-comment">// Synthetic也是最简单的属性之一，起到标识作用，不包含任何数据，可出现在ClassFile、field_info和method_info结构中。</span><br>		<span class="hljs-comment">// Synthetic 用于标记源文件中不存在、由编译器生成的类成员，引入Synthetic属性主要是为了支持嵌套类和嵌套接口。</span><br>	<span class="hljs-keyword">case</span> <span class="hljs-string">&quot;Synthetic&quot;</span>:<br>		<span class="hljs-keyword">return</span> &amp;SyntheticAttribute&#123;&#125;<br><br>		<span class="hljs-comment">// 编译器生成的</span><br>		<span class="hljs-comment">// SourceFile是可选定长属性，只会出现在ClassFile结构中，用于指出源文件名。</span><br>	<span class="hljs-keyword">case</span> <span class="hljs-string">&quot;SourceFile&quot;</span>:<br>		<span class="hljs-keyword">return</span> &amp;SourceFileAttribute&#123;cp: cp&#125;<br>	<span class="hljs-keyword">case</span> <span class="hljs-string">&quot;LineNumberTable&quot;</span>:<br>		<span class="hljs-keyword">return</span> &amp;LineNumberTableAttribute&#123;&#125;<br>	<span class="hljs-keyword">case</span> <span class="hljs-string">&quot;LocalVariableTable&quot;</span>:<br>		<span class="hljs-keyword">return</span> &amp;LocalVariableTableAttribute&#123;&#125;<br><br>		<span class="hljs-comment">// 存放信息</span><br>		<span class="hljs-comment">// ConstantValue是定长属性，只会出现在field_info结构中，用于表示常量表达式的值。</span><br>	<span class="hljs-keyword">case</span> <span class="hljs-string">&quot;ConstantValue&quot;</span>:<br>		<span class="hljs-keyword">return</span> &amp;ConstantValueAttribute&#123;&#125;<br>		<span class="hljs-comment">// Code是变长属性，只会出现在method_info结构中，用于存放字节码等方法相关信息。</span><br>	<span class="hljs-keyword">case</span> <span class="hljs-string">&quot;Code&quot;</span>:<br>		<span class="hljs-keyword">return</span> &amp;CodeAttribute&#123;cp: cp&#125;<br>		<span class="hljs-comment">// Exceptions是变长属性，用于指出方法抛出的异常表。</span><br>	<span class="hljs-keyword">case</span> <span class="hljs-string">&quot;Exceptions&quot;</span>:<br>		<span class="hljs-keyword">return</span> &amp;ExceptionsAttribute&#123;&#125;<br><br>	<span class="hljs-keyword">default</span>:<br>		<span class="hljs-keyword">return</span> &amp;UnparsedAttribute&#123;attrName, attrLen, <span class="hljs-literal">nil</span>&#125;<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>首先读取属性表，然后再读每一个属性，根据属性名，创建属性信息，然后读取属性信息。</p>
+<p>具体属性信息也详见<a target="_blank" rel="noopener" href="https://github.com/TRO148/TroJvm/tree/master/classfile">这里</a></p>
+<h3 id="结束"><a href="#结束" class="headerlink" title="结束"></a>结束</h3><p>解析class文件部分，基本就是使用reader，读取固定长度的字节，获取相应的信息，并组成不同的信息结构，这里就不再赘述了。</p>
+
+  </div>
+</article>
+
+
+    <div class="blog-post-comments">
+        <div id="utterances_thread">
+            <noscript>加载评论需要在浏览器启用 JavaScript 脚本支持。</noscript>
+        </div>
+    </div>
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">首页</a></li>
+        
+          <li><a href="/archives/">文章</a></li>
+        
+          <li><a href="/search/">搜索</a></li>
+        
+          <li><a target="_blank" rel="noopener" href="http://github.com/tro148">项目</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Class%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84"><span class="toc-number">1.</span> <span class="toc-text">Class文件结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A7%A3%E6%9E%90Class"><span class="toc-number">2.</span> <span class="toc-text">解析Class</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%86%E6%9E%90%E5%B8%B8%E9%87%8F%E6%B1%A0"><span class="toc-number">3.</span> <span class="toc-text">分析常量池</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A7%A3%E6%9E%90%E5%AD%97%E6%AE%B5%E5%92%8C%E6%96%B9%E6%B3%95%E8%A1%A8"><span class="toc-number">4.</span> <span class="toc-text">解析字段和方法表</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A7%A3%E6%9E%90%E5%B1%9E%E6%80%A7%E8%A1%A8"><span class="toc-number">5.</span> <span class="toc-text">解析属性表</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BB%93%E6%9D%9F"><span class="toc-number">5.1.</span> <span class="toc-text">结束</span></a></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2023/05/26/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E8%A7%A3%E6%9E%90class%E6%96%87%E4%BB%B6/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2023/05/26/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E8%A7%A3%E6%9E%90class%E6%96%87%E4%BB%B6/&text=用go写jvm之解析class文件"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2023/05/26/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E8%A7%A3%E6%9E%90class%E6%96%87%E4%BB%B6/&title=用go写jvm之解析class文件"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2023/05/26/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E8%A7%A3%E6%9E%90class%E6%96%87%E4%BB%B6/&is_video=false&description=用go写jvm之解析class文件"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=用go写jvm之解析class文件&body=Check out this article: http://example.com/2023/05/26/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E8%A7%A3%E6%9E%90class%E6%96%87%E4%BB%B6/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2023/05/26/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E8%A7%A3%E6%9E%90class%E6%96%87%E4%BB%B6/&title=用go写jvm之解析class文件"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2023/05/26/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E8%A7%A3%E6%9E%90class%E6%96%87%E4%BB%B6/&title=用go写jvm之解析class文件"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2023/05/26/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E8%A7%A3%E6%9E%90class%E6%96%87%E4%BB%B6/&title=用go写jvm之解析class文件"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2023/05/26/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E8%A7%A3%E6%9E%90class%E6%96%87%E4%BB%B6/&title=用go写jvm之解析class文件"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2023/05/26/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E8%A7%A3%E6%9E%90class%E6%96%87%E4%BB%B6/&name=用go写jvm之解析class文件&description=&lt;p&gt;在搜索到class文件后，得到字节码数据，然后将它解析为class文件结构&lt;/p&gt;"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2023/05/26/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E8%A7%A3%E6%9E%90class%E6%96%87%E4%BB%B6/&t=用go写jvm之解析class文件"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2021-2023
+    TroTro
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/search/">搜索</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="http://github.com/tro148">项目</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板！\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功！");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+    <script type="text/javascript">
+      var utterances_repo = 'tro148/tro148.github.io';
+      var utterances_issue_term = 'comment';
+      var utterances_label = 'Comment';
+      var utterances_theme = 'github-light';
+
+      (function(){
+          var script = document.createElement('script');
+
+          script.src = 'https://utteranc.es/client.js';
+          script.setAttribute('repo', utterances_repo);
+          script.setAttribute('issue-term', 'pathname');
+          script.setAttribute('label', utterances_label);
+          script.setAttribute('theme', utterances_theme);
+          script.setAttribute('crossorigin', 'anonymous');
+          script.async = true;
+          (document.getElementById('utterances_thread')).appendChild(script);
+      }());
+  </script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginModelPath":"assets/","model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/wanko.model.json"},"display":{"superSample":2,"width":250,"height":500,"position":"right","hOffset":0,"vOffset":-20},"mobile":{"show":false,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"pluginJsPath":"lib/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

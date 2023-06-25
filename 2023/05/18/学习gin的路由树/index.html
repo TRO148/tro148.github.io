@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="通过学习和写Gin的路由树，学习路由匹配知识">
+<meta property="og:type" content="article">
+<meta property="og:title" content="学习gin的路由树">
+<meta property="og:url" content="http://example.com/2023/05/18/%E5%AD%A6%E4%B9%A0gin%E7%9A%84%E8%B7%AF%E7%94%B1%E6%A0%91/index.html">
+<meta property="og:site_name" content="TroTro">
+<meta property="og:description" content="通过学习和写Gin的路由树，学习路由匹配知识">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-05-18T13:15:47.000Z">
+<meta property="article:modified_time" content="2023-05-27T02:42:52.653Z">
+<meta property="article:author" content="TroTro">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="Gin">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>学习gin的路由树</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-NGQ4ZR4FTC"></script>
+  <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-NGQ4ZR4FTC');
+  </script>
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+      <link rel="alternate" href="/true" title="TroTro" type="application/atom+xml" />
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="顶部" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/search/">搜索</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="http://github.com/tro148">项目</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="上一篇" href="/2023/05/19/gin%E7%9A%84%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%8E%9F%E7%90%86%E7%AE%80%E5%8D%95%E5%AE%9E%E7%8E%B0/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="下一篇" href="/2023/05/04/%E4%BA%86%E8%A7%A3RPC/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="返回顶部" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="分享文章" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2023/05/18/%E5%AD%A6%E4%B9%A0gin%E7%9A%84%E8%B7%AF%E7%94%B1%E6%A0%91/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2023/05/18/%E5%AD%A6%E4%B9%A0gin%E7%9A%84%E8%B7%AF%E7%94%B1%E6%A0%91/&text=学习gin的路由树"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2023/05/18/%E5%AD%A6%E4%B9%A0gin%E7%9A%84%E8%B7%AF%E7%94%B1%E6%A0%91/&title=学习gin的路由树"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2023/05/18/%E5%AD%A6%E4%B9%A0gin%E7%9A%84%E8%B7%AF%E7%94%B1%E6%A0%91/&is_video=false&description=学习gin的路由树"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=学习gin的路由树&body=Check out this article: http://example.com/2023/05/18/%E5%AD%A6%E4%B9%A0gin%E7%9A%84%E8%B7%AF%E7%94%B1%E6%A0%91/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2023/05/18/%E5%AD%A6%E4%B9%A0gin%E7%9A%84%E8%B7%AF%E7%94%B1%E6%A0%91/&title=学习gin的路由树"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2023/05/18/%E5%AD%A6%E4%B9%A0gin%E7%9A%84%E8%B7%AF%E7%94%B1%E6%A0%91/&title=学习gin的路由树"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2023/05/18/%E5%AD%A6%E4%B9%A0gin%E7%9A%84%E8%B7%AF%E7%94%B1%E6%A0%91/&title=学习gin的路由树"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2023/05/18/%E5%AD%A6%E4%B9%A0gin%E7%9A%84%E8%B7%AF%E7%94%B1%E6%A0%91/&title=学习gin的路由树"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2023/05/18/%E5%AD%A6%E4%B9%A0gin%E7%9A%84%E8%B7%AF%E7%94%B1%E6%A0%91/&name=学习gin的路由树&description=&lt;p&gt;通过学习和写Gin的路由树，学习路由匹配知识&lt;/p&gt;"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2023/05/18/%E5%AD%A6%E4%B9%A0gin%E7%9A%84%E8%B7%AF%E7%94%B1%E6%A0%91/&t=学习gin的路由树"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8F%90%E8%A6%81"><span class="toc-number">1.</span> <span class="toc-text">提要</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A6%96%E5%85%88%E8%A6%81%E5%88%9B%E5%BB%BA%E8%B7%AF%E7%94%B1%E8%8A%82%E7%82%B9%EF%BC%8C%E6%90%AD%E5%BB%BA%E5%A5%BD%E8%B7%AF%E7%94%B1%E6%A0%91%E7%9A%84%E6%93%8D%E4%BD%9C%E6%96%B9%E6%B3%95"><span class="toc-number">1.1.</span> <span class="toc-text">首先要创建路由节点，搭建好路由树的操作方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E8%B7%AF%E7%94%B1%E6%A0%91%EF%BC%8C%E6%90%AD%E5%BB%BA%E5%A5%BD%E8%B7%AF%E7%94%B1%E6%A0%91%E7%9A%84%E6%93%8D%E4%BD%9C%E6%96%B9%E6%B3%95"><span class="toc-number">1.2.</span> <span class="toc-text">创建路由树，搭建好路由树的操作方法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%92%B3%E5%92%B3%EF%BC%8C%E5%86%85%E5%AE%B9%E8%BE%83%E5%B0%91%EF%BC%8C%E4%BB%A3%E7%A0%81%E8%BE%83%E5%A4%9A%EF%BC%8C%E9%80%BB%E8%BE%91%E8%BF%98%E6%98%AF%E6%AF%94%E8%BE%83%E6%B8%85%E6%99%B0%E7%9A%84"><span class="toc-number">1.2.1.</span> <span class="toc-text">咳咳，内容较少，代码较多，逻辑还是比较清晰的</span></a></li></ol></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        学习gin的路由树
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">TroTro</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2023-05-18T13:15:47.000Z" class="dt-published" itemprop="datePublished">2023-05-18</time>
+        
+        (Updated: <time datetime="2023-05-27T02:42:52.653Z" class="dt-updated" itemprop="dateModified">2023-05-27</time>)
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/Gin/" rel="tag">Gin</a>, <a class="p-category" href="/tags/Go/" rel="tag">Go</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <p>通过学习和写Gin的路由树，学习路由匹配知识</p>
+<span id="more"></span>
+<h2 id="提要"><a href="#提要" class="headerlink" title="提要"></a>提要</h2><p>通过创建路由节点，匹配子节点，插入与搜索节点，再搭配路由的插入与搜索，来实现路由。</p>
+<h3 id="首先要创建路由节点，搭建好路由树的操作方法"><a href="#首先要创建路由节点，搭建好路由树的操作方法" class="headerlink" title="首先要创建路由节点，搭建好路由树的操作方法"></a>首先要创建路由节点，搭建好路由树的操作方法</h3><figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><code class="hljs Golang"><span class="hljs-comment">// 路由树节点，主要是树的操作，通过matchChild与matChildren搜索子节点，insert与search完成树基本操作</span><br><span class="hljs-keyword">type</span> node <span class="hljs-keyword">struct</span> &#123;<br>	pattern  <span class="hljs-type">string</span>  <span class="hljs-comment">//匹配路由</span><br>	part     <span class="hljs-type">string</span>  <span class="hljs-comment">//路由中的一部分</span><br>	children []*node <span class="hljs-comment">//子节点</span><br>	isWild   <span class="hljs-type">bool</span>    <span class="hljs-comment">//是否精确匹配，part含有:或*时为true</span><br>&#125;<br><br><span class="hljs-comment">// matchChild 匹配子节点，返回第一个匹配成功的节点，用于插入</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(n *node)</span></span> matchChild(part <span class="hljs-type">string</span>) *node &#123;<br>	<span class="hljs-keyword">for</span> _, child := <span class="hljs-keyword">range</span> n.children &#123;<br>		<span class="hljs-comment">//如果子节点的part与要匹配的part相同，或者子节点的part为通配符，则返回该子节点</span><br>		<span class="hljs-keyword">if</span> child.part == part || child.isWild &#123;<br>			<span class="hljs-keyword">return</span> child<br>		&#125;<br>	&#125;<br>	<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span><br>&#125;<br><br><span class="hljs-comment">// matchChildren 匹配子节点，返回所有匹配成功的节点，用于查找</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(n *node)</span></span> matchChildren(part <span class="hljs-type">string</span>) []*node &#123;<br>	nodes := <span class="hljs-built_in">make</span>([]*node, <span class="hljs-number">0</span>)<br>	<span class="hljs-keyword">for</span> _, child := <span class="hljs-keyword">range</span> n.children &#123;<br>		<span class="hljs-comment">//如果子节点的part与要匹配的part相同，或者子节点的part为通配符，则返回该子节点</span><br>		<span class="hljs-keyword">if</span> child.part == part || child.isWild &#123;<br>			nodes = <span class="hljs-built_in">append</span>(nodes, child)<br>		&#125;<br>	&#125;<br>	<span class="hljs-keyword">return</span> nodes<br>&#125;<br><br><span class="hljs-comment">// insert 插入节点，height说是第几层就是第几层，遇到没有的就自己填上，遇到有的就继续向下插入</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(n *node)</span></span> insert(pattern <span class="hljs-type">string</span>, parts []<span class="hljs-type">string</span>, height <span class="hljs-type">int</span>) &#123;<br>	<span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(parts) == height &#123; <span class="hljs-comment">//递归结束条件</span><br>		n.pattern = pattern<br>		<span class="hljs-keyword">return</span><br>	&#125;<br><br>	part := parts[height]       <span class="hljs-comment">//获取当前层级的part</span><br>	child := n.matchChild(part) <span class="hljs-comment">//获取当前层级的part对应的子节点</span><br>	<span class="hljs-keyword">if</span> child == <span class="hljs-literal">nil</span> &#123;<br>		child = &amp;node&#123;part: part, isWild: part[<span class="hljs-number">0</span>] == <span class="hljs-string">&#x27;:&#x27;</span> || part[<span class="hljs-number">0</span>] == <span class="hljs-string">&#x27;*&#x27;</span>&#125;<br>		n.children = <span class="hljs-built_in">append</span>(n.children, child)<br>	&#125;<br><br>	child.insert(pattern, parts, height+<span class="hljs-number">1</span>) <span class="hljs-comment">//递归插入子节点</span><br>&#125;<br><br><span class="hljs-comment">// search 查询，不断匹配part，查询到路径的那个点</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(n *node)</span></span> search(parts []<span class="hljs-type">string</span>, height <span class="hljs-type">int</span>) *node &#123;<br>	<span class="hljs-comment">//只要出现*，则不再进行后续搜索</span><br>	<span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(parts) == height || strings.HasPrefix(n.part, <span class="hljs-string">&quot;*&quot;</span>) &#123; <span class="hljs-comment">//递归结束条件</span><br>		<span class="hljs-keyword">if</span> n.pattern == <span class="hljs-string">&quot;&quot;</span> &#123; <span class="hljs-comment">//如果当前节点的pattern为空，则说明没有匹配到</span><br>			<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span><br>		&#125;<br>		<span class="hljs-keyword">return</span> n<br>	&#125;<br><br>	part := parts[height]             <span class="hljs-comment">//获取当前层级的part</span><br>	children := n.matchChildren(part) <span class="hljs-comment">//获取所有对应的子节点，包括*与:</span><br><br>	<span class="hljs-keyword">for</span> _, child := <span class="hljs-keyword">range</span> children &#123;<br>		result := child.search(parts, height+<span class="hljs-number">1</span>)<br>		<span class="hljs-keyword">if</span> result != <span class="hljs-literal">nil</span> &#123;<br>			<span class="hljs-keyword">return</span> result<br>		&#125;<br>	&#125;<br><br>	<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span><br>&#125;<br></code></pre></td></tr></table></figure>
+<blockquote>
+<p>通过matchChild与matchChildren完成基本的子节点搜索</p>
+<p>在插入过程中，直至匹配到响应的层数，就进行插入操作，如果没有匹配到，则新建一个节点，然后继续插入</p>
+<p>在搜索过程中，不断匹配part，直至匹配到最后一层，或者遇到*，则不再进行后续搜索</p>
+</blockquote>
+<h3 id="创建路由树，搭建好路由树的操作方法"><a href="#创建路由树，搭建好路由树的操作方法" class="headerlink" title="创建路由树，搭建好路由树的操作方法"></a>创建路由树，搭建好路由树的操作方法</h3><figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><code class="hljs Golang"><span class="hljs-comment">// Router 路由，用于存储路由信息</span><br><span class="hljs-keyword">type</span> Router <span class="hljs-keyword">struct</span> &#123;<br>	roots    <span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]*node<br>	handlers <span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]HandlerFunc<br>&#125;<br><br><span class="hljs-comment">// parsePattern 解析路由，辅助函数，将pattern拆分parts</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">parsePattern</span><span class="hljs-params">(pattern <span class="hljs-type">string</span>)</span></span> []<span class="hljs-type">string</span> &#123;<br>	vs := strings.Split(pattern, <span class="hljs-string">&quot;/&quot;</span>)<br><br>	<span class="hljs-comment">//所以不支持/*hi/hihi/hi,没有后续，只能到/*hi</span><br>	parts := <span class="hljs-built_in">make</span>([]<span class="hljs-type">string</span>, <span class="hljs-number">0</span>)<br>	<span class="hljs-keyword">for</span> _, item := <span class="hljs-keyword">range</span> vs &#123;<br>		<span class="hljs-keyword">if</span> item != <span class="hljs-string">&quot;&quot;</span> &#123;<br>			parts = <span class="hljs-built_in">append</span>(parts, item)<br>			<span class="hljs-keyword">if</span> item[<span class="hljs-number">0</span>] == <span class="hljs-string">&#x27;*&#x27;</span> &#123;<br>				<span class="hljs-keyword">break</span><br>			&#125;<br>		&#125;<br>	&#125;<br><br>	<span class="hljs-keyword">return</span> parts<br>&#125;<br><br><span class="hljs-comment">// addRoute 添加路由，存入路由树与handlers方法中</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(router *Router)</span></span> addRoute(method <span class="hljs-type">string</span>, pattern <span class="hljs-type">string</span>, handler HandlerFunc) &#123;<br>	parts := parsePattern(pattern)<br><br>	<span class="hljs-comment">//存入节点，以方法为树的基本节点</span><br>	_, ok := router.roots[method]<br>	<span class="hljs-keyword">if</span> !ok &#123;<br>		router.roots[method] = &amp;node&#123;&#125;<br>	&#125;<br>	router.roots[method].insert(pattern, parts, <span class="hljs-number">0</span>)<br><br>	<span class="hljs-comment">//存入处理函数</span><br>	key := method + <span class="hljs-string">&quot;-&quot;</span> + pattern<br>	router.handlers[key] = handler<br>&#125;<br><br><span class="hljs-comment">// getRoute 获取路由，查询节点与参数</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(router *Router)</span></span> getRoute(method <span class="hljs-type">string</span>, path <span class="hljs-type">string</span>) (*node, <span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]<span class="hljs-type">string</span>) &#123;<br>	searchParts := parsePattern(path)<br>	params := <span class="hljs-built_in">make</span>(<span class="hljs-keyword">map</span>[<span class="hljs-type">string</span>]<span class="hljs-type">string</span>)<br><br>	root, ok := router.roots[method]<br>	<span class="hljs-keyword">if</span> !ok &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, <span class="hljs-literal">nil</span><br>	&#125;<br><br>	<span class="hljs-comment">//查询到这个点</span><br>	n := root.search(searchParts, <span class="hljs-number">0</span>)<br>	<span class="hljs-keyword">if</span> n != <span class="hljs-literal">nil</span> &#123;<br>		parts := parsePattern(n.pattern)<br>		<span class="hljs-keyword">for</span> index, part := <span class="hljs-keyword">range</span> parts &#123;<br>			<span class="hljs-comment">//如果为:，则添加到参数</span><br>			<span class="hljs-keyword">if</span> part[<span class="hljs-number">0</span>] == <span class="hljs-string">&#x27;:&#x27;</span> &#123;<br>				params[part[<span class="hljs-number">1</span>:]] = searchParts[index]<br>			&#125;<br>			<span class="hljs-keyword">if</span> part[<span class="hljs-number">0</span>] == <span class="hljs-string">&#x27;*&#x27;</span> &amp;&amp; <span class="hljs-built_in">len</span>(part) &gt; <span class="hljs-number">1</span> &#123;<br>				<span class="hljs-comment">//如果为*，把路径后续添加到参数</span><br>				params[part[<span class="hljs-number">1</span>:]] = strings.Join(searchParts[index:], <span class="hljs-string">&quot;/&quot;</span>)<br>				<span class="hljs-keyword">break</span><br>			&#125;<br>		&#125;<br>		<span class="hljs-keyword">return</span> n, params<br>	&#125;<br><br>	<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span>, <span class="hljs-literal">nil</span><br>&#125;<br><br><span class="hljs-comment">// handle 处理请求，根据请求方法+请求路径，从map中取出对应的处理函数，执行</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(router *Router)</span></span> handle(c *Context) &#123;<br>	n, params := router.getRoute(c.Method, c.Path)<br>	<span class="hljs-keyword">if</span> n != <span class="hljs-literal">nil</span> &#123;<br>		c.Params = params<br>		key := c.Method + <span class="hljs-string">&quot;-&quot;</span> + n.pattern<br>		router.handlers[key](c)<br>	&#125; <span class="hljs-keyword">else</span> &#123;<br>		c.String(http.StatusNotFound, <span class="hljs-string">&quot;404 NOT FOUND: %s\n&quot;</span>, c.Path)<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<blockquote>
+<p>在创建路由树的时候，需要将路由树与handlers方法都存起来，路由树用于查询，handlers用于执行。</p>
+</blockquote>
+<h4 id="咳咳，内容较少，代码较多，逻辑还是比较清晰的"><a href="#咳咳，内容较少，代码较多，逻辑还是比较清晰的" class="headerlink" title="咳咳，内容较少，代码较多，逻辑还是比较清晰的"></a>咳咳，内容较少，代码较多，逻辑还是比较清晰的</h4>
+  </div>
+</article>
+
+
+    <div class="blog-post-comments">
+        <div id="utterances_thread">
+            <noscript>加载评论需要在浏览器启用 JavaScript 脚本支持。</noscript>
+        </div>
+    </div>
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">首页</a></li>
+        
+          <li><a href="/archives/">文章</a></li>
+        
+          <li><a href="/search/">搜索</a></li>
+        
+          <li><a target="_blank" rel="noopener" href="http://github.com/tro148">项目</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8F%90%E8%A6%81"><span class="toc-number">1.</span> <span class="toc-text">提要</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%A6%96%E5%85%88%E8%A6%81%E5%88%9B%E5%BB%BA%E8%B7%AF%E7%94%B1%E8%8A%82%E7%82%B9%EF%BC%8C%E6%90%AD%E5%BB%BA%E5%A5%BD%E8%B7%AF%E7%94%B1%E6%A0%91%E7%9A%84%E6%93%8D%E4%BD%9C%E6%96%B9%E6%B3%95"><span class="toc-number">1.1.</span> <span class="toc-text">首先要创建路由节点，搭建好路由树的操作方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E8%B7%AF%E7%94%B1%E6%A0%91%EF%BC%8C%E6%90%AD%E5%BB%BA%E5%A5%BD%E8%B7%AF%E7%94%B1%E6%A0%91%E7%9A%84%E6%93%8D%E4%BD%9C%E6%96%B9%E6%B3%95"><span class="toc-number">1.2.</span> <span class="toc-text">创建路由树，搭建好路由树的操作方法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%92%B3%E5%92%B3%EF%BC%8C%E5%86%85%E5%AE%B9%E8%BE%83%E5%B0%91%EF%BC%8C%E4%BB%A3%E7%A0%81%E8%BE%83%E5%A4%9A%EF%BC%8C%E9%80%BB%E8%BE%91%E8%BF%98%E6%98%AF%E6%AF%94%E8%BE%83%E6%B8%85%E6%99%B0%E7%9A%84"><span class="toc-number">1.2.1.</span> <span class="toc-text">咳咳，内容较少，代码较多，逻辑还是比较清晰的</span></a></li></ol></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2023/05/18/%E5%AD%A6%E4%B9%A0gin%E7%9A%84%E8%B7%AF%E7%94%B1%E6%A0%91/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2023/05/18/%E5%AD%A6%E4%B9%A0gin%E7%9A%84%E8%B7%AF%E7%94%B1%E6%A0%91/&text=学习gin的路由树"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2023/05/18/%E5%AD%A6%E4%B9%A0gin%E7%9A%84%E8%B7%AF%E7%94%B1%E6%A0%91/&title=学习gin的路由树"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2023/05/18/%E5%AD%A6%E4%B9%A0gin%E7%9A%84%E8%B7%AF%E7%94%B1%E6%A0%91/&is_video=false&description=学习gin的路由树"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=学习gin的路由树&body=Check out this article: http://example.com/2023/05/18/%E5%AD%A6%E4%B9%A0gin%E7%9A%84%E8%B7%AF%E7%94%B1%E6%A0%91/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2023/05/18/%E5%AD%A6%E4%B9%A0gin%E7%9A%84%E8%B7%AF%E7%94%B1%E6%A0%91/&title=学习gin的路由树"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2023/05/18/%E5%AD%A6%E4%B9%A0gin%E7%9A%84%E8%B7%AF%E7%94%B1%E6%A0%91/&title=学习gin的路由树"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2023/05/18/%E5%AD%A6%E4%B9%A0gin%E7%9A%84%E8%B7%AF%E7%94%B1%E6%A0%91/&title=学习gin的路由树"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2023/05/18/%E5%AD%A6%E4%B9%A0gin%E7%9A%84%E8%B7%AF%E7%94%B1%E6%A0%91/&title=学习gin的路由树"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2023/05/18/%E5%AD%A6%E4%B9%A0gin%E7%9A%84%E8%B7%AF%E7%94%B1%E6%A0%91/&name=学习gin的路由树&description=&lt;p&gt;通过学习和写Gin的路由树，学习路由匹配知识&lt;/p&gt;"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2023/05/18/%E5%AD%A6%E4%B9%A0gin%E7%9A%84%E8%B7%AF%E7%94%B1%E6%A0%91/&t=学习gin的路由树"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2021-2023
+    TroTro
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/search/">搜索</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="http://github.com/tro148">项目</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板！\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功！");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+    <script type="text/javascript">
+      var utterances_repo = 'tro148/tro148.github.io';
+      var utterances_issue_term = 'comment';
+      var utterances_label = 'Comment';
+      var utterances_theme = 'github-light';
+
+      (function(){
+          var script = document.createElement('script');
+
+          script.src = 'https://utteranc.es/client.js';
+          script.setAttribute('repo', utterances_repo);
+          script.setAttribute('issue-term', 'pathname');
+          script.setAttribute('label', utterances_label);
+          script.setAttribute('theme', utterances_theme);
+          script.setAttribute('crossorigin', 'anonymous');
+          script.async = true;
+          (document.getElementById('utterances_thread')).appendChild(script);
+      }());
+  </script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginModelPath":"assets/","model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/wanko.model.json"},"display":{"superSample":2,"width":250,"height":500,"position":"right","hOffset":0,"vOffset":-20},"mobile":{"show":false,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"pluginJsPath":"lib/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

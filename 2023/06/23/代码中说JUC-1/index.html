@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="本系列是写在代码里的记录，用来记录juc的学习过程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="代码中说JUC-1">
+<meta property="og:url" content="http://example.com/2023/06/23/%E4%BB%A3%E7%A0%81%E4%B8%AD%E8%AF%B4JUC-1/index.html">
+<meta property="og:site_name" content="TroTro">
+<meta property="og:description" content="本系列是写在代码里的记录，用来记录juc的学习过程">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-06-23T13:08:40.000Z">
+<meta property="article:modified_time" content="2023-06-23T13:17:05.584Z">
+<meta property="article:author" content="TroTro">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="JUC">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>代码中说JUC-1</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-NGQ4ZR4FTC"></script>
+  <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-NGQ4ZR4FTC');
+  </script>
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+      <link rel="alternate" href="/true" title="TroTro" type="application/atom+xml" />
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="顶部" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/search/">搜索</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="http://github.com/tro148">项目</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="上一篇" href="/2023/06/23/%E4%BB%A3%E7%A0%81%E4%B8%AD%E8%AF%B4JUC-2/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="下一篇" href="/2023/06/02/%E4%BB%94%E7%BB%86%E7%A0%94%E7%A9%B6Java%E7%9A%84Stream%E6%B5%81/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="返回顶部" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="分享文章" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2023/06/23/%E4%BB%A3%E7%A0%81%E4%B8%AD%E8%AF%B4JUC-1/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2023/06/23/%E4%BB%A3%E7%A0%81%E4%B8%AD%E8%AF%B4JUC-1/&text=代码中说JUC-1"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2023/06/23/%E4%BB%A3%E7%A0%81%E4%B8%AD%E8%AF%B4JUC-1/&title=代码中说JUC-1"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2023/06/23/%E4%BB%A3%E7%A0%81%E4%B8%AD%E8%AF%B4JUC-1/&is_video=false&description=代码中说JUC-1"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=代码中说JUC-1&body=Check out this article: http://example.com/2023/06/23/%E4%BB%A3%E7%A0%81%E4%B8%AD%E8%AF%B4JUC-1/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2023/06/23/%E4%BB%A3%E7%A0%81%E4%B8%AD%E8%AF%B4JUC-1/&title=代码中说JUC-1"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2023/06/23/%E4%BB%A3%E7%A0%81%E4%B8%AD%E8%AF%B4JUC-1/&title=代码中说JUC-1"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2023/06/23/%E4%BB%A3%E7%A0%81%E4%B8%AD%E8%AF%B4JUC-1/&title=代码中说JUC-1"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2023/06/23/%E4%BB%A3%E7%A0%81%E4%B8%AD%E8%AF%B4JUC-1/&title=代码中说JUC-1"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2023/06/23/%E4%BB%A3%E7%A0%81%E4%B8%AD%E8%AF%B4JUC-1/&name=代码中说JUC-1&description=&lt;p&gt;本系列是写在代码里的记录，用来记录juc的学习过程&lt;/p&gt;"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2023/06/23/%E4%BB%A3%E7%A0%81%E4%B8%AD%E8%AF%B4JUC-1/&t=代码中说JUC-1"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        代码中说JUC-1
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">TroTro</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2023-06-23T13:08:40.000Z" class="dt-published" itemprop="datePublished">2023-06-23</time>
+        
+        (Updated: <time datetime="2023-06-23T13:17:05.584Z" class="dt-updated" itemprop="dateModified">2023-06-23</time>)
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/JUC/" rel="tag">JUC</a>, <a class="p-category" href="/tags/Java/" rel="tag">Java</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <p>本系列是写在代码里的记录，用来记录juc的学习过程</p>
+<span id="more"></span>
+<p>具体代码在github里嗷~</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br><span class="line">338</span><br><span class="line">339</span><br><span class="line">340</span><br><span class="line">341</span><br><span class="line">342</span><br><span class="line">343</span><br><span class="line">344</span><br><span class="line">345</span><br><span class="line">346</span><br><span class="line">347</span><br><span class="line">348</span><br><span class="line">349</span><br><span class="line">350</span><br><span class="line">351</span><br><span class="line">352</span><br><span class="line">353</span><br><span class="line">354</span><br><span class="line">355</span><br><span class="line">356</span><br><span class="line">357</span><br><span class="line">358</span><br><span class="line">359</span><br><span class="line">360</span><br><span class="line">361</span><br><span class="line">362</span><br><span class="line">363</span><br><span class="line">364</span><br><span class="line">365</span><br><span class="line">366</span><br><span class="line">367</span><br><span class="line">368</span><br><span class="line">369</span><br><span class="line">370</span><br><span class="line">371</span><br><span class="line">372</span><br><span class="line">373</span><br><span class="line">374</span><br><span class="line">375</span><br><span class="line">376</span><br><span class="line">377</span><br><span class="line">378</span><br><span class="line">379</span><br></pre></td><td class="code"><pre><code class="hljs Java"><span class="hljs-comment">/*</span><br><span class="hljs-comment">  线程常用方法</span><br><span class="hljs-comment">  @author trotro</span><br><span class="hljs-comment"> */</span><br><span class="hljs-meta">@Slf4j(topic = &quot;n2&quot;)</span><br><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">n2</span> &#123;<br>    <span class="hljs-comment">/*</span><br><span class="hljs-comment">      创建线程</span><br><span class="hljs-comment">      列举主要三种模式</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@Test</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">creatThread</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-comment">// 第一种创建线程方法</span><br>        <span class="hljs-comment">// 直接使用Thread类，写一个匿名内部类，同时重写run方法</span><br>        <span class="hljs-type">Thread</span> <span class="hljs-variable">thread</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>(<span class="hljs-string">&quot;innerClass&quot;</span>) &#123;<br>            <span class="hljs-comment">//重写run</span><br>            <span class="hljs-meta">@Override</span><br>            <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">run</span><span class="hljs-params">()</span> &#123;<br>                log.debug(<span class="hljs-string">&quot;running&quot;</span>);<br>            &#125;<br>        &#125;;<br>        thread.start();<br><br>        <span class="hljs-comment">// 第二种使用Runnable配合Thread</span><br>        <span class="hljs-comment">// 实现Runnable方法</span><br>        <span class="hljs-type">Runnable</span> <span class="hljs-variable">running2</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Runnable</span>() &#123;<br>            <span class="hljs-meta">@Override</span><br>            <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">run</span><span class="hljs-params">()</span> &#123;<br>                log.debug(<span class="hljs-string">&quot;running2&quot;</span>);<br>            &#125;<br>        &#125;;<br>        <span class="hljs-type">Thread</span> <span class="hljs-variable">thread1</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>(running2, <span class="hljs-string">&quot;Runnable&quot;</span>);<br>        thread1.start();<br><br>        <span class="hljs-comment">// 第二点五种使用Lambda配合Thread</span><br>        <span class="hljs-comment">// 比较常用嗷</span><br>        <span class="hljs-type">Thread</span> <span class="hljs-variable">thread2</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>(() -&gt; log.debug(<span class="hljs-string">&quot;running3&quot;</span>), <span class="hljs-string">&quot;lambda&quot;</span>);<br>        thread2.start();<br><br>        <span class="hljs-comment">// 第三种使用FutureTask配合Thread</span><br>        <span class="hljs-comment">// FutureTask能够接受返回值</span><br><br>        FutureTask&lt;Integer&gt; task = <span class="hljs-keyword">new</span> <span class="hljs-title class_">FutureTask</span>&lt;&gt;(() -&gt; &#123;<br>            log.debug(<span class="hljs-string">&quot;task&quot;</span>);<br>            <span class="hljs-keyword">return</span> <span class="hljs-number">100</span>;<br>        &#125;);<br>        <span class="hljs-type">Thread</span> <span class="hljs-variable">thread3</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>(task, <span class="hljs-string">&quot;Future&quot;</span>);<br>        thread3.start();<br>        <span class="hljs-keyword">try</span> &#123;<br>            log.debug(<span class="hljs-string">&quot;出现结果:&#123;&#125;&quot;</span>, task.get());<br>        &#125; <span class="hljs-keyword">catch</span> (InterruptedException e) &#123;<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">RuntimeException</span>(e);<br>        &#125; <span class="hljs-keyword">catch</span> (ExecutionException e) &#123;<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">RuntimeException</span>(e);<br>        &#125;<br><br><br>        log.debug(<span class="hljs-string">&quot;main&quot;</span>);<br>    &#125;<br><br><br>    <span class="hljs-comment">/*</span><br><span class="hljs-comment">      观察线程</span><br><span class="hljs-comment">      看到线程交替运行</span><br><span class="hljs-comment">      1.使用window(tasklist)或linux(ps)(top -H -p pid查看这个pid的所有进程实时)提供的查看方式</span><br><span class="hljs-comment">      2.jps 查看所有java的进程，和pid</span><br><span class="hljs-comment">      3.jstack pid 查看该pid的所有进程</span><br><span class="hljs-comment">      4.jconsole pid 图形化查看pid</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@Test</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">watch</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> InterruptedException &#123;<br>        <span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>(() -&gt; &#123;<br>            <span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>) &#123;<br>                log.debug(<span class="hljs-string">&quot;running&quot;</span>);<br>                <span class="hljs-keyword">try</span> &#123;<br>                    Thread.sleep(<span class="hljs-number">100</span>);<br>                &#125; <span class="hljs-keyword">catch</span> (InterruptedException e) &#123;<br>                    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">RuntimeException</span>(e);<br>                &#125;<br>            &#125;<br>        &#125;, <span class="hljs-string">&quot;t1&quot;</span>).start();<br><br>        <span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>(() -&gt; &#123;<br>            <span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>) &#123;<br>                log.debug(<span class="hljs-string">&quot;2Running&quot;</span>);<br>                <span class="hljs-keyword">try</span> &#123;<br>                    Thread.sleep(<span class="hljs-number">100</span>);<br>                &#125; <span class="hljs-keyword">catch</span> (InterruptedException e) &#123;<br>                    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">RuntimeException</span>(e);<br>                &#125;<br>            &#125;<br>        &#125;, <span class="hljs-string">&quot;t2&quot;</span>).start();<br><br>        TimeUnit.SECONDS.sleep(<span class="hljs-number">2</span>);<br>    &#125;<br><br>    <span class="hljs-comment">/*</span><br><span class="hljs-comment">     使用Debug 观察栈帧，可以看到线程是在操作中可以随时创建的</span><br><span class="hljs-comment">     上下文切换：</span><br><span class="hljs-comment">     触发线程的被动方法，例如时间片用完（任务调度器在时钟提醒后，会进行任务调度切换线程）、</span><br><span class="hljs-comment">     垃圾回收（在垃圾回收的时候，会切换线程到垃圾回收的线程）、有更高的优先级线程调用</span><br><span class="hljs-comment"></span><br><span class="hljs-comment">     触发上下文切换的主动方法，</span><br><span class="hljs-comment">     线程内部使用&#123;Thread.sleep()&#125;将对cpu的使用放弃xx秒</span><br><span class="hljs-comment">     &#123;Thread.yield&#125;主动放弃对cpu的使用，优先让其他线程使用</span><br><span class="hljs-comment">     &#123;thread.wait()&#125;（不建议直接使用wait）让当前线程等待直到它被唤醒，通常是通过通知或中断</span><br><span class="hljs-comment">     &#123;thread.join()&#125;同上</span><br><span class="hljs-comment">     &#123;park synchronized lock&#125;同样也会触发上下文切换</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@Test</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">frames</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-type">Thread</span> <span class="hljs-variable">thread</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>(() -&gt; &#123;<br>            <span class="hljs-keyword">try</span> &#123;<br>                Thread.sleep(<span class="hljs-number">1000</span>);<br>                log.debug(<span class="hljs-string">&quot;hihi&quot;</span>);<br>            &#125; <span class="hljs-keyword">catch</span> (InterruptedException e) &#123;<br>                <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">RuntimeException</span>(e);<br>            &#125;<br>        &#125;);<br>        thread.start();<br>        <span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>(() -&gt; &#123;<br>            <span class="hljs-keyword">try</span> &#123;<br>                Thread.sleep(<span class="hljs-number">1000</span>);<br>                log.debug(<span class="hljs-string">&quot;hihi&quot;</span>);<br>            &#125; <span class="hljs-keyword">catch</span> (InterruptedException e) &#123;<br>                <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">RuntimeException</span>(e);<br>            &#125;<br>        &#125;).start();<br><br>        log.debug(String.valueOf(System.nanoTime()));<br>    &#125;<br><br>    <span class="hljs-comment">/*</span><br><span class="hljs-comment">      常用方法：</span><br><span class="hljs-comment">      start与run</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@Test</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">methods</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-comment">// 运行可以看到线程名字为main，所以run只是单纯调用关系</span><br>        <span class="hljs-type">Thread</span> <span class="hljs-variable">thread</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>(() -&gt; &#123;<br>            log.debug(Thread.currentThread().getName());<br>        &#125;);<br>        thread.start();<br>        thread.run();<br>        log.debug(<span class="hljs-string">&quot;start&quot;</span>);<br><br>        log.debug(<span class="hljs-string">&quot;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&quot;</span>);<br>        <span class="hljs-comment">// 打断</span><br>        <span class="hljs-type">Thread</span> <span class="hljs-variable">thread1</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>(() -&gt; &#123;<br>            <span class="hljs-keyword">synchronized</span> (Thread.class) &#123;<br>                log.debug(<span class="hljs-string">&quot;sleep&quot;</span>);<br>                <span class="hljs-keyword">try</span> &#123;<br>                    TimeUnit.SECONDS.sleep(<span class="hljs-number">1</span>);<br>                    TimeUnit.MILLISECONDS.sleep(<span class="hljs-number">2</span>);<br>                &#125; <span class="hljs-keyword">catch</span> (InterruptedException e) &#123;<br>                    log.debug(<span class="hljs-string">&quot;wake up!&quot;</span>);<br>                    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">RuntimeException</span>(e);<br>                &#125;<br>            &#125;<br>        &#125;);<br>        thread1.start();<br>        <span class="hljs-keyword">try</span> &#123;<br>            Thread.sleep(<span class="hljs-number">1000</span>);<br>            thread1.interrupt();<br>        &#125; <span class="hljs-keyword">catch</span> (InterruptedException e) &#123;<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">RuntimeException</span>(e);<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-comment">/*</span><br><span class="hljs-comment">      优先级和yield</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@Test</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">yieldP</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> ExecutionException, InterruptedException &#123;<br>        <span class="hljs-comment">// 定义方法变量</span><br>        <span class="hljs-type">AtomicInteger</span> <span class="hljs-variable">res0</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">AtomicInteger</span>();<br>        <span class="hljs-type">AtomicInteger</span> <span class="hljs-variable">res1</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">AtomicInteger</span>();<br>        <span class="hljs-type">Thread</span> <span class="hljs-variable">thread</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>(() -&gt; &#123;<br>            <span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>) &#123;<br>                <span class="hljs-keyword">if</span> (Thread.currentThread().isInterrupted()) &#123;<br>                    <span class="hljs-keyword">break</span>;<br>                &#125;<br><br>                res0.getAndIncrement(); <span class="hljs-comment">// +1</span><br>            &#125;<br>        &#125;);<br>        <span class="hljs-type">Thread</span> <span class="hljs-variable">thread1</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>(() -&gt; &#123;<br>            <span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>) &#123;<br>                <span class="hljs-keyword">if</span> (Thread.currentThread().isInterrupted()) &#123;<br>                    <span class="hljs-keyword">break</span>;<br>                &#125;<br><br>                <span class="hljs-keyword">try</span> &#123;<br><span class="hljs-comment">//                    Thread.yield();</span><br>                &#125; <span class="hljs-keyword">catch</span> (Exception e) &#123;<br>                    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">RuntimeException</span>(e);<br>                &#125;<br>                res1.getAndIncrement(); <span class="hljs-comment">// +1</span><br>            &#125;<br>        &#125;);<br><br><span class="hljs-comment">//        thread.setPriority(Thread.MAX_PRIORITY);</span><br><span class="hljs-comment">//        thread1.setPriority(Thread.MIN_PRIORITY);</span><br><br><br>        <span class="hljs-comment">// 启动线程</span><br>        thread.start();<br>        thread1.start();<br><br>        TimeUnit.SECONDS.sleep(<span class="hljs-number">2</span>);<br>        thread.interrupt();<br>        thread1.interrupt();<br><br>        <span class="hljs-comment">// 查看结果</span><br>        log.debug(<span class="hljs-string">&quot;thread0:&#123;&#125;&quot;</span>, res0.get());<br>        log.debug(<span class="hljs-string">&quot;thread1:&#123;&#125;&quot;</span>, res1.get());<br><br>        <span class="hljs-comment">/*</span><br><span class="hljs-comment">        可以看到，yield()对线程的影响还是十分大的。</span><br><span class="hljs-comment">        向调度程序提示当前线程愿意放弃其当前对处理器的使用。调度程序可以随意忽略此提示。</span><br><span class="hljs-comment">        Yield 是一种启发式尝试，旨在改善线程之间的相对进度，否则会过度使用 CPU。它的使用应与详细的分析和基准测试相结合，以确保它确实具有预期的效果。</span><br><span class="hljs-comment">        使用这种方法很少是合适的。它可能对调试或测试有用，因为它可能有助于重现由于竞争条件导致的错误。在设计并发控制结构（如java.util.concurrent.locks包中的结构）时，它也可能很有用。</span><br><span class="hljs-comment">         */</span><br>    &#125;<br><br>    <span class="hljs-comment">/*</span><br><span class="hljs-comment">     join的使用场景</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@Test</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">testJoin</span><span class="hljs-params">()</span> &#123;<br>        <span class="hljs-type">Thread</span> <span class="hljs-variable">thread</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>(() -&gt; &#123;<br>            <span class="hljs-keyword">try</span> &#123;<br>                TimeUnit.SECONDS.sleep(<span class="hljs-number">2</span>);<br>                log.debug(<span class="hljs-string">&quot;yeyeyeyey&quot;</span>);<br>            &#125; <span class="hljs-keyword">catch</span> (InterruptedException e) &#123;<br>                <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">RuntimeException</span>(e);<br>            &#125;<br>        &#125;);<br>        thread.start();<br>        log.debug(<span class="hljs-string">&quot;不使用join&quot;</span>);<br>        log.debug(<span class="hljs-string">&quot;线程状态：&#123;&#125;&quot;</span>, thread.getState());<br><br>        log.debug(<span class="hljs-string">&quot;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&quot;</span>);<br>        <span class="hljs-keyword">try</span> &#123;<br>            thread.join();<br>            log.debug(<span class="hljs-string">&quot;线程状态：&#123;&#125;&quot;</span>, thread.getState());<br>            log.debug(<span class="hljs-string">&quot;使用join&quot;</span>);<br>        &#125; <span class="hljs-keyword">catch</span> (InterruptedException e) &#123;<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">RuntimeException</span>(e);<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-comment">/*</span><br><span class="hljs-comment">    打断标记</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@Test</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">interruptFlag</span><span class="hljs-params">()</span>&#123;<br>        <span class="hljs-comment">// 1.在正常情况下（非sleep，wait，join阻塞状态时候）进行打断，会标记上打断标记</span><br>        <span class="hljs-comment">// 注意，这种情况下不会停止线程运行</span><br>        <span class="hljs-type">Thread</span> <span class="hljs-variable">thread</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>(() -&gt; &#123;<br>            <span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>) &#123;<br><span class="hljs-comment">//                可以用来手动停止线程运行</span><br><span class="hljs-comment">//                if (Thread.currentThread().isInterrupted()) &#123;</span><br><span class="hljs-comment">//                    break;</span><br><span class="hljs-comment">//                &#125;</span><br>            &#125;<br>        &#125;);<br><br>        <span class="hljs-comment">// 开始</span><br>        log.debug(<span class="hljs-string">&quot;start&quot;</span>);<br>        thread.start();<br>        <span class="hljs-keyword">try</span> &#123;<br>            TimeUnit.SECONDS.sleep(<span class="hljs-number">2</span>);<br>        &#125; <span class="hljs-keyword">catch</span> (InterruptedException e) &#123;<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">RuntimeException</span>(e);<br>        &#125;<br><br>        <span class="hljs-comment">//两秒后打断</span><br>        log.debug(<span class="hljs-string">&quot;interrupt&quot;</span>);<br>        thread.interrupt();<br><br>        <span class="hljs-comment">//查看状态</span><br>        log.debug(<span class="hljs-string">&quot;打断标记：&#123;&#125;&quot;</span>, thread.isInterrupted());<br>        log.debug(<span class="hljs-string">&quot;线程状态:&#123;&#125;&quot;</span>, thread.getState()); <span class="hljs-comment">//仍然运行</span><br>        <span class="hljs-keyword">try</span> &#123;<br>            TimeUnit.SECONDS.sleep(<span class="hljs-number">5</span>);<br>        &#125; <span class="hljs-keyword">catch</span> (InterruptedException e) &#123;<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">RuntimeException</span>(e);<br>        &#125;<br><br><br><br>        log.debug(<span class="hljs-string">&quot;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;.&quot;</span>);<br><br><br><br>        <span class="hljs-comment">// 2.在sleep,或者wait、join的时候打断，会是false，因为trycatch直接捕获了异常</span><br>        <span class="hljs-type">Thread</span> <span class="hljs-variable">interruptSleep</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>(() -&gt; &#123;<br>            <span class="hljs-keyword">try</span> &#123;<br>                TimeUnit.SECONDS.sleep(<span class="hljs-number">2</span>);<br>            &#125; <span class="hljs-keyword">catch</span> (InterruptedException e) &#123;<br>                log.warn(e.toString());<br>            &#125;<br>        &#125;);<br><br>        <span class="hljs-comment">// 开始</span><br>        interruptSleep.start();<br>        <span class="hljs-keyword">try</span> &#123;<br>            TimeUnit.SECONDS.sleep(<span class="hljs-number">1</span>);<br>        &#125; <span class="hljs-keyword">catch</span> (InterruptedException e) &#123;<br>            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">RuntimeException</span>(e);<br>        &#125;<br><br>        <span class="hljs-comment">//一秒后打断</span><br>        interruptSleep.interrupt();<br>        log.debug(<span class="hljs-string">&quot;打断标记为:&#123;&#125;&quot;</span>, interruptSleep.isInterrupted());<br>        log.debug(<span class="hljs-string">&quot;线程状态:&#123;&#125;&quot;</span>, interruptSleep.getState()); <span class="hljs-comment">//TERMINATED 终止</span><br>    &#125;<br><br>    <span class="hljs-comment">/*</span><br><span class="hljs-comment">    打断标记interrupted和park</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-meta">@Test</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">interruptAndPark</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> InterruptedException &#123;<br>        <span class="hljs-type">Thread</span> <span class="hljs-variable">thread</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>(() -&gt; &#123;<br>            <span class="hljs-comment">// park是locks的方法，用来让线程处阻塞状态</span><br>            log.debug(<span class="hljs-string">&quot;park&quot;</span>);<br>            LockSupport.park();<br>            log.debug(<span class="hljs-string">&quot;unpark，打断标记为：&#123;&#125;&quot;</span>, Thread.currentThread().isInterrupted());<br><br>            LockSupport.park();<br>            log.debug(<span class="hljs-string">&quot;由于打断标记为true，park无用&quot;</span>);<br>        &#125;);<br><br>        thread.start();<br><br>        <span class="hljs-comment">// 1秒后打断</span><br>        TimeUnit.SECONDS.sleep(<span class="hljs-number">1</span>);<br>        thread.interrupt();<br><br>        thread.join();<br><br><span class="hljs-comment">//        &gt;&gt;&gt;&gt;&gt;&gt;</span><br>        <span class="hljs-type">Thread</span> <span class="hljs-variable">thread1</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>(() -&gt; &#123;<br>            log.debug(<span class="hljs-string">&quot;park&quot;</span>);<br>            LockSupport.park();<br>            log.debug(<span class="hljs-string">&quot;unpark, 打断标记为:&#123;&#125;，顺便清楚打断标记&quot;</span>, Thread.interrupted());<br><br>            LockSupport.park();<br>            log.debug(<span class="hljs-string">&quot;unpark，看不见嗷&quot;</span>);<br>        &#125;);<br><br>        thread1.start();<br><br>        <span class="hljs-comment">// 1秒后打断</span><br>        TimeUnit.SECONDS.sleep(<span class="hljs-number">1</span>);<br>        thread1.interrupt();<br><br>        thread1.join();<br>    &#125;<br><br>    <span class="hljs-meta">@Test</span><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">testThread</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> InterruptedException &#123;<br>        <span class="hljs-type">Thread</span> <span class="hljs-variable">thread</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Thread</span>(() -&gt; &#123;<br>            <span class="hljs-keyword">while</span>(<span class="hljs-literal">true</span>) &#123;<br>                <span class="hljs-keyword">if</span> (Thread.currentThread().isInterrupted()) &#123;<br>                    <span class="hljs-keyword">break</span>;<br>                &#125;<br>            &#125;<br>            log.debug(<span class="hljs-string">&quot;结束了&quot;</span>);<br>        &#125;, <span class="hljs-string">&quot;t1&quot;</span>);<br><br>        thread.start();<br><br>        TimeUnit.SECONDS.sleep(<span class="hljs-number">2</span>);<br><br>        log.debug(<span class="hljs-string">&quot;我go啦&quot;</span>);<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+  </div>
+</article>
+
+
+    <div class="blog-post-comments">
+        <div id="utterances_thread">
+            <noscript>加载评论需要在浏览器启用 JavaScript 脚本支持。</noscript>
+        </div>
+    </div>
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">首页</a></li>
+        
+          <li><a href="/archives/">文章</a></li>
+        
+          <li><a href="/search/">搜索</a></li>
+        
+          <li><a target="_blank" rel="noopener" href="http://github.com/tro148">项目</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2023/06/23/%E4%BB%A3%E7%A0%81%E4%B8%AD%E8%AF%B4JUC-1/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2023/06/23/%E4%BB%A3%E7%A0%81%E4%B8%AD%E8%AF%B4JUC-1/&text=代码中说JUC-1"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2023/06/23/%E4%BB%A3%E7%A0%81%E4%B8%AD%E8%AF%B4JUC-1/&title=代码中说JUC-1"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2023/06/23/%E4%BB%A3%E7%A0%81%E4%B8%AD%E8%AF%B4JUC-1/&is_video=false&description=代码中说JUC-1"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=代码中说JUC-1&body=Check out this article: http://example.com/2023/06/23/%E4%BB%A3%E7%A0%81%E4%B8%AD%E8%AF%B4JUC-1/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2023/06/23/%E4%BB%A3%E7%A0%81%E4%B8%AD%E8%AF%B4JUC-1/&title=代码中说JUC-1"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2023/06/23/%E4%BB%A3%E7%A0%81%E4%B8%AD%E8%AF%B4JUC-1/&title=代码中说JUC-1"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2023/06/23/%E4%BB%A3%E7%A0%81%E4%B8%AD%E8%AF%B4JUC-1/&title=代码中说JUC-1"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2023/06/23/%E4%BB%A3%E7%A0%81%E4%B8%AD%E8%AF%B4JUC-1/&title=代码中说JUC-1"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2023/06/23/%E4%BB%A3%E7%A0%81%E4%B8%AD%E8%AF%B4JUC-1/&name=代码中说JUC-1&description=&lt;p&gt;本系列是写在代码里的记录，用来记录juc的学习过程&lt;/p&gt;"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2023/06/23/%E4%BB%A3%E7%A0%81%E4%B8%AD%E8%AF%B4JUC-1/&t=代码中说JUC-1"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2021-2023
+    TroTro
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/search/">搜索</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="http://github.com/tro148">项目</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板！\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功！");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+    <script type="text/javascript">
+      var utterances_repo = 'tro148/tro148.github.io';
+      var utterances_issue_term = 'comment';
+      var utterances_label = 'Comment';
+      var utterances_theme = 'github-light';
+
+      (function(){
+          var script = document.createElement('script');
+
+          script.src = 'https://utteranc.es/client.js';
+          script.setAttribute('repo', utterances_repo);
+          script.setAttribute('issue-term', 'pathname');
+          script.setAttribute('label', utterances_label);
+          script.setAttribute('theme', utterances_theme);
+          script.setAttribute('crossorigin', 'anonymous');
+          script.async = true;
+          (document.getElementById('utterances_thread')).appendChild(script);
+      }());
+  </script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginModelPath":"assets/","model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/wanko.model.json"},"display":{"superSample":2,"width":250,"height":500,"position":"right","hOffset":0,"vOffset":-20},"mobile":{"show":false,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"pluginJsPath":"lib/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

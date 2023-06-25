@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="在本节，我们将实现线程共享的运行时数据区，包括方法区和运行时常量池">
+<meta property="og:type" content="article">
+<meta property="og:title" content="用go写jvm之线程共享的运行时数据区">
+<meta property="og:url" content="http://example.com/2023/05/28/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E7%BA%BF%E7%A8%8B%E5%85%B1%E4%BA%AB%E7%9A%84%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/index.html">
+<meta property="og:site_name" content="TroTro">
+<meta property="og:description" content="在本节，我们将实现线程共享的运行时数据区，包括方法区和运行时常量池">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-05-28T10:24:50.000Z">
+<meta property="article:modified_time" content="2023-06-23T13:10:30.461Z">
+<meta property="article:author" content="TroTro">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="项目">
+<meta property="article:tag" content="JVM">
+<meta property="article:tag" content="JAVA">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>用go写jvm之线程共享的运行时数据区</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-NGQ4ZR4FTC"></script>
+  <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-NGQ4ZR4FTC');
+  </script>
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+      <link rel="alternate" href="/true" title="TroTro" type="application/atom+xml" />
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="顶部" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/search/">搜索</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="http://github.com/tro148">项目</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="上一篇" href="/2023/06/02/%E4%BB%94%E7%BB%86%E7%A0%94%E7%A9%B6Java%E7%9A%84Stream%E6%B5%81/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="下一篇" href="/2023/05/27/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E6%8C%87%E4%BB%A4%E9%9B%86%E5%92%8C%E8%A7%A3%E9%87%8A%E5%99%A8/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="返回顶部" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="分享文章" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2023/05/28/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E7%BA%BF%E7%A8%8B%E5%85%B1%E4%BA%AB%E7%9A%84%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2023/05/28/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E7%BA%BF%E7%A8%8B%E5%85%B1%E4%BA%AB%E7%9A%84%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/&text=用go写jvm之线程共享的运行时数据区"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2023/05/28/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E7%BA%BF%E7%A8%8B%E5%85%B1%E4%BA%AB%E7%9A%84%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/&title=用go写jvm之线程共享的运行时数据区"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2023/05/28/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E7%BA%BF%E7%A8%8B%E5%85%B1%E4%BA%AB%E7%9A%84%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/&is_video=false&description=用go写jvm之线程共享的运行时数据区"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=用go写jvm之线程共享的运行时数据区&body=Check out this article: http://example.com/2023/05/28/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E7%BA%BF%E7%A8%8B%E5%85%B1%E4%BA%AB%E7%9A%84%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2023/05/28/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E7%BA%BF%E7%A8%8B%E5%85%B1%E4%BA%AB%E7%9A%84%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/&title=用go写jvm之线程共享的运行时数据区"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2023/05/28/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E7%BA%BF%E7%A8%8B%E5%85%B1%E4%BA%AB%E7%9A%84%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/&title=用go写jvm之线程共享的运行时数据区"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2023/05/28/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E7%BA%BF%E7%A8%8B%E5%85%B1%E4%BA%AB%E7%9A%84%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/&title=用go写jvm之线程共享的运行时数据区"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2023/05/28/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E7%BA%BF%E7%A8%8B%E5%85%B1%E4%BA%AB%E7%9A%84%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/&title=用go写jvm之线程共享的运行时数据区"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2023/05/28/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E7%BA%BF%E7%A8%8B%E5%85%B1%E4%BA%AB%E7%9A%84%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/&name=用go写jvm之线程共享的运行时数据区&description=&lt;p&gt;在本节，我们将实现线程共享的运行时数据区，包括方法区和运行时常量池&lt;/p&gt;"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2023/05/28/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E7%BA%BF%E7%A8%8B%E5%85%B1%E4%BA%AB%E7%9A%84%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/&t=用go写jvm之线程共享的运行时数据区"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%96%B9%E6%B3%95%E5%8C%BA"><span class="toc-number">1.</span> <span class="toc-text">方法区</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#class%E7%9B%B8%E5%85%B3%E7%BB%93%E6%9E%84%E4%BD%93"><span class="toc-number">1.0.1.</span> <span class="toc-text">class相关结构体</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%90%E8%A1%8C%E6%97%B6%E5%B8%B8%E9%87%8F%E6%B1%A0"><span class="toc-number">1.0.2.</span> <span class="toc-text">运行时常量池</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8"><span class="toc-number">1.0.3.</span> <span class="toc-text">类加载器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%B1%BB%E5%92%8C%E7%B1%BB%E6%88%90%E5%91%98%E5%BC%95%E7%94%A8"><span class="toc-number">1.0.4.</span> <span class="toc-text">类和类成员引用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">1.0.5.</span> <span class="toc-text">总结</span></a></li></ol></li></ol></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        用go写jvm之线程共享的运行时数据区
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">TroTro</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2023-05-28T10:24:50.000Z" class="dt-published" itemprop="datePublished">2023-05-28</time>
+        
+        (Updated: <time datetime="2023-06-23T13:10:30.461Z" class="dt-updated" itemprop="dateModified">2023-06-23</time>)
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/Go/" rel="tag">Go</a>, <a class="p-category" href="/tags/JAVA/" rel="tag">JAVA</a>, <a class="p-category" href="/tags/JVM/" rel="tag">JVM</a>, <a class="p-category" href="/tags/%E9%A1%B9%E7%9B%AE/" rel="tag">项目</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <p>在本节，我们将实现线程共享的运行时数据区，包括方法区和运行时常量池</p>
+<span id="more"></span>
+<h1 id="方法区"><a href="#方法区" class="headerlink" title="方法区"></a>方法区</h1><p>它是运行时数据区的一块逻辑区域，由多个线程共享，主要存放从class文件获取的类信息，另外类变量也存放在方法区中。</p>
+<h3 id="class相关结构体"><a href="#class相关结构体" class="headerlink" title="class相关结构体"></a>class相关结构体</h3><p>我们首先实现类结构体和类成员结构体，</p>
+<figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><code class="hljs Golang"><span class="hljs-comment">// Class 定义类结构体</span><br><span class="hljs-keyword">type</span> Class <span class="hljs-keyword">struct</span> &#123;<br>	accessFlags       <span class="hljs-type">uint16</span>                  <span class="hljs-comment">//访问标志</span><br>	name              <span class="hljs-type">string</span>                  <span class="hljs-comment">//类名，完全限定名</span><br>	superClassName    <span class="hljs-type">string</span>                  <span class="hljs-comment">//超类名</span><br>	interfaceNames    []<span class="hljs-type">string</span>                <span class="hljs-comment">//接口名</span><br>	constantPool      *classfile.ConstantPool <span class="hljs-comment">//运行时常量池指针</span><br>	fields            []*Field                <span class="hljs-comment">//字段表</span><br>	methods           []*Method               <span class="hljs-comment">//方法表</span><br>	loader            *ClassLoader            <span class="hljs-comment">//读取类数据的类加载器</span><br>	superClass        *Class                  <span class="hljs-comment">//超类</span><br>	interfaces        []*Class                <span class="hljs-comment">//接口</span><br>	instanceSlotCount <span class="hljs-type">uint</span>                    <span class="hljs-comment">//实例变量占据的空间大小</span><br>	staticSlotCount   <span class="hljs-type">uint</span>                    <span class="hljs-comment">//静态变量占据的空间大小</span><br>	staticVars        Slots                  <span class="hljs-comment">//静态变量</span><br>&#125;<br><span class="hljs-comment">// 类成员，包括字段和方法</span><br><span class="hljs-keyword">type</span> ClassMember <span class="hljs-keyword">struct</span> &#123;<br>	accessFlags <span class="hljs-type">uint16</span> <span class="hljs-comment">//访问标志</span><br>	name        <span class="hljs-type">string</span> <span class="hljs-comment">//名字</span><br>	descriptor  <span class="hljs-type">string</span> <span class="hljs-comment">//标志</span><br>	class       *Class <span class="hljs-comment">//所属类</span><br>&#125;<br><span class="hljs-comment">// Field 字段</span><br><span class="hljs-keyword">type</span> Field <span class="hljs-keyword">struct</span> &#123;<br>	ClassMember<br>&#125;<br><span class="hljs-comment">// Method 方法</span><br><span class="hljs-keyword">type</span> Method <span class="hljs-keyword">struct</span> &#123;<br>	ClassMember<br>	maxStack  <span class="hljs-type">uint</span>   <span class="hljs-comment">// 操作数栈的最大深度</span><br>	maxLocals <span class="hljs-type">uint</span>   <span class="hljs-comment">// 局部变量表大小</span><br>	code      []<span class="hljs-type">byte</span> <span class="hljs-comment">// 字节码</span><br>&#125;<br></code></pre></td></tr></table></figure>
+<h3 id="运行时常量池"><a href="#运行时常量池" class="headerlink" title="运行时常量池"></a>运行时常量池</h3><figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><code class="hljs Golang"><span class="hljs-keyword">type</span> ConstantPool <span class="hljs-keyword">struct</span> &#123;<br>	class  *Class<br>	consts []Constant<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">newConstantPool</span><span class="hljs-params">(class *Class, cfCp classfile.ConstantPool)</span></span> *ConstantPool &#123;<br>	<span class="hljs-comment">// 将class文件中的常量池，转换为运行时常量池</span><br>	cpCount := <span class="hljs-built_in">len</span>(cfCp)<br>	consts := <span class="hljs-built_in">make</span>([]Constant, cpCount)<br>	rtCp := &amp;ConstantPool&#123;class, consts&#125;<br><br>	<span class="hljs-comment">// cp的引用类型，继承关系如下:</span><br>	<span class="hljs-comment">// symref -&gt; classRef</span><br>	<span class="hljs-comment">//		  -&gt; memberRef</span><br>	<span class="hljs-comment">//						-&gt; fieldRef</span><br>	<span class="hljs-comment">//						-&gt; methodRef</span><br><br>	<span class="hljs-keyword">for</span> i := <span class="hljs-number">0</span>; i &lt; cpCount; i++ &#123;<br>		<span class="hljs-comment">// 获取常量池信息</span><br>		cpInfo := cfCp[i]<br>		<span class="hljs-keyword">switch</span> cpInfo.(<span class="hljs-keyword">type</span>) &#123;<br>		<span class="hljs-keyword">case</span> *classfile.ConstantIntegerInfo:<br>			<span class="hljs-comment">// 整数</span><br>			intInfo := cpInfo.(*classfile.ConstantIntegerInfo)<br>			consts[i] = intInfo.Value()<br>		<span class="hljs-keyword">case</span> *classfile.ConstantFloatInfo:<br>			<span class="hljs-comment">// 浮点数</span><br>			floatInfo := cpInfo.(*classfile.ConstantFloatInfo)<br>			consts[i] = floatInfo.Value()<br>		<span class="hljs-keyword">case</span> *classfile.ConstantLongInfo:<br>			<span class="hljs-comment">// 长整数，因为占两个位置，所以需要跳过一个位置</span><br>			longInfo := cpInfo.(*classfile.ConstantLongInfo)<br>			consts[i] = longInfo.Value()<br>			i++<br>		<span class="hljs-keyword">case</span> *classfile.ConstantDoubleInfo:<br>			<span class="hljs-comment">// 双精度浮点数，因为占两个位置，所以需要跳过一个位置</span><br>			doubleInfo := cpInfo.(*classfile.ConstantDoubleInfo)<br>			consts[i] = doubleInfo.Value()<br>			i++<br>		<span class="hljs-keyword">case</span> *classfile.ConstantStringInfo:<br>			<span class="hljs-comment">// 字符串字面量</span><br>			stringInfo := cpInfo.(*classfile.ConstantStringInfo)<br>			consts[i] = stringInfo.Name()<br>		<span class="hljs-keyword">case</span> *classfile.ConstantClassInfo:<br>			<span class="hljs-comment">// 类符号引用</span><br>			classInfo := cpInfo.(*classfile.ConstantClassInfo)<br>			consts[i] = newClassRef(rtCp, classInfo)<br>		<span class="hljs-keyword">case</span> *classfile.ConstantFieldrefInfo:<br>			<span class="hljs-comment">// 字段符号引用</span><br>			fieldrefInfo := cpInfo.(*classfile.ConstantFieldrefInfo)<br>			consts[i] = newFieldRef(rtCp, fieldrefInfo)<br>		<span class="hljs-keyword">case</span> *classfile.ConstantMethodrefInfo:<br>			<span class="hljs-comment">// 方法符号引用</span><br>			methodrefInfo := cpInfo.(*classfile.ConstantMethodrefInfo)<br>			consts[i] = newMethodRef(rtCp, methodrefInfo)<br>		<span class="hljs-keyword">case</span> *classfile.ConstantInterfaceMethodrefInfo:<br>			<span class="hljs-comment">// 接口方法符号引用</span><br>			methodrefInfo := cpInfo.(*classfile.ConstantInterfaceMethodrefInfo)<br>			consts[i] = newInterfaceMethodRef(rtCp, methodrefInfo)<br>		&#125;<br>	&#125;<br><br>	<span class="hljs-keyword">return</span> rtCp<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>对应classFile中的常量池中元素类型，我们转换其相应的类型，<br>分为字面量和引用，字面量包括整数、浮点数、长整数、双精度浮点数、字符串字面量，引用包括类符号引用、字段符号引用、方法符号引用、接口方法符号引用。</p>
+<p>举例如方法符号引用：</p>
+<figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs Golang"><span class="hljs-comment">// SymRef 符号引用</span><br><span class="hljs-keyword">type</span> SymRef <span class="hljs-keyword">struct</span> &#123;<br>	cp        *ConstantPool <span class="hljs-comment">// 常量池，运行时常量指针</span><br>	className <span class="hljs-type">string</span>        <span class="hljs-comment">// 类名，完全限定名</span><br>	class     *Class        <span class="hljs-comment">// 类</span><br>&#125;<br><br><span class="hljs-comment">// MemberRef 字段符号引用和方法符号引用共有的信息</span><br><span class="hljs-keyword">type</span> MemberRef <span class="hljs-keyword">struct</span> &#123;<br>	SymRef<br>	name       <span class="hljs-type">string</span> <span class="hljs-comment">// 字段名</span><br>	descriptor <span class="hljs-type">string</span> <span class="hljs-comment">// 字段描述符，代表在java虚拟机的角度，一个类可以有多个同名字段</span><br>&#125;<br><span class="hljs-comment">// copyMemberRefInfo()方法从classfile.MemberInfo结构体中复制数据</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(self *MemberRef)</span></span> copyMemberRefInfo(memberInfo *classfile.ConstantMemberrefInfo) &#123;<br>	self.className = memberInfo.ClassName()<br>	self.name, self.descriptor = memberInfo.NameAndDescriptor()<br>&#125;<br><br><span class="hljs-comment">// MethodRef 方法符号引用</span><br><span class="hljs-keyword">type</span> MethodRef <span class="hljs-keyword">struct</span> &#123;<br>	MemberRef<br>	method *Method<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">newMethodRef</span><span class="hljs-params">(cp *ConstantPool, refInfo *classfile.ConstantMethodrefInfo)</span></span> *MethodRef &#123;<br>	ref := &amp;MethodRef&#123;&#125;<br>	ref.cp = cp<br>	ref.copyMemberRefInfo(&amp;refInfo.ConstantMemberrefInfo)<br>	<span class="hljs-keyword">return</span> ref<br>&#125;<br></code></pre></td></tr></table></figure>
+<h3 id="类加载器"><a href="#类加载器" class="headerlink" title="类加载器"></a>类加载器</h3><p>类加载器，用来读取class文件、解析class、验证和准备class，<br>分别使用classpath,classfile，相当于再次走一遍过程即可。</p>
+<p>重点说一下验证和准备class:</p>
+<figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br></pre></td><td class="code"><pre><code class="hljs Golang"><br><span class="hljs-comment">// 链接，进行验证和准备</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">link</span><span class="hljs-params">(class *Class)</span></span> &#123;<br>	<span class="hljs-comment">// 对类进行严格验证</span><br>	verify(class)<br>	<span class="hljs-comment">// 准备阶段，给类变量分配空间并给予初始值</span><br>	prepare(class)<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">verify</span><span class="hljs-params">(class *Class)</span></span> &#123;<br>	<span class="hljs-comment">// todo</span><br>&#125;<br><br><span class="hljs-comment">// prepare 准备阶段，给类变量分配空间并给予初始值</span><br><span class="hljs-comment">// 从上一个类的实例变量个数开始，给类的实例变量分配空间</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">prepare</span><span class="hljs-params">(class *Class)</span></span> &#123;<br>	calcInstanceFieldSlotIds(class)<br>	calcStaticFieldSlotIds(class)<br>	allocAndInitStaticVars(class)<br>&#125;<br><br><span class="hljs-comment">// 计算类的实例字段变量个数</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">calcInstanceFieldSlotIds</span><span class="hljs-params">(class *Class)</span></span> &#123;<br>	slotId := <span class="hljs-type">uint</span>(<span class="hljs-number">0</span>)<br>	<span class="hljs-keyword">if</span> class.superClass != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-comment">// 等于超类的实例变量个数</span><br>		slotId = class.superClass.instanceSlotCount<br>	&#125;<br>	<span class="hljs-keyword">for</span> _, field := <span class="hljs-keyword">range</span> class.fields &#123;<br>		<span class="hljs-keyword">if</span> !field.IsStatic() &#123;<br>			field.slotId = slotId<br>			slotId++<br>			<span class="hljs-keyword">if</span> field.isLongOrDouble() &#123;<br>				field.slotId++<br>			&#125;<br>		&#125;<br>	&#125;<br>	class.instanceSlotCount = slotId<br>&#125;<br><br><span class="hljs-comment">// 计算类的静态变量个数</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">calcStaticFieldSlotIds</span><span class="hljs-params">(class *Class)</span></span> &#123;<br>	slotId := <span class="hljs-type">uint</span>(<span class="hljs-number">0</span>)<br>	<span class="hljs-keyword">for</span> _, field := <span class="hljs-keyword">range</span> class.fields &#123;<br>		<span class="hljs-keyword">if</span> field.IsStatic() &#123;<br>			field.slotId = slotId<br>			slotId++<br>			<span class="hljs-keyword">if</span> field.isLongOrDouble() &#123;<br>				slotId++<br>			&#125;<br>		&#125;<br>	&#125;<br>	class.staticSlotCount = slotId<br>&#125;<br><br><span class="hljs-comment">// 给类变量分配空间</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">allocAndInitStaticVars</span><span class="hljs-params">(class *Class)</span></span> &#123;<br>	<span class="hljs-comment">// 给类变量分配空间</span><br>	class.staticVars = newSlots(class.staticSlotCount)<br>	<span class="hljs-comment">// 给类变量赋予初始值</span><br>	<span class="hljs-keyword">for</span> _, field := <span class="hljs-keyword">range</span> class.fields &#123;<br>		<span class="hljs-comment">// 给静态变量复制，从常量池中加载常量值</span><br>		<span class="hljs-keyword">if</span> field.IsStatic() &amp;&amp; field.IsFinal() &#123;<br>			initStaticFinalVar(class, field)<br>		&#125;<br>	&#125;<br>&#125;<br><br><span class="hljs-comment">// 给静态变量赋予初始值</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">initStaticFinalVar</span><span class="hljs-params">(class *Class, field *Field)</span></span> &#123;<br>	<span class="hljs-comment">// 获取静态变量表</span><br>	vars := class.staticVars<br>	<span class="hljs-comment">// 获取常量池</span><br>	cp := class.constantPool<br>	<span class="hljs-comment">// 获取常量值索引</span><br>	cpIndex := field.ConstValueIndex()<br>	<span class="hljs-comment">// 获取静态变量索引</span><br>	slotId := field.SlotId()<br><br>	<span class="hljs-keyword">if</span> cpIndex &gt; <span class="hljs-number">0</span> &#123;<br>		<span class="hljs-keyword">switch</span> field.descriptor &#123;<br>		<span class="hljs-keyword">case</span> <span class="hljs-string">&quot;Z&quot;</span>, <span class="hljs-string">&quot;B&quot;</span>, <span class="hljs-string">&quot;C&quot;</span>, <span class="hljs-string">&quot;S&quot;</span>, <span class="hljs-string">&quot;I&quot;</span>:<br>			<span class="hljs-comment">// 获取int类型的常量值</span><br>			val := cp.GetConstant(cpIndex).(<span class="hljs-type">int32</span>)<br>			<span class="hljs-comment">// 给静态变量赋值</span><br>			vars.SetInt(slotId, val)<br>		<span class="hljs-keyword">case</span> <span class="hljs-string">&quot;J&quot;</span>:<br>			<span class="hljs-comment">// 获取long类型的常量值</span><br>			val := cp.GetConstant(cpIndex).(<span class="hljs-type">int64</span>)<br>			<span class="hljs-comment">// 给静态变量赋值</span><br>			vars.SetLong(slotId, val)<br>		<span class="hljs-keyword">case</span> <span class="hljs-string">&quot;F&quot;</span>:<br>			<span class="hljs-comment">// 获取float类型的常量值</span><br>			val := cp.GetConstant(cpIndex).(<span class="hljs-type">float32</span>)<br>			<span class="hljs-comment">// 给静态变量赋值</span><br>			vars.SetFloat(slotId, val)<br>		<span class="hljs-keyword">case</span> <span class="hljs-string">&quot;D&quot;</span>:<br>			<span class="hljs-comment">// 获取double类型的常量值</span><br>			val := cp.GetConstant(cpIndex).(<span class="hljs-type">float64</span>)<br>			<span class="hljs-comment">// 给静态变量赋值</span><br>			vars.SetDouble(slotId, val)<br>		<span class="hljs-keyword">case</span> <span class="hljs-string">&quot;Ljava/lang/String;&quot;</span>:<br>			<span class="hljs-built_in">panic</span>(<span class="hljs-string">&quot;todo&quot;</span>)<br>		&#125;<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="类和类成员引用"><a href="#类和类成员引用" class="headerlink" title="类和类成员引用"></a>类和类成员引用</h3><p>实现ResolvedClass和ResolvedMemberRef接口，用来表示类和类成员引用。</p>
+<figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs Golang"><span class="hljs-comment">// ResolvedClass 类符号引用解析</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(self *SymRef)</span></span> ResolvedClass() *Class &#123;<br>	<span class="hljs-comment">// 如果已经解析过了，就不解析了</span><br>	<span class="hljs-keyword">if</span> self.class == <span class="hljs-literal">nil</span> &#123;<br>		self.resolveClassRef()<br>	&#125;<br>	<span class="hljs-keyword">return</span> self.class<br>&#125;<br><span class="hljs-comment">// resolveClassRef 类符号引用解析</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(self *SymRef)</span></span> resolveClassRef() &#123;<br>	d := self.cp.class                      <span class="hljs-comment">// 使用当前主类的类加载器</span><br>	c := d.loader.LoadClass(self.className) <span class="hljs-comment">// 加载类</span><br>	<span class="hljs-comment">// 类的访问控制规则</span><br>	<span class="hljs-keyword">if</span> !c.isAccessibleTo(d) &#123;<br>		<span class="hljs-built_in">panic</span>(<span class="hljs-string">&quot;java.lang.IllegalAccessError&quot;</span>)<br>	&#125;<br>	self.class = c<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>如果类已经解析过了，就不解析了。解析类时，应进行类的访问控制规则判断，只有符合规则的类才能被访问。<br>类似，我们实现字段引用</p>
+<figure class="highlight golang"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><code class="hljs Golang"><span class="hljs-comment">// FieldRef 定义字段引用</span><br><span class="hljs-keyword">type</span> FieldRef <span class="hljs-keyword">struct</span> &#123;<br>	MemberRef<br>	field *Field <span class="hljs-comment">//指向属性</span><br>&#125;<br><br><span class="hljs-comment">// ResolvedField 字段符号引用解析</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(self *FieldRef)</span></span> ResolvedField() *Field &#123;<br>	<span class="hljs-keyword">if</span> self.field == <span class="hljs-literal">nil</span> &#123;<br>		self.resolvedFieldRef()<br>	&#125;<br>	<span class="hljs-keyword">return</span> self.field<br>&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(self *FieldRef)</span></span> resolvedFieldRef() &#123;<br>	d := self.cp.class<br>	c := self.ResolvedClass()<br>	<span class="hljs-comment">// 查找字段</span><br>	field := lookupField(c, self.name, self.descriptor)<br><br>	<span class="hljs-keyword">if</span> field == <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-built_in">panic</span>(<span class="hljs-string">&quot;java.lang.NoSuchFieldError&quot;</span>)<br>	&#125;<br><br>	<span class="hljs-comment">// 判断字段是否可以访问</span><br>	<span class="hljs-keyword">if</span> !field.isAccessibleTo(d) &#123;<br>		<span class="hljs-built_in">panic</span>(<span class="hljs-string">&quot;java.lang.IllegalAccessError&quot;</span>)<br>	&#125;<br>&#125;<br><br><span class="hljs-comment">// lookupField 查找字段</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">lookupField</span><span class="hljs-params">(class *Class, name, descriptor <span class="hljs-type">string</span>)</span></span> *Field &#123;<br>	<span class="hljs-comment">// 先在当前类中查找</span><br>	<span class="hljs-keyword">for</span> _, field := <span class="hljs-keyword">range</span> class.fields &#123;<br>		<span class="hljs-keyword">if</span> field.name == name &amp;&amp; field.descriptor == descriptor &#123;<br>			<span class="hljs-keyword">return</span> field<br>		&#125;<br>	&#125;<br>	<span class="hljs-comment">// 在接口中查找</span><br>	<span class="hljs-keyword">for</span> _, iface := <span class="hljs-keyword">range</span> class.interfaces &#123;<br>		<span class="hljs-keyword">if</span> field := lookupField(iface, name, descriptor); field != <span class="hljs-literal">nil</span> &#123;<br>			<span class="hljs-keyword">return</span> field<br>		&#125;<br>	&#125;<br>	<span class="hljs-comment">// 在父类中查找</span><br>	<span class="hljs-keyword">if</span> class.superClass != <span class="hljs-literal">nil</span> &#123;<br>		<span class="hljs-keyword">return</span> lookupField(class.superClass, name, descriptor)<br>	&#125;<br>	<span class="hljs-keyword">return</span> <span class="hljs-literal">nil</span><br>&#125;<br><br><span class="hljs-comment">// 访问控制规则</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-params">(self *Field)</span></span> isAccessibleTo(d *Class) <span class="hljs-type">bool</span> &#123;<br>	<span class="hljs-comment">// 如果是public，就是任意访问</span><br>	<span class="hljs-keyword">if</span> self.IsPublic() &#123;<br>		<span class="hljs-keyword">return</span> <span class="hljs-literal">true</span><br>	&#125;<br>	c := self.class<br><br>	<span class="hljs-comment">// 如果是protected, 就是同一个类，子类，同一个包</span><br>	<span class="hljs-keyword">if</span> self.IsProtected() &#123;<br>		<span class="hljs-keyword">return</span> d == c || d.isSubClassOf(c) || c.getPackageName() == d.getPackageName()<br>	&#125;<br><br>	<span class="hljs-comment">// 如果是private, 就是同一个类</span><br>	<span class="hljs-keyword">if</span> self.IsPrivate() &#123;<br>		<span class="hljs-keyword">return</span> d == c<br>	&#125;<br><br>	<span class="hljs-keyword">return</span> c.getPackageName() == d.getPackageName()<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>如果字段已经解析了，就不解析了。<br>解析字段的时候，先进行查找字段，查询字段所属类是否存在字段，然后查询其父类和接口是否存在字段。<br>最后进行字段的访问控制规则判断，只有符合规则的字段才能被访问。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>在本篇，我们实现了类的结构体，以及其相关的属性。<br>常量池将class文件的常量池转换而来，常量池存储常量数值和符号引用。<br>方法表与字段表存储对应的类成员信息，静态变量存储静态变量。<br>当然我们也做了classLoader的实现，实现了类的加载，解析，初始化。</p>
+
+  </div>
+</article>
+
+
+    <div class="blog-post-comments">
+        <div id="utterances_thread">
+            <noscript>加载评论需要在浏览器启用 JavaScript 脚本支持。</noscript>
+        </div>
+    </div>
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">首页</a></li>
+        
+          <li><a href="/archives/">文章</a></li>
+        
+          <li><a href="/search/">搜索</a></li>
+        
+          <li><a target="_blank" rel="noopener" href="http://github.com/tro148">项目</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%96%B9%E6%B3%95%E5%8C%BA"><span class="toc-number">1.</span> <span class="toc-text">方法区</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#class%E7%9B%B8%E5%85%B3%E7%BB%93%E6%9E%84%E4%BD%93"><span class="toc-number">1.0.1.</span> <span class="toc-text">class相关结构体</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%90%E8%A1%8C%E6%97%B6%E5%B8%B8%E9%87%8F%E6%B1%A0"><span class="toc-number">1.0.2.</span> <span class="toc-text">运行时常量池</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8"><span class="toc-number">1.0.3.</span> <span class="toc-text">类加载器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%B1%BB%E5%92%8C%E7%B1%BB%E6%88%90%E5%91%98%E5%BC%95%E7%94%A8"><span class="toc-number">1.0.4.</span> <span class="toc-text">类和类成员引用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">1.0.5.</span> <span class="toc-text">总结</span></a></li></ol></li></ol></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2023/05/28/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E7%BA%BF%E7%A8%8B%E5%85%B1%E4%BA%AB%E7%9A%84%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2023/05/28/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E7%BA%BF%E7%A8%8B%E5%85%B1%E4%BA%AB%E7%9A%84%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/&text=用go写jvm之线程共享的运行时数据区"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2023/05/28/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E7%BA%BF%E7%A8%8B%E5%85%B1%E4%BA%AB%E7%9A%84%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/&title=用go写jvm之线程共享的运行时数据区"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2023/05/28/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E7%BA%BF%E7%A8%8B%E5%85%B1%E4%BA%AB%E7%9A%84%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/&is_video=false&description=用go写jvm之线程共享的运行时数据区"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=用go写jvm之线程共享的运行时数据区&body=Check out this article: http://example.com/2023/05/28/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E7%BA%BF%E7%A8%8B%E5%85%B1%E4%BA%AB%E7%9A%84%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2023/05/28/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E7%BA%BF%E7%A8%8B%E5%85%B1%E4%BA%AB%E7%9A%84%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/&title=用go写jvm之线程共享的运行时数据区"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2023/05/28/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E7%BA%BF%E7%A8%8B%E5%85%B1%E4%BA%AB%E7%9A%84%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/&title=用go写jvm之线程共享的运行时数据区"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2023/05/28/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E7%BA%BF%E7%A8%8B%E5%85%B1%E4%BA%AB%E7%9A%84%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/&title=用go写jvm之线程共享的运行时数据区"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2023/05/28/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E7%BA%BF%E7%A8%8B%E5%85%B1%E4%BA%AB%E7%9A%84%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/&title=用go写jvm之线程共享的运行时数据区"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2023/05/28/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E7%BA%BF%E7%A8%8B%E5%85%B1%E4%BA%AB%E7%9A%84%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/&name=用go写jvm之线程共享的运行时数据区&description=&lt;p&gt;在本节，我们将实现线程共享的运行时数据区，包括方法区和运行时常量池&lt;/p&gt;"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2023/05/28/%E7%94%A8go%E5%86%99jvm%E4%B9%8B%E7%BA%BF%E7%A8%8B%E5%85%B1%E4%BA%AB%E7%9A%84%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA/&t=用go写jvm之线程共享的运行时数据区"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2021-2023
+    TroTro
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/search/">搜索</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="http://github.com/tro148">项目</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板！\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功！");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+    <script type="text/javascript">
+      var utterances_repo = 'tro148/tro148.github.io';
+      var utterances_issue_term = 'comment';
+      var utterances_label = 'Comment';
+      var utterances_theme = 'github-light';
+
+      (function(){
+          var script = document.createElement('script');
+
+          script.src = 'https://utteranc.es/client.js';
+          script.setAttribute('repo', utterances_repo);
+          script.setAttribute('issue-term', 'pathname');
+          script.setAttribute('label', utterances_label);
+          script.setAttribute('theme', utterances_theme);
+          script.setAttribute('crossorigin', 'anonymous');
+          script.async = true;
+          (document.getElementById('utterances_thread')).appendChild(script);
+      }());
+  </script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginModelPath":"assets/","model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/wanko.model.json"},"display":{"superSample":2,"width":250,"height":500,"position":"right","hOffset":0,"vOffset":-20},"mobile":{"show":false,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"pluginJsPath":"lib/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

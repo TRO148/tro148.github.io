@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="因之前学习过部分语言，所以就光说些不同的大方面啦包括基础语法，函数，高级特性，高级函数，模块">
+<meta property="og:type" content="article">
+<meta property="og:title" content="学习python的笔记本1">
+<meta property="og:url" content="http://example.com/2022/10/08/%E5%AD%A6%E4%B9%A0python%E7%9A%84%E7%AC%94%E8%AE%B0%E6%9C%AC1/index.html">
+<meta property="og:site_name" content="TroTro">
+<meta property="og:description" content="因之前学习过部分语言，所以就光说些不同的大方面啦包括基础语法，函数，高级特性，高级函数，模块">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-10-08T11:42:14.000Z">
+<meta property="article:modified_time" content="2023-05-27T02:40:45.197Z">
+<meta property="article:author" content="TroTro">
+<meta property="article:tag" content="python">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>学习python的笔记本1</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-NGQ4ZR4FTC"></script>
+  <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-NGQ4ZR4FTC');
+  </script>
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+      <link rel="alternate" href="/true" title="TroTro" type="application/atom+xml" />
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="目录"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="顶部" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/search/">搜索</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="http://github.com/tro148">项目</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="上一篇" href="/2022/10/12/%E5%AD%A6%E4%B9%A0python%E7%9A%84%E7%AC%94%E8%AE%B0%E6%9C%AC2/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="返回顶部" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="分享文章" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">上一篇</span>
+      <span id="i-next" class="info" style="display:none;">下一篇</span>
+      <span id="i-top" class="info" style="display:none;">返回顶部</span>
+      <span id="i-share" class="info" style="display:none;">分享文章</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2022/10/08/%E5%AD%A6%E4%B9%A0python%E7%9A%84%E7%AC%94%E8%AE%B0%E6%9C%AC1/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2022/10/08/%E5%AD%A6%E4%B9%A0python%E7%9A%84%E7%AC%94%E8%AE%B0%E6%9C%AC1/&text=学习python的笔记本1"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2022/10/08/%E5%AD%A6%E4%B9%A0python%E7%9A%84%E7%AC%94%E8%AE%B0%E6%9C%AC1/&title=学习python的笔记本1"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2022/10/08/%E5%AD%A6%E4%B9%A0python%E7%9A%84%E7%AC%94%E8%AE%B0%E6%9C%AC1/&is_video=false&description=学习python的笔记本1"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=学习python的笔记本1&body=Check out this article: http://example.com/2022/10/08/%E5%AD%A6%E4%B9%A0python%E7%9A%84%E7%AC%94%E8%AE%B0%E6%9C%AC1/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2022/10/08/%E5%AD%A6%E4%B9%A0python%E7%9A%84%E7%AC%94%E8%AE%B0%E6%9C%AC1/&title=学习python的笔记本1"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2022/10/08/%E5%AD%A6%E4%B9%A0python%E7%9A%84%E7%AC%94%E8%AE%B0%E6%9C%AC1/&title=学习python的笔记本1"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2022/10/08/%E5%AD%A6%E4%B9%A0python%E7%9A%84%E7%AC%94%E8%AE%B0%E6%9C%AC1/&title=学习python的笔记本1"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2022/10/08/%E5%AD%A6%E4%B9%A0python%E7%9A%84%E7%AC%94%E8%AE%B0%E6%9C%AC1/&title=学习python的笔记本1"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2022/10/08/%E5%AD%A6%E4%B9%A0python%E7%9A%84%E7%AC%94%E8%AE%B0%E6%9C%AC1/&name=学习python的笔记本1&description=&lt;blockquote&gt;
+&lt;p&gt;因之前学习过部分语言，所以就光说些不同的大方面啦&lt;br&gt;包括基础语法，函数，高级特性，高级函数，模块&lt;/p&gt;
+&lt;/blockquote&gt;"><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2022/10/08/%E5%AD%A6%E4%B9%A0python%E7%9A%84%E7%AC%94%E8%AE%B0%E6%9C%AC1/&t=学习python的笔记本1"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E8%83%8C%E6%99%AF"><span class="toc-number">1.</span> <span class="toc-text">1.背景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%9F%BA%E7%A1%80"><span class="toc-number">2.</span> <span class="toc-text">2.基础</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%87%BD%E6%95%B0"><span class="toc-number">3.</span> <span class="toc-text">3.函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E9%AB%98%E7%BA%A7%E7%89%B9%E6%80%A7"><span class="toc-number">4.</span> <span class="toc-text">4.高级特性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E9%AB%98%E7%BA%A7%E5%87%BD%E6%95%B0"><span class="toc-number">5.</span> <span class="toc-text">5.高级函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E6%A8%A1%E5%9D%97"><span class="toc-number">6.</span> <span class="toc-text">6.模块</span></a></li></ol>
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        学习python的笔记本1
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">TroTro</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2022-10-08T11:42:14.000Z" class="dt-published" itemprop="datePublished">2022-10-08</time>
+        
+        (Updated: <time datetime="2023-05-27T02:40:45.197Z" class="dt-updated" itemprop="dateModified">2023-05-27</time>)
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/python/" rel="tag">python</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <blockquote>
+<p>因之前学习过部分语言，所以就光说些不同的大方面啦<br>包括基础语法，函数，高级特性，高级函数，模块</p>
+</blockquote>
+<span id="more"></span>
+<h2 id="1-背景"><a href="#1-背景" class="headerlink" title="1.背景"></a>1.背景</h2><p>python是解释型语言，在执行时一行一行翻译成CPU能看懂的语言。<br>python的解释器有多种，也可以在不同平台相应解释器下运行。</p>
+<h2 id="2-基础"><a href="#2-基础" class="headerlink" title="2.基础"></a>2.基础</h2><ul>
+<li>Python采用<strong>Tab来区分代码块</strong>，相当于{}，记住<strong>Tab!&#x3D;4个空格</strong>。</li>
+<li>基础数据类型有整数（无限大），浮点数（无限大），字符串，布尔值，空值，变量。</li>
+<li>list[],是可变的。tuple()，是不变的。</li>
+<li><strong>dic为{a:1}进行字典查询, set为set([])作为集合存放元素，创建应填写list类型</strong></li>
+<li>条件判断:<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python">a = <span class="hljs-number">1</span><br><span class="hljs-keyword">if</span> <span class="hljs-literal">True</span>:<br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;nihao%s&quot;</span> % a)<br><span class="hljs-keyword">elif</span> a == <span class="hljs-number">1</span>:<br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;你好&quot;</span>)<br></code></pre></td></tr></table></figure></li>
+<li>循环:<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs python">//forin循环<br><span class="hljs-keyword">for</span> a <span class="hljs-keyword">in</span> b:<br>    <span class="hljs-built_in">print</span>(a)<br>//<span class="hljs-keyword">while</span>循环<br><span class="hljs-keyword">while</span> Ture:<br>    <span class="hljs-keyword">break</span><br></code></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="3-函数"><a href="#3-函数" class="headerlink" title="3.函数"></a>3.函数</h2><ul>
+<li>使用def定义函数，如：<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">Hello_World</span>():<br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;你好&quot;</span>)<br></code></pre></td></tr></table></figure></li>
+<li>pass表示空函数，可以表示暂时没想好写什么的内容</li>
+<li>*可以把list的数值拆分为多个参数</li>
+<li>函数传入的参数类型：<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">a</span>(<span class="hljs-params">c, d</span>): //顺序参数<br><span class="hljs-keyword">def</span> <span class="hljs-title function_">a</span>(<span class="hljs-params">c, d=[]</span>): //默认参数，只有第一次才会运行<br><span class="hljs-keyword">def</span> <span class="hljs-title function_">a</span>(<span class="hljs-params">*c</span>): //可变参数，传入<span class="hljs-built_in">tuple</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">a</span>(<span class="hljs-params">**c</span>): //关键字参数，传入<span class="hljs-built_in">dict</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">a</span>(<span class="hljs-params">a, *, d</span>): //在*之后，d为关键字传入a(<span class="hljs-number">1</span>, d=<span class="hljs-number">1</span>)<br></code></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="4-高级特性"><a href="#4-高级特性" class="headerlink" title="4.高级特性"></a>4.高级特性</h2><ul>
+<li><p>切片: [x:y]，list切出x到y的list</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs python">L[:<span class="hljs-number">10</span>]前<span class="hljs-number">10</span>个<br>L[:<span class="hljs-number">10</span>:<span class="hljs-number">2</span>]前<span class="hljs-number">10</span>个，隔两个取一次<br>L[-<span class="hljs-number">10</span>:]后<span class="hljs-number">10</span>个<br>L[<span class="hljs-number">1</span>:-<span class="hljs-number">1</span>]第一个到倒数第一个<br></code></pre></td></tr></table></figure></li>
+<li><p>列表生成式: [x for ····]，生成元素为x的列表</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs python">[x * x <span class="hljs-keyword">for</span> x <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">1</span>, <span class="hljs-number">11</span>) <span class="hljs-keyword">if</span> x % <span class="hljs-number">2</span> == <span class="hljs-number">0</span>]<br>结果为[<span class="hljs-number">4</span>, <span class="hljs-number">16</span>, <span class="hljs-number">36</span>, <span class="hljs-number">64</span>, <span class="hljs-number">100</span>]<br>[m + n <span class="hljs-keyword">for</span> m <span class="hljs-keyword">in</span> <span class="hljs-string">&#x27;ABC&#x27;</span> <span class="hljs-keyword">for</span> n <span class="hljs-keyword">in</span> <span class="hljs-string">&#x27;XYZ&#x27;</span>]<br>结果为[<span class="hljs-string">&#x27;AX&#x27;</span>, <span class="hljs-string">&#x27;AY&#x27;</span>, <span class="hljs-string">&#x27;AZ&#x27;</span>, <span class="hljs-string">&#x27;BX&#x27;</span>, <span class="hljs-string">&#x27;BY&#x27;</span>, <span class="hljs-string">&#x27;BZ&#x27;</span>, <span class="hljs-string">&#x27;CX&#x27;</span>, <span class="hljs-string">&#x27;CY&#x27;</span>, <span class="hljs-string">&#x27;CZ&#x27;</span>]<br></code></pre></td></tr></table></figure></li>
+<li><p>生成器: (x for ····)，不生成列表，生成一个generator，占空间小，自动计算</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python">g = (x * x <span class="hljs-keyword">for</span> x <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-number">10</span>))<br><span class="hljs-keyword">for</span> a <span class="hljs-keyword">in</span> g<br>    <span class="hljs-built_in">print</span>(a)<br></code></pre></td></tr></table></figure>
+</li>
+<li><p>yield先攒参数，然后可返回迭代对象</p>
+</li>
+<li><p>yield from可以之间返回迭代对象</p>
+</li>
+</ul>
+<h2 id="5-高级函数"><a href="#5-高级函数" class="headerlink" title="5.高级函数"></a>5.高级函数</h2><ul>
+<li>map&#x2F;reduce,map(f, [])可以让f函数作用于[],reduce(f, [])可以累计作用<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">f</span> (x):<br>    <span class="hljs-keyword">return</span> x * x<br>r = <span class="hljs-built_in">map</span>(f, [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>])<br>[<span class="hljs-number">1</span>, <span class="hljs-number">4</span>, <span class="hljs-number">9</span>]<br><span class="hljs-keyword">def</span> <span class="hljs-title function_">p</span> (x, y):<br>    <span class="hljs-keyword">return</span> x * y<br>k = reduce(f, [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>])<br>[<span class="hljs-number">6</span>]<br></code></pre></td></tr></table></figure></li>
+<li>filter(b, [])，传入判断是否去留的函数与列表</li>
+<li><strong>闭包</strong>:<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">def</span> <span class="hljs-title function_">f</span>(<span class="hljs-params">*args</span>):<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">a</span>():<br>        <span class="hljs-keyword">return</span> <span class="hljs-built_in">print</span>(*args)<br>    <span class="hljs-keyword">return</span> a<br>    <br>    <br>k = f(<span class="hljs-number">1</span>)<br>k()<br></code></pre></td></tr></table></figure>
+闭包就是将数据暂时存储到函数中，需要时候再调用即可</li>
+<li>匿名函数:<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">lambda</span> x(参数): x * x(返回值) <br></code></pre></td></tr></table></figure>
+匿名函数不具有函数名，可以随时调用，但只能有一个表达式</li>
+</ul>
+<h2 id="6-模块"><a href="#6-模块" class="headerlink" title="6.模块"></a>6.模块</h2><p>pip 可以安装其他模块，用import引用，类似包安装器</p>
+
+  </div>
+</article>
+
+
+    <div class="blog-post-comments">
+        <div id="utterances_thread">
+            <noscript>加载评论需要在浏览器启用 JavaScript 脚本支持。</noscript>
+        </div>
+    </div>
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">首页</a></li>
+        
+          <li><a href="/archives/">文章</a></li>
+        
+          <li><a href="/search/">搜索</a></li>
+        
+          <li><a target="_blank" rel="noopener" href="http://github.com/tro148">项目</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-%E8%83%8C%E6%99%AF"><span class="toc-number">1.</span> <span class="toc-text">1.背景</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-%E5%9F%BA%E7%A1%80"><span class="toc-number">2.</span> <span class="toc-text">2.基础</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-%E5%87%BD%E6%95%B0"><span class="toc-number">3.</span> <span class="toc-text">3.函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#4-%E9%AB%98%E7%BA%A7%E7%89%B9%E6%80%A7"><span class="toc-number">4.</span> <span class="toc-text">4.高级特性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#5-%E9%AB%98%E7%BA%A7%E5%87%BD%E6%95%B0"><span class="toc-number">5.</span> <span class="toc-text">5.高级函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#6-%E6%A8%A1%E5%9D%97"><span class="toc-number">6.</span> <span class="toc-text">6.模块</span></a></li></ol>
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=http://example.com/2022/10/08/%E5%AD%A6%E4%B9%A0python%E7%9A%84%E7%AC%94%E8%AE%B0%E6%9C%AC1/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=http://example.com/2022/10/08/%E5%AD%A6%E4%B9%A0python%E7%9A%84%E7%AC%94%E8%AE%B0%E6%9C%AC1/&text=学习python的笔记本1"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=http://example.com/2022/10/08/%E5%AD%A6%E4%B9%A0python%E7%9A%84%E7%AC%94%E8%AE%B0%E6%9C%AC1/&title=学习python的笔记本1"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=http://example.com/2022/10/08/%E5%AD%A6%E4%B9%A0python%E7%9A%84%E7%AC%94%E8%AE%B0%E6%9C%AC1/&is_video=false&description=学习python的笔记本1"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=学习python的笔记本1&body=Check out this article: http://example.com/2022/10/08/%E5%AD%A6%E4%B9%A0python%E7%9A%84%E7%AC%94%E8%AE%B0%E6%9C%AC1/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=http://example.com/2022/10/08/%E5%AD%A6%E4%B9%A0python%E7%9A%84%E7%AC%94%E8%AE%B0%E6%9C%AC1/&title=学习python的笔记本1"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=http://example.com/2022/10/08/%E5%AD%A6%E4%B9%A0python%E7%9A%84%E7%AC%94%E8%AE%B0%E6%9C%AC1/&title=学习python的笔记本1"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=http://example.com/2022/10/08/%E5%AD%A6%E4%B9%A0python%E7%9A%84%E7%AC%94%E8%AE%B0%E6%9C%AC1/&title=学习python的笔记本1"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=http://example.com/2022/10/08/%E5%AD%A6%E4%B9%A0python%E7%9A%84%E7%AC%94%E8%AE%B0%E6%9C%AC1/&title=学习python的笔记本1"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=http://example.com/2022/10/08/%E5%AD%A6%E4%B9%A0python%E7%9A%84%E7%AC%94%E8%AE%B0%E6%9C%AC1/&name=学习python的笔记本1&description=&lt;blockquote&gt;
+&lt;p&gt;因之前学习过部分语言，所以就光说些不同的大方面啦&lt;br&gt;包括基础语法，函数，高级特性，高级函数，模块&lt;/p&gt;
+&lt;/blockquote&gt;"><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=http://example.com/2022/10/08/%E5%AD%A6%E4%B9%A0python%E7%9A%84%E7%AC%94%E8%AE%B0%E6%9C%AC1/&t=学习python的笔记本1"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> 菜单</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> 目录</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> 分享</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> 返回顶部</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2021-2023
+    TroTro
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">首页</a></li><!--
+     --><!--
+       --><li><a href="/archives/">文章</a></li><!--
+     --><!--
+       --><li><a href="/search/">搜索</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="http://github.com/tro148">项目</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"复制到粘贴板！\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "复制成功！");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+    <script type="text/javascript">
+      var utterances_repo = 'tro148/tro148.github.io';
+      var utterances_issue_term = 'comment';
+      var utterances_label = 'Comment';
+      var utterances_theme = 'github-light';
+
+      (function(){
+          var script = document.createElement('script');
+
+          script.src = 'https://utteranc.es/client.js';
+          script.setAttribute('repo', utterances_repo);
+          script.setAttribute('issue-term', 'pathname');
+          script.setAttribute('label', utterances_label);
+          script.setAttribute('theme', utterances_theme);
+          script.setAttribute('crossorigin', 'anonymous');
+          script.async = true;
+          (document.getElementById('utterances_thread')).appendChild(script);
+      }());
+  </script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginModelPath":"assets/","model":{"scale":1,"hHeadPos":0.5,"vHeadPos":0.618,"jsonPath":"/live2dw/assets/wanko.model.json"},"display":{"superSample":2,"width":250,"height":500,"position":"right","hOffset":0,"vOffset":-20},"mobile":{"show":false,"scale":0.5},"react":{"opacityDefault":0.7,"opacityOnHover":0.2},"log":false,"pluginJsPath":"lib/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>
